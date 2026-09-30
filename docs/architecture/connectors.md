@@ -37,7 +37,7 @@ Erro em um item não interrompe os demais; erro no conector não interrompe outr
 
 ## PoliteFetcher (regras de coleta responsável)
 
-1. **User-Agent identificado**: `RadarScorpionBits/0.1 (+https://scorpionbits.com; <e-mail @scorpionbits.com definido na E01b>)`.
+1. **User-Agent identificado**: `RadarScorpionBits/0.1 (+https://scorpionbits.com; <CONTACT_EMAIL do .env>)`.
 2. **robots.txt** respeitado (cache de 24h por domínio). Disallow → não baixa, registra.
 3. **Rate limit por domínio**: padrão 1 requisição a cada 5 s; configurável por fonte.
 4. **Cache condicional**: `ETag`/`If-Modified-Since`; conteúdo guardado por hash.

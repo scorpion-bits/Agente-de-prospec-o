@@ -1,0 +1,5 @@
+organization_name,network,municipality,uf,occurred_at,kind,channel,service_slug,contact_role,summary,outcome,next_action,next_action_at,data_status,notes
+SESC Araraquara,SESC-SP,Araraquara,SP,,course_delivered,in_person,course_gamedev,,Game Lab - curso de desenvolvimento de jogos,positive,,,pendente,Informar data numero de alunos e cargo do contato
+SESC Bauru,SESC-SP,Bauru,SP,,proposal_sent,,,,Proposta enviada,pending,,,pendente,Informar data canal cargo do contato servico proposto status e proxima acao
+SESC Ribeirao Preto,SESC-SP,Ribeirao Preto,SP,,proposal_sent,,,,Proposta enviada,pending,,,pendente,Informar data canal cargo do contato servico proposto status e proxima acao
+SESC Sao Carlos,SESC-SP,Sao Carlos,SP,,proposal_sent,,,,Proposta enviada,pending,,,pendente,Informar data canal cargo do contato servico proposto status e proxima acao

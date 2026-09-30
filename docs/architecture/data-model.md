@@ -124,6 +124,8 @@ Uma afirmação sobre um campo de uma entidade.
 - `slug`, `name`, `category` (`games`, `education`, `software`, `web`, `other`)
 - `description`, `keywords` (lista), `target_org_kinds`, `target_cnaes` (prefixos),
 - `geo_profile` (ver `geo-relevance.md`), `typical_ticket_brl` (faixa), `active`
+- `mei_coverage` (`covered`/`verify`/`not_covered`) e `required_cnae_prefixes` — se o enquadramento
+  atual cobre vender este serviço (ADR-015); editável no admin
 Novos serviços = novas linhas, sem código.
 
 ### `PortfolioItem` (prova de capacidade — ADR-012)
@@ -155,10 +157,11 @@ Hipótese "organização X provavelmente compraria serviço Y".
 - Importação inicial a partir de CSV privado (fora do git) na E03b.
 
 ### `CompanyProfile` (linha única — ADR-013)
-- `legal_form` (`MEI`), `opened_at`, `cnaes` (lista), `hq_municipality`,
+- `legal_form` (`MEI`), `opened_at`, `cnaes` (lista de {código, descrição, principal/secundário}), `hq_municipality`,
   `annual_revenue_cap_brl` (MEI 2026: 81.000), `website` (`scorpionbits.com`),
   `contact_email` (para User-Agent/digest)
-- CNPJ e dados do titular: só no banco/`.env`, nunca no git.
+- Seed não sensível versionado: `data/seeds/company_profile.json`. CNPJ, razão social do titular e
+  endereço: só no banco/`.env`, nunca no git (repositório público — ADR-014).
 
 ### `Score`
 - `entity_type`, `entity_id`, `profile` (ex. `opportunity.edital`, `lead.school_course`)

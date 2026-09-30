@@ -78,6 +78,9 @@ docs/             memória do projeto (ver docs/README.md)
   chame SDK de provedor direto em outro módulo.
 - Testes de conectores usam respostas gravadas (fixtures); nada de rede em teste.
 - Segredos só em `.env` (nunca commitados). `.env.example` documenta as chaves.
+- **Repositório PÚBLICO (ADR-014)**: nunca commitar CNPJ, endereço, e-mails/telefones/nomes de
+  contatos, interações, digests, dumps ou chaves. Logs do Actions são públicos: sem dados pessoais.
+  Dados privados ficam em `data/private/` (ignorado) ou no banco; `data/seeds/` só com dados públicos.
 - Etapas pequenas: se uma etapa crescer demais, divida-a e atualize o plano.
 
 ## Onde encontrar o quê
@@ -108,7 +111,8 @@ docs/             memória do projeto (ver docs/README.md)
 - **SESC é hipótese validada**: Game Lab realizado; propostas enviadas a Bauru, Ribeirão
   Preto e São Carlos. O sistema **lembra** interações e nunca "redescobre" quem já foi
   contatado (ADR-012). Buscar também organizações parecidas com o SESC.
-- Empresa é **MEI** (CNPJ fora do git): elegibilidade = requisitos do edital × `CompanyProfile` (ADR-013).
+- Empresa é **MEI** desde 10/04/2025 (2 anos em 10/04/2027). CNAEs cobrem ensino e treinamento em
+  informática; software/web/jogos sob encomenda podem exigir ME → alerta, não gate (ADR-013, ADR-015).
 - Portfólio (AstroDash, Tirania, protótipo, itch.io, Game Lab) é **prova** no matching (`PortfolioItem`).
 - Domínio: `scorpionbits.com`.
 - Serviços: jogos (educativos, institucionais, gamificação), educação (cursos, oficinas,

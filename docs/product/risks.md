@@ -22,7 +22,8 @@ Revisar na E22 e sempre que um risco se materializar (registrar em STATUS).
 | PDFs escaneados sem texto | Média | Baixo | Entrada nativa de PDF do Gemini (ADR-011); revisão humana se falhar |
 | Supabase Free pausa após 7 dias sem uso | Média | Baixo | Pipeline diário mantém ativo; retomada manual documentada |
 | Supabase Free sem backups | Média | Alto | `pg_dump` semanal (artefato) + cópia local; restauração testada (E16) |
-| `schedule` do GitHub Actions indisponível no repositório privado | Média | Baixo | Cron externo (workflow_dispatch) ou cron local |
+| `schedule` desliga após 60 dias sem commits (repositório público) | Média | Médio | Alerta "última coleta há X dias" no digest; runbook de reativação; commits regulares |
+| Vazamento por repositório público (logs, artefatos, commits) | Média | Alto | ADR-014: nada pessoal em git/logs; backup criptografado; digest por e-mail; revisão antes de cada commit |
 | Limite de 500 MB do banco | Baixa | Médio | Sem binários no banco; texto comprimido com retenção |
 | Perda de dados | Média | Alto | Ver backups do Supabase acima; restauração testada (E16) |
 | Contexto perdido entre sessões do Claude | Média | Médio | CLAUDE.md, STATUS, etapas pequenas, histórico |
@@ -47,5 +48,7 @@ Revisar na E22 e sempre que um risco se materializar (registrar em STATUS).
 | Informação inventada numa abordagem | Baixa | Alto | Evidência obrigatória; rascunhos só com fatos citados |
 | Inelegibilidade (MEI não aceito, CNPJ/sede recente, CNAE) descoberta tarde | Média | Médio | Requisitos extraídos e comparados ao `CompanyProfile`; seção no digest (ADR-013) |
 | Contrato acima do limite do MEI (R$ 81 mil/ano) | Baixa | Médio | Alerta "exigiria migrar para ME"; decisão de negócio |
+| Vender software/web/jogos sob encomenda fora dos CNAEs do MEI | Média | Alto | `mei_coverage` + alerta (ADR-015); confirmar com contador; decidir migração para ME |
+| Conta Google pessoal concentra créditos de IA | Média | Baixo | Chave gratuita + reserva Claude; migrar para conta da empresa depois |
 | Recontato indevido de organização já prospectada | Média | Alto | Memória comercial; carência de 21 dias; follow-ups explícitos (ADR-012) |
 | Dados pessoais em interações (nomes de contatos) | Média | Médio | Fora do git; só no banco; mínimo necessário; só provedores de IA pagos |

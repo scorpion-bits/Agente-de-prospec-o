@@ -102,7 +102,7 @@ semana" (top-10 com contato sugerido, razão e portfólio a citar) e "Em andamen
 **Resultado esperado:** comando `manage.py run_pipeline` (collect → extract → match → rescore →
 digest); workflow `.github/workflows/pipeline.yml` (`schedule` diário + `workflow_dispatch`,
 segredos no GitHub Secrets, conexão via pooler do Supabase); workflow `backup.yml` semanal
-(`pg_dump` comprimido → artefato com retenção) + instrução de cópia local; `docs/operations/runbook.md`.
+(`pg_dump` comprimido **e criptografado com age** → artefato com retenção; repositório público, ADR-014) + instrução de cópia local; `docs/operations/runbook.md`.
 O pipeline diário também evita a pausa do Supabase Free por inatividade.
 **Ler antes:** `docs/architecture/overview.md` (decisões transversais), `docs/research/hosting.md`.
 **Alterações:** `radar/management/commands/run_pipeline.py`; workflows; `docs/operations/runbook.md`
@@ -111,8 +111,8 @@ fallback de agendamento: cron externo chamando `workflow_dispatch` ou cron local
 **Dependências:** E15.
 **Modelo (desenvolvimento):** Claude Sonnet 5.5 (ou Haiku para o runbook). **IA em runtime:** nenhuma.
 **Custo:** US$ 0. **Complexidade:** baixa.
-**Riscos:** `schedule` indisponível no repositório → fallback documentado; minutos do GitHub
-Actions (2.000/mês em repo privado) → medir duração; falha silenciosa → digest mostra "última coleta há X dias".
+**Riscos:** `schedule` indisponível no repositório → fallback documentado; repositório público (minutos
+ilimitados), mas `schedule` desliga após 60 dias sem commits → alerta no digest e no runbook; falha silenciosa → digest mostra "última coleta há X dias".
 **Testes:** `run_pipeline --dry-run`; backup restaura no projeto `radar-dev`.
 **Critério de conclusão:**
 - [ ] Pipeline agendado rodou sozinho ao menos 1×.

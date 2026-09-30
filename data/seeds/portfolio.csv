@@ -1,0 +1,6 @@
+slug,title,kind,year,description,public_url,url_source,services,capability_tags,public,status,notes
+game-lab-sesc-araraquara,Game Lab - SESC Araraquara,course,,Curso de desenvolvimento de jogos realizado em parceria com o SESC Araraquara,,,course_gamedev;workshop_gamedev;extracurricular_school,jogos;ensino_presencial;educacao,yes,pendente,Informar data do curso e numero de alunos; sem URL publica conhecida
+tirania,Tirania,game,,,https://scorpionbits.itch.io/tirania,informado pelo titular,indie_game;institutional_game,jogos,yes,descricao_pendente,Informar genero ano e engine; URL nao verificada automaticamente (itch.io bloqueado no ambiente de planejamento)
+astrodash,AstroDash,game,,,https://scorpionbits.itch.io/astrodash,informado pelo titular,indie_game;institutional_game,jogos,yes,descricao_pendente,Informar genero ano e engine; URL nao verificada automaticamente (itch.io bloqueado no ambiente de planejamento)
+prototipo-jogo,Prototipo de jogo,prototype,,,,,indie_game,jogos,no,pendente,Informar nome e URL; public=no ate haver URL
+site-scorpionbits,Site da Scorpion Bits,website,,,https://scorpionbits.com/,informado pelo titular,institutional_site;landing_page,web,yes,confirmar,Confirmar se foi desenvolvido pela equipe antes de usar como prova de capacidade web

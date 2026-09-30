@@ -1,0 +1,25 @@
+{
+  "_comment": "Dados NAO sensiveis do perfil da empresa (repositorio publico - ADR-014). CNPJ, razao social do titular, endereco, e-mails e telefones ficam so no .env/banco.",
+  "legal_form": "MEI",
+  "status": "ativa",
+  "opened_at": "2025-04-10",
+  "hq_municipality": "Araraquara",
+  "hq_uf": "SP",
+  "annual_revenue_cap_brl": 81000,
+  "website": "https://scorpionbits.com",
+  "activity_mode": "Internet",
+  "primary_cnae": "85.92-9/99",
+  "cnaes": [
+    {"code": "85.92-9/99", "description": "Ensino de arte e cultura nao especificado anteriormente", "role": "principal", "occupation": "Instrutor(a) de arte e cultura em geral"},
+    {"code": "32.40-0/99", "description": "Fabricacao de outros brinquedos e jogos recreativos nao especificados anteriormente", "role": "secundario", "occupation": "Fabricante de jogos recreativos"},
+    {"code": "90.01-9/01", "description": "Producao teatral", "role": "secundario", "occupation": "Humorista e contador de historias"},
+    {"code": "61.90-6/99", "description": "Outras atividades de telecomunicacoes nao especificadas anteriormente", "role": "secundario", "occupation": "Instalador(a) de rede de computadores"},
+    {"code": "85.99-6/05", "description": "Cursos preparatorios para concursos", "role": "secundario", "occupation": "Instrutor(a) de cursos preparatorios"},
+    {"code": "85.99-6/03", "description": "Treinamento em informatica", "role": "secundario", "occupation": "Instrutor(a) de informatica"},
+    {"code": "85.92-9/03", "description": "Ensino de musica", "role": "secundario", "occupation": "Instrutor(a) de musica"},
+    {"code": "59.12-0/01", "description": "Servicos de dublagem", "role": "secundario", "occupation": "Dublador(a)"},
+    {"code": "59.12-0/99", "description": "Atividades de pos-producao cinematografica, de videos e de programas de televisao", "role": "secundario", "occupation": "Editor(a) de video"},
+    {"code": "90.01-9/02", "description": "Producao musical", "role": "secundario", "occupation": "Cantor(a)/musico(a)"}
+  ],
+  "notes": "Nao constam entre os CNAEs: desenvolvimento de software sob encomenda (62.01-5), edicao de jogos eletronicos (58.21-2) e desenvolvimento web. Ver ADR-015. Confirmar com contador."
+}

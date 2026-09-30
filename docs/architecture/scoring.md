@@ -38,6 +38,11 @@ ser incluído no MEI, valor acima do limite anual do MEI ("exigiria migrar para 
 bloqueadas por requisito da empresa — insumo para decisões de negócio (quando virar ME, que
 CNAE incluir).
 
+**Cobertura de atividade (ADR-015).** Serviço do match com `mei_coverage=not_covered` (software, web,
+sites) → alerta "exigiria ME" e redução de Chance; `verify` → alerta leve; `covered` (cursos, oficinas,
+treinamento em informática) → sem alerta. O digest soma o valor potencial que depende de serviços
+não cobertos ("receita que exigiria ME").
+
 **Memória comercial (ADR-012).** Organizações já contatadas nunca aparecem como novas.
 Leads com `next_action_at` vencendo ou vencido aparecem na seção **"Follow-ups"** do digest,
 com o resumo da última interação.

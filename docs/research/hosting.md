@@ -88,3 +88,12 @@ nos workers → não ficamos presos.
 - GitHub Actions cobrança/agendamento: https://docs.github.com/en/actions/reference/usage-limits-billing-and-administration ; https://devactivity.com/insights/github-actions-cron-schedules-a-hidden-free-tier-hurdle-impacting-developer-productivity/
 - Cloud Run: https://cloud.google.com/run/pricing
 - Créditos Google AI Pro: https://blog.google/innovation-and-ai/technology/developers-tools/gdp-premium-ai-pro-ultra/
+
+## Atualização E01b (2026-09-30) — repositório público
+
+O repositório é **público**. Efeitos: minutos de GitHub Actions sem limite e `schedule`
+disponível (resolve a dúvida do repositório privado); por outro lado **commits, logs e (por
+cautela) artefatos são visíveis a terceiros** e workflows agendados **desligam após 60 dias sem
+commits**. Regras em ADR-014 (nada pessoal em git/logs; backup `pg_dump` criptografado com `age`;
+digest por e-mail, nunca como artefato).
+Fontes: https://github.com/orgs/community/discussions/114184 ; https://cronuru.com/guides/github-actions-scheduled-workflows

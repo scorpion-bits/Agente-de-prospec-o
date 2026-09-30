@@ -26,3 +26,11 @@ spikes/**/samples/*.zip
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Dados privados e artefatos sensiveis (repositorio publico - ADR-014)
+data/private/
+digests/
+backups/
+*.dump
+*.dump.age
+*.sql.gz

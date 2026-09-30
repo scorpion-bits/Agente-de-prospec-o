@@ -24,3 +24,5 @@ Regras:
 | 011 | Seleção de modelos por tarefa; Gemini como provedor principal de extração | aceito |
 | 012 | Memória comercial (interações) e portfólio no MVP | aceito |
 | 013 | MEI: elegibilidade pelo perfil da empresa | aceito |
+| 014 | Repositório público: higiene de dados, logs e backups | aceito |
+| 015 | Cobertura de atividades do MEI (CNAE) como fator de elegibilidade | aceito |

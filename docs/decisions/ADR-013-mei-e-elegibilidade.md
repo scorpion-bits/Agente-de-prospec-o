@@ -1,6 +1,6 @@
 # ADR-013 — Empresa formalizada como MEI: elegibilidade pelo perfil da empresa
 
-- **Status:** aceito (ajusta ADR-006 e a premissa "empresa não formalizada")
+- **Status:** aceito (ajusta ADR-006 e a premissa "empresa não formalizada"; complementado por ADR-015: cobertura de atividades/CNAE)
 - **Data:** 2026-09-30
 
 ## Contexto

@@ -58,7 +58,7 @@ as etapas seguintes não inventem nada.
 `docs/research/hosting.md`, ADR-010, ADR-011, ADR-013.
 
 **Alterações:**
-- `data/seeds/portfolio.csv` (versionado; só dados públicos): slug, título, tipo, ano,
+- `data/seeds/portfolio.csv` (versionado; só dados públicos — **repositório é público, ADR-014**): slug, título, tipo, ano,
   descrição curta, URL pública (itch.io etc.), serviços relacionados, tags de capacidade.
   Itens: Game Lab SESC, AstroDash, Tirania, protótipo, outros jogos do itch.io.
 - `data/private/interactions.csv` (**fora do git**): histórico SESC (Game Lab — unidade,
@@ -69,14 +69,17 @@ as etapas seguintes não inventem nada.
   - Supabase: projetos `radar-dev` e `radar-prod`; string do **pooler**; Data API desativada ou plano de schema dedicado.
   - Google: benefícios de desenvolvedor do AI Pro **ativados** (créditos ~US$ 10/mês); projeto
     Gemini API com faturamento pelos créditos; chave do AI Studio (free tier).
-  - GitHub Actions: repositório privado ou público? `schedule` funciona? (teste com workflow vazio).
+  - GitHub Actions: repositório **público** (confirmado) → minutos ilimitados e `schedule` disponível; testar um workflow vazio na E16.
   - Busca: Brave (crédito US$ 5/mês) ou Serper (2.500 grátis).
   - (Opcional) Anthropic API com limite de gasto.
-  - E-mail `@scorpionbits.com` para User-Agent e digest.
+  - E-mail de contato (Gmail por enquanto; `@scorpionbits.com` opcional) em `CONTACT_EMAIL` no `.env`.
 - `CompanyProfile` (valores a carregar na E03b): natureza jurídica MEI, data de abertura,
   CNAEs, município da sede — **CNPJ só no `.env`/banco**.
 
 **Dependências:** nenhuma.
+**Status (2026-09-30): parcial.** Feito: seeds (`portfolio.csv`, `company_profile.json`,
+`interactions.template.csv`), `.env.example`, `accounts-checklist.md`, ADR-014, ADR-015. Pendentes do
+humano: A1–A9 do checklist e o preenchimento das datas/cargos/status do template de interações.
 **Modelo (desenvolvimento):** Claude Sonnet 5.5 (ou Haiku 4.5). **IA em runtime:** nenhuma.
 **Custo:** US$ 0. **Complexidade:** baixa.
 **Riscos:** informação incompleta → marcar como pendente, nunca preencher por suposição;
@@ -139,8 +142,9 @@ transação do pooler (prepared statements/cursors) → preferir modo sessão ou
 - `core/admin.py`: listas com filtros, busca, inlines de `Evidence` e `ContactPoint`;
   inferências visualmente distintas.
 - `core/fixtures/services.json`: `course_gamedev`, `workshop_gamedev`, `game_jam_org`,
-  `extracurricular_school`, `educational_game`, `institutional_game`, `gamification`,
-  `custom_software`, `web_app`, `landing_page`, `institutional_site` (palavras-chave, perfis geográficos).
+  `extracurricular_school`, `indie_game`, `educational_game`, `institutional_game`, `gamification`,
+  `custom_software`, `web_app`, `landing_page`, `institutional_site` (palavras-chave, perfis geográficos). Cada serviço tem `mei_coverage`
+  (`covered`/`verify`/`not_covered`, valores iniciais em ADR-015).
 - `core/services/evidence.py`: `record_evidence(...)`. Testes.
 
 **Dependências:** E02.
@@ -170,8 +174,9 @@ resultado, próximo passo — e conhece o **portfólio** e o **perfil MEI**. Pri
 - Admin: inline de interações na organização (mais recente primeiro); filtro por status de
   relacionamento; lista "próximas ações" ordenada por data; `PortfolioItem` editável;
   `CompanyProfile` como singleton.
-- Comandos: `import_portfolio data/seeds/portfolio.csv`;
-  `import_interactions data/private/interactions.csv` (cria organizações SESC com
+- Comandos: `load_company_profile data/seeds/company_profile.json` (CNPJ vem do `.env`);
+  `import_portfolio data/seeds/portfolio.csv`; `import_interactions data/private/interactions.csv`
+  (começar copiando `data/seeds/interactions.template.csv` e preenchendo; linhas `pendente` são importadas sem datas inventadas) (cria organizações SESC com
   `network="SESC-SP"` e `parent`, e as interações — idempotente).
 - Regra de dedupe: criar organização sempre passa por busca de existente (nome normalizado +
   município + rede) — base para "nunca redescobrir".

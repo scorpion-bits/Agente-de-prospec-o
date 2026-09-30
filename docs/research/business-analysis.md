@@ -50,3 +50,17 @@
 - E-mail em `@scorpionbits.com` para User-Agent e digest.
 - Raio aceitável para cursos presenciais além dos polos (proposta: interior até ~150 km).
 - Teto mensal de dinheiro novo com APIs (proposta: US$ 5).
+
+## Atualização E01b (2026-09-30) — respostas do titular
+
+- **Game Lab**: realizado no **SESC Araraquara** (data, nº de alunos e cargo do contato: pendentes).
+- **Propostas** a SESC Bauru, Ribeirão Preto e São Carlos: existem; datas, canais, cargos, serviço
+  proposto e status: pendentes (template em `data/seeds/interactions.template.csv`).
+- **Portfólio público**: site scorpionbits.com; jogos Tirania e AstroDash no itch.io (URLs em `data/seeds/portfolio.csv`); protótipo sem URL.
+- **MEI** aberto em 10/04/2025 (≈ 17 meses hoje; **2 anos em 10/04/2027**). Atividade principal:
+  ensino de arte e cultura; secundárias incluem treinamento em informática. Desenvolvimento de
+  software/web/jogos eletrônicos **não constam** (ADR-015).
+- **Consequência**: a prioridade do MVP (cursos/oficinas em SESC, similares e escolas) é exatamente
+  o que o enquadramento atual cobre. Editais que exigem 2 anos de sede (ex. ProAC 05/2026 de jogos
+  eletrônicos) só ficam elegíveis a partir de abril/2027 — o radar deve avisar quando a próxima
+  edição sair.

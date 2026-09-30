@@ -1,6 +1,6 @@
 # ADR-010 — Hospedagem: Supabase (PostgreSQL) + workers no GitHub Actions + admin local
 
-- **Status:** aceito (substitui ADR-002)
+- **Status:** aceito (substitui ADR-002; complementado por ADR-014: backup criptografado, repositório público)
 - **Data:** 2026-09-30
 - **Etapa:** E00 (complemento)
 

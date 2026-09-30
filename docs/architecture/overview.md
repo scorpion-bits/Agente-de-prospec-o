@@ -78,8 +78,8 @@ Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem l
 | Auth | Local: usuários Django | Online: Django auth + HTTPS; opcional camada extra (Cloudflare Access/IAP) |
 | Observabilidade | Logs do job no GitHub Actions + `CollectionRun` + `LLMCall` | Sentry free tier |
 | Erros | Conector isolado; falha registrada; alerta no digest | — |
-| Segredos | `.env` local; GitHub Secrets nos workers | Secret Manager no Cloud Run |
-| Backups | `pg_dump` semanal → artefato do GitHub Actions + cópia local | Backups do Supabase Pro |
+| Segredos e dados | `.env` local; GitHub Secrets nos workers; **repositório público**: nada pessoal em git/logs/artefatos (ADR-014) | Secret Manager no Cloud Run |
+| Backups | `pg_dump` semanal **criptografado com age** → artefato + cópia local (repositório público — ADR-014) | Backups do Supabase Pro |
 | Custos | Teto mensal na camada `llm/` e de busca | Relatório no digest |
 
 ## Quando separar serviços
