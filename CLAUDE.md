@@ -1,0 +1,107 @@
+# CLAUDE.md — Radar Scorpion Bits
+
+> Contexto operacional de alta prioridade. **Limite: 150 linhas (~2.000 tokens).**
+> Se passar do limite, siga `docs/operations/claude-md-maintenance.md` antes de continuar.
+
+## O que é
+
+Plataforma **interna** da Scorpion Bits (estúdio de jogos/tecnologia em estágio inicial,
+Araraquara/SP) para **encontrar, qualificar e priorizar** oportunidades comerciais
+(escolas, SESCs, empresas, instituições) e institucionais (editais, hackathons,
+game jams, programas). Pergunta central: **"o que devemos fazer primeiro, e por quê?"**
+
+Visão completa: `docs/product/vision.md` · MVP: `docs/product/mvp.md`
+
+## Ritual de início de sessão (obrigatório após /clear)
+
+1. Leia este arquivo.
+2. Leia `docs/plan/STATUS.md` → identifica a **próxima etapa** (ex.: `E03`).
+3. Abra a seção dessa etapa no arquivo de fase indicado em `docs/plan/PLAN.md`.
+4. Leia **só** os documentos que a etapa lista em "Ler antes". Não leia tudo.
+5. Execute **uma** etapa. Não avance para a seguinte sem o humano pedir.
+
+## Ritual de fim de etapa (obrigatório)
+
+1. Testes passando (`make check` quando existir).
+2. Atualize `docs/plan/STATUS.md` (concluído, próxima etapa, problemas abertos).
+3. Registre decisões questionáveis como ADR em `docs/decisions/`.
+4. Registre o resumo da sessão em `docs/history/sessions/AAAA-MM-DD-EXX.md`.
+5. Verifique o tamanho deste arquivo (`wc -l CLAUDE.md` ≤ 150).
+6. Commit com mensagem clara referenciando a etapa (ex.: `E03: modelo de dados núcleo`).
+
+## Princípios inegociáveis
+
+1. **Custo primeiro.** Sem IA quando código, SQL, regex ou heurística resolvem.
+   Ordem de preferência: determinístico → modelo gratuito/local → modelo barato → modelo forte.
+   Ver `docs/architecture/llm-strategy.md`.
+2. **Nada inventado.** Todo dado tem fonte (URL, data, trecho). Separe sempre
+   **fato observado** (`kind=observed`) de **inferência** (`kind=inferred`). Ver ADR-004.
+3. **Humano no controle.** O sistema recomenda; humano decide e contata. Sem envio
+   automático de mensagens no MVP. Ver ADR-005.
+4. **Prospecção responsável.** Respeitar robots.txt, termos de uso, LGPD, opt-out.
+   Preferir contatos institucionais. Sem scraping de LinkedIn/Google Maps.
+   Ver `docs/research/legal-and-compliance.md`.
+5. **Pontuação explicável.** Todo score guarda o detalhamento ("por que 87/100").
+   Ver `docs/architecture/scoring.md`.
+6. **Pequeno e incremental.** Monólito modular. Sem microserviços, filas distribuídas,
+   vector DB ou multi-agentes antes de haver necessidade medida.
+
+## Stack (decidida — ADR-001, ADR-002)
+
+- Python 3.12 · gerenciador `uv` · Django 5 (ORM, migrations, **admin como UI do MVP**, auth)
+- SQLite (WAL) no MVP → PostgreSQL quando houver deploy compartilhado
+- Jobs: comandos `manage.py` agendados por cron (sem fila no MVP)
+- HTTP: `httpx`; HTML: `selectolax`/`trafilatura`; PDF: `pypdf`/`pdfplumber`
+- Qualidade: `ruff` (lint+format), `pytest`, `pytest-django`; CI no GitHub Actions
+- LLM: camada própria `llm/` com provedores plugáveis (ADR-003)
+
+## Estrutura (alvo; criada a partir da E02)
+
+```
+radar/            projeto Django (settings, urls)
+core/             modelos núcleo: Organization, Opportunity, Evidence, ServiceOffering
+collection/       fetcher educado, cache, RawDocument, conectores (fontes)
+extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
+scoring/          geo, gates, fatores, perfis de pontuação
+llm/              abstração de provedores, cache, log de custo, orçamento
+reports/          digest semanal
+docs/             memória do projeto (ver docs/README.md)
+```
+
+## Convenções
+
+- Código, identificadores e commits técnicos em **inglês**; documentação em **português**.
+- Todo conector implementa a interface de `docs/architecture/connectors.md`.
+- Toda chamada LLM passa por `llm/` (cache + log de custo + teto de orçamento). Nunca
+  chame SDK de provedor direto em outro módulo.
+- Testes de conectores usam respostas gravadas (fixtures); nada de rede em teste.
+- Segredos só em `.env` (nunca commitados). `.env.example` documenta as chaves.
+- Etapas pequenas: se uma etapa crescer demais, divida-a e atualize o plano.
+
+## Onde encontrar o quê
+
+| Preciso de… | Arquivo |
+|---|---|
+| Estado atual / próxima etapa | `docs/plan/STATUS.md` |
+| Lista de etapas e fases | `docs/plan/PLAN.md` |
+| Arquitetura geral | `docs/architecture/overview.md` |
+| Modelo de dados | `docs/architecture/data-model.md` |
+| Score e geografia | `docs/architecture/scoring.md`, `geo-relevance.md` |
+| Uso de IA e custos | `docs/architecture/llm-strategy.md`, `docs/research/ai-models-and-costs.md` |
+| Agentes (quais existem e por quê) | `docs/agents/README.md` |
+| Fontes de dados | `docs/research/opportunity-sources.md`, `organization-sources.md` |
+| Legal / LGPD | `docs/research/legal-and-compliance.md` |
+| Riscos | `docs/product/risks.md` |
+| Decisões | `docs/decisions/` |
+| Histórico / conteúdo arquivado | `docs/history/` |
+| Como trabalhar em ciclos /clear | `docs/operations/claude-workflow.md` |
+
+## Contexto de negócio mínimo
+
+- Base: Araraquara/SP. Proximidade importa para cursos presenciais, SESCs, escolas,
+  eventos; não importa para software, sites e eventos online.
+- Tração real hoje: **Game Lab com o SESC** (curso de desenvolvimento de jogos).
+- Empresa **ainda não formalizada** (sem CNPJ): editais que exigem PJ devem aparecer
+  marcados como "exige CNPJ", não escondidos.
+- Serviços: jogos (educativos, institucionais, gamificação), educação (cursos, oficinas,
+  game jams), software sob demanda, web. Catálogo é **dado**, não código (`ServiceOffering`).
