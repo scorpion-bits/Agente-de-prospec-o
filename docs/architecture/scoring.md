@@ -25,22 +25,31 @@ esforço, tempo e confiança nos dados**.
 | Prazo vencido | Oportunidades | `gated`, some do digest |
 | Território inelegível (ex. "só proponentes do RJ") | Oportunidades | `gated` |
 | Público inelegível explícito (ex. "somente universidades públicas") | Oportunidades | `gated` |
-| Organização/contato em `Suppression` | Leads | `gated` |
+| Requisito explícito da empresa não atendido pelo `CompanyProfile` (ex.: "não aceita MEI", CNPJ/sede com menos tempo que o mínimo na data do prazo) | Oportunidades | `gated` com motivo "bloqueado por requisito da empresa" (vai para seção própria do digest) |
+| Organização/contato em `Suppression` ou `relationship_status=do_not_contact` | Leads | `gated` |
+| Contato recente (última interação < 21 dias, sem próxima ação vencida) | Leads | Sai da lista de "novos contatos"; aparece só em "em andamento" |
 | Duplicata | Todos | `gated` |
 | Já descartado pelo humano | Todos | Fora do digest (não recalcula) |
 
-**Não é gate** (é alerta + redução de Chance): "exige CNPJ" enquanto a empresa não é
-formalizada. Mostrar como **"⚠ exige CNPJ"** — isso também gera inteligência de negócio
-(quanto dinheiro estamos deixando na mesa por não formalizar? ver relatório na E15).
+**Elegibilidade da empresa (ADR-013).** A Scorpion Bits é **MEI**. Não é gate, mas alerta +
+ajuste de Chance: requisito ambíguo ("pessoa jurídica" sem especificar), CNAE que precisaria
+ser incluído no MEI, valor acima do limite anual do MEI ("exigiria migrar para ME").
+**Bônus** de Chance: cota exclusiva ME/EPP/MEI. O digest soma o valor das oportunidades
+bloqueadas por requisito da empresa — insumo para decisões de negócio (quando virar ME, que
+CNAE incluir).
+
+**Memória comercial (ADR-012).** Organizações já contatadas nunca aparecem como novas.
+Leads com `next_action_at` vencendo ou vencido aparecem na seção **"Follow-ups"** do digest,
+com o resumo da última interação.
 
 ## Etapa 2 — Fatores (cada um de 0 a 1)
 
 | Fator | Significado | Insumos (exemplos) |
 |---|---|---|
 | **V — Valor** | Retorno potencial | Prêmio/valor em R$ (faixas), tipo de benefício (dinheiro/contrato > clientes/parceria > visibilidade/networking/portfólio), ticket típico do serviço |
-| **F — Fit** | Compatibilidade com o que sabemos fazer | Força do `Match` (categorias, palavras-chave, CNAE, tipo de organização) |
-| **C — Chance** | Probabilidade de sucesso | Clareza de elegibilidade, concorrência provável (nacional aberto ↓, local ↑), relacionamento prévio (SESC ↑), exige CNPJ ↓ |
-| **T — Timing** | Janela certa | Prazo: <5 dias ↓ (inviável), 7–45 dias ↑, >90 dias médio; sazonalidade (escolas: out–dez ↑) |
+| **F — Fit** | Compatibilidade com o que sabemos fazer | Força do `Match` (categorias, palavras-chave, CNAE, tipo de organização) + **existe item de portfólio que prova a capacidade** (ex.: Game Lab SESC para cursos; AstroDash/Tirania para jogos) |
+| **C — Chance** | Probabilidade de sucesso | Elegibilidade vs. `CompanyProfile` (MEI), cota exclusiva ME/EPP/MEI ↑, concorrência provável (nacional aberto ↓, local ↑), **relacionamento**: mesma rede de quem já nos contratou (SESC) ↑↑, resposta positiva anterior ↑, "perdido" recente ↓ |
+| **T — Timing** | Janela certa | Prazo: <5 dias ↓ (inviável), 7–45 dias ↑, >90 dias médio; sazonalidade (escolas: out–dez ↑; SESC: planejamento semestral — confirmar na E01b); follow-up vencendo ↑ |
 | **A — Acesso** | Dá para chegar lá / falar com eles | Relevância geográfica `G` (ver `geo-relevance.md`) × contatabilidade (e-mail/telefone institucional ↑, só formulário ↓, nada ↓↓) |
 | **L — Leveza** | Inverso do esforço | `effort_estimate`: low 1,0 · medium 0,6 · high 0,25 · unknown 0,5 |
 
@@ -72,6 +81,9 @@ Score = round(100 × K × Σ wᵢ·fᵢ)         (Σ wᵢ = 1 por perfil)
 
 Racional: editais valem pelo dinheiro; jams pelo fit e baixo esforço; eventos presenciais
 pelo acesso; escolas/SESC pela chance e valor recorrente; empresas pelo fit e acesso.
+O perfil `lead.sesc` também vale para organizações parecidas com o SESC (`similarity_tags`),
+com Chance menor que as unidades SESC (sem o case direto). SESC é hipótese **validada**
+(curso realizado + propostas enviadas) — por isso Chance tem o maior peso nesse perfil.
 
 ## Faixas de decisão
 
@@ -88,7 +100,7 @@ pelo acesso; escolas/SESC pela chance e valor recorrente; empresas pelo fit e ac
 Edital "PIPE Fase 1 — Soberania Digital" (FAPESP)          Perfil: opp.edital  v1
   V Valor   0,95 × 0,30 = 28,5   até R$ 500 mil não reembolsável (observado: fapesp.br, 20/05/2026)
   F Fit     0,80 × 0,20 = 16,0   categorias software/inovação ↔ serviço "software sob demanda"
-  C Chance  0,55 × 0,15 =  8,3   concorrência estadual; ⚠ exige CNPJ (empresa não formalizada)
+  C Chance  0,55 × 0,15 =  8,3   concorrência estadual; ⚠ aceita MEI? não explícito no edital
   T Timing  0,90 × 0,15 = 13,5   prazo em 32 dias (janela ideal)
   A Acesso  0,80 × 0,05 =  4,0   estadual SP, Araraquara elegível
   L Leveza  0,25 × 0,15 =  3,8   esforço alto (proposta técnica + plano de negócios) [inferido]

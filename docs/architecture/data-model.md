@@ -10,19 +10,23 @@ Source ──< CollectionRun ──< RawDocument
    │                              │
    └──────────────┬───────────────┘
                   ▼
-        Evidence (observed | inferred)  ── aponta para qualquer entidade + campo
+        Evidence (observed | inferred | manual) ── aponta para qualquer entidade + campo
                   │
    ┌──────────────┼───────────────────────────┐
    ▼              ▼                           ▼
 Organization ──< ContactPoint           Opportunity
-   │                                          │
-   ├──< Match >── ServiceOffering ──< ─ ─ ─ ─ ┘ (opportunity também pode casar com serviço)
-   │
+   │  (parent/network: SESC-SP → unidades)    │
+   ├──< Interaction (memória comercial)       │
+   ├──< Match >── ServiceOffering ──< PortfolioItem (prova de capacidade)
+   │      └── portfolio_refs ─────────────────┘
    └── Municipality (IBGE) ◄── Opportunity.location
+CompanyProfile (única linha: MEI, abertura, CNAEs, sede) → usada na elegibilidade
 Score (genérico: entity_type, entity_id, profile, total, breakdown JSON, version)
 Triage (status humano: new/interesting/discarded/acting + motivo + nota)
 LLMCall (log de custo/cache)   SearchQuery (cache de busca)   Suppression (opt-out)
 ```
+
+Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de binários no banco.
 
 ## Entidades
 
@@ -41,8 +45,11 @@ Uma execução de um conector: `source`, `started_at`, `finished_at`, `status`
 ### `RawDocument`
 Conteúdo bruto baixado (cache e prova).
 - `url`, `canonical_url`, `fetched_at`, `http_status`, `etag`, `content_hash` (sha256)
-- `content_type`, `storage_path` (arquivo em `data/raw/<hash[:2]>/<hash>`), `text_path`
+- `content_type`, `text_gz` (texto extraído comprimido, ou referência no Supabase Storage),
+  `size_bytes`, `retain_until`
 - `source`, `run`
+Binários (PDFs) **não** são guardados: só URL + hash + texto extraído (os workers rodam em
+máquinas efêmeras do GitHub Actions; o ETag no banco permite requisições condicionais).
 Regra: nunca baixar de novo se `etag`/`last-modified` indicarem igual; nunca reprocessar
 com LLM se `content_hash` já foi processado com a mesma versão de prompt.
 
@@ -58,8 +65,17 @@ Escola, SESC, empresa, instituição, órgão público, organizador de evento.
 - `segment` (texto livre curto), `cnae_main`, `size_hint` (`micro`/`small`/`medium`/`large`/`unknown`)
 - `municipality` (FK), `address`, `lat`, `lon`
 - `website`, `website_status` (`unknown`/`found`/`not_found`/`ambiguous`)
+- `network` (ex. `SESC-SP`, `SENAC-SP`, `Centro Paula Souza`) e `parent` (FK para a
+  organização-mãe), para tratar redes com várias unidades
+- `similarity_tags` (ex. `sistema_s`, `cultural_publico`, `educacao_nao_formal`) — usado para
+  achar "organizações parecidas com o SESC"
+- `relationship_status` (derivado de `Interaction`, recalculado ao salvar): `never_contacted`,
+  `contacted`, `in_conversation`, `proposal_sent`, `client`, `lost`, `do_not_contact`
+- `last_interaction_at`, `next_action_at` (derivados)
 - `created_at`, `updated_at`, `first_seen_source`
-- Dedupe: `cnpj` > `inep_code` > domínio do site > (nome normalizado + município)
+- Dedupe: `cnpj` > `inep_code` > domínio do site > (nome normalizado + município).
+  Toda descoberta consulta primeiro a base existente: organização conhecida **nunca** vira
+  "nova"; o digest mostra o histórico ("proposta enviada em DD/MM").
 
 ### `ContactPoint`
 - `organization`, `kind` (`email`, `phone`, `whatsapp`, `contact_form`, `website`,
@@ -80,7 +96,11 @@ Edital, hackathon, game jam, evento, programa, concurso, chamada, licitação.
   (`municipal`/`regional`/`state`/`national`/`international`)
 - Datas: `opens_at`, `deadline_at`, `starts_at`, `ends_at`
 - `eligibility_text`, `requires_legal_entity` (`yes`/`no`/`unknown`),
+  `eligible_legal_forms` (ex. `["MEI","ME","EPP"]`, vazio = sem restrição conhecida),
+  `exclusive_small_business` (bool/unknown — cota exclusiva ME/EPP/MEI),
+  `min_company_age_months`, `required_cnaes` (prefixos),
   `eligible_regions` (lista de UF/municípios, vazio = sem restrição conhecida)
+  (comparados com `CompanyProfile` no scoring — ADR-013)
 - `requirements_text`, `prize_text`, `prize_amount_brl` (quando numérico),
   `benefits` (lista: `money`, `contract`, `prize`, `visibility`, `networking`,
   `mentoring`, `infrastructure`, `acceleration`, `partnership`, `clients`,
@@ -106,11 +126,39 @@ Uma afirmação sobre um campo de uma entidade.
 - `geo_profile` (ver `geo-relevance.md`), `typical_ticket_brl` (faixa), `active`
 Novos serviços = novas linhas, sem código.
 
+### `PortfolioItem` (prova de capacidade — ADR-012)
+- `slug`, `title` (ex. AstroDash, Tirania, Game Lab SESC), `kind` (`game`, `prototype`,
+  `course`, `event`, `website`, `software`), `description`, `year`
+- `public_url` (ex. página no itch.io — preenchida pelo humano, nunca inventada),
+  `media_urls`, `public` (bool — só itens públicos aparecem em abordagens)
+- `services` (M2M `ServiceOffering`), `capability_tags` (ex. `godot`, `2d`, `mobile`,
+  `educacao`, `ensino_presencial`), `outcomes` (texto: nº de alunos, downloads… com fonte)
+- Novos trabalhos = novas linhas; alimentam matching e, na Fase 4, rascunhos.
+
 ### `Match`
 Hipótese "organização X provavelmente compraria serviço Y".
 - `organization`, `service`, `reasons` (lista de `{text, evidence_id, kind}`),
   `strength` (0–1), `method` (`rules_v1`, `llm_v1`), `created_at`
+- `portfolio_refs` (M2M `PortfolioItem`): trabalhos que demonstram a capacidade
+  (cadeia **Lead → Necessidade → Serviço → Portfólio**)
 - Uma organização pode ter vários matches.
+
+### `Interaction` (memória comercial — ADR-012)
+- `organization`, `occurred_at`, `channel` (`email`, `phone`, `whatsapp`, `in_person`,
+  `form`, `other`), `kind` (`proposal_sent`, `meeting`, `message`, `call`, `visit`,
+  `course_delivered`, `event_participation`, `response_received`, `other`)
+- `service` (FK opcional), `contact_point` (FK opcional), `contact_name_role` (texto; dado
+  pessoal — só o necessário), `summary`, `outcome` (`pending`, `positive`, `negative`,
+  `no_response`, `won`, `lost`), `next_action`, `next_action_at`, `attachments_url` (link
+  para proposta em drive próprio), `created_by`
+- Responde: "Já falamos com eles? Quando? Sobre o quê? Resultado? Próximo passo?"
+- Importação inicial a partir de CSV privado (fora do git) na E03b.
+
+### `CompanyProfile` (linha única — ADR-013)
+- `legal_form` (`MEI`), `opened_at`, `cnaes` (lista), `hq_municipality`,
+  `annual_revenue_cap_brl` (MEI 2026: 81.000), `website` (`scorpionbits.com`),
+  `contact_email` (para User-Agent/digest)
+- CNPJ e dados do titular: só no banco/`.env`, nunca no git.
 
 ### `Score`
 - `entity_type`, `entity_id`, `profile` (ex. `opportunity.edital`, `lead.school_course`)
@@ -137,5 +185,5 @@ Mesma query + params nunca é refeita dentro do TTL (padrão: 90 dias).
 Consultada antes de exibir qualquer contato e antes de qualquer abordagem.
 
 ### Fase 4
-`PipelineStage` / `Deal` (organização + serviço + estágio + valor estimado + próxima ação),
-`Interaction` (data, canal, resumo, resultado). Detalhar na E23.
+`Deal` (organização + serviço + estágio + valor estimado + próxima ação), agrupando
+`Interaction`s já existentes. Detalhar na E23.

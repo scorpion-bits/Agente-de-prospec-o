@@ -46,14 +46,16 @@ Visão completa: `docs/product/vision.md` · MVP: `docs/product/mvp.md`
 6. **Pequeno e incremental.** Monólito modular. Sem microserviços, filas distribuídas,
    vector DB ou multi-agentes antes de haver necessidade medida.
 
-## Stack (decidida — ADR-001, ADR-002)
+## Stack (decidida — ADR-001, ADR-010, ADR-011)
 
 - Python 3.12 · gerenciador `uv` · Django 5 (ORM, migrations, **admin como UI do MVP**, auth)
-- SQLite (WAL) no MVP → PostgreSQL quando houver deploy compartilhado
-- Jobs: comandos `manage.py` agendados por cron (sem fila no MVP)
+- PostgreSQL no **Supabase** (projetos `radar-dev`/`radar-prod`, via pooler); só o Django acessa
+- Jobs: comandos `manage.py`, agendados no **GitHub Actions** (sem fila, sem servidor)
+- UI do MVP: Django admin **local**; online depois em `app.scorpionbits.com` (Cloud Run). Sem Vercel no MVP
 - HTTP: `httpx`; HTML: `selectolax`/`trafilatura`; PDF: `pypdf`/`pdfplumber`
 - Qualidade: `ruff` (lint+format), `pytest`, `pytest-django`; CI no GitHub Actions
-- LLM: camada própria `llm/` com provedores plugáveis (ADR-003)
+- IA: camada `llm/` por **tarefa**, estratégias trocáveis (regras | Gemini | Claude | local);
+  Gemini é o principal na extração; dados internos só em provedor pago (ADR-003, ADR-011)
 
 ## Estrutura (alvo; criada a partir da E02)
 
@@ -88,6 +90,7 @@ docs/             memória do projeto (ver docs/README.md)
 | Modelo de dados | `docs/architecture/data-model.md` |
 | Score e geografia | `docs/architecture/scoring.md`, `geo-relevance.md` |
 | Uso de IA e custos | `docs/architecture/llm-strategy.md`, `docs/research/ai-models-and-costs.md` |
+| Hospedagem | `docs/research/hosting.md`, ADR-010 |
 | Agentes (quais existem e por quê) | `docs/agents/README.md` |
 | Fontes de dados | `docs/research/opportunity-sources.md`, `organization-sources.md` |
 | Legal / LGPD | `docs/research/legal-and-compliance.md` |
@@ -100,8 +103,13 @@ docs/             memória do projeto (ver docs/README.md)
 
 - Base: Araraquara/SP. Proximidade importa para cursos presenciais, SESCs, escolas,
   eventos; não importa para software, sites e eventos online.
-- Tração real hoje: **Game Lab com o SESC** (curso de desenvolvimento de jogos).
-- Empresa **ainda não formalizada** (sem CNPJ): editais que exigem PJ devem aparecer
-  marcados como "exige CNPJ", não escondidos.
+- Polos prioritários: Araraquara, São Carlos, Ribeirão Preto, Bauru. Localização é
+  **fator** de prioridade, nunca filtro absoluto.
+- **SESC é hipótese validada**: Game Lab realizado; propostas enviadas a Bauru, Ribeirão
+  Preto e São Carlos. O sistema **lembra** interações e nunca "redescobre" quem já foi
+  contatado (ADR-012). Buscar também organizações parecidas com o SESC.
+- Empresa é **MEI** (CNPJ fora do git): elegibilidade = requisitos do edital × `CompanyProfile` (ADR-013).
+- Portfólio (AstroDash, Tirania, protótipo, itch.io, Game Lab) é **prova** no matching (`PortfolioItem`).
+- Domínio: `scorpionbits.com`.
 - Serviços: jogos (educativos, institucionais, gamificação), educação (cursos, oficinas,
   game jams), software sob demanda, web. Catálogo é **dado**, não código (`ServiceOffering`).

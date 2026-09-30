@@ -1,100 +1,89 @@
 # Arquitetura — visão geral
 
-## Decisão central
+## Decisões centrais
 
-**Monólito modular em Python/Django**, rodando em uma única máquina, com SQLite no MVP
-e jobs agendados por cron. (ADR-001, ADR-002)
+- **Monólito modular em Python/Django** (ADR-001). O Django admin é a UI do MVP.
+- **PostgreSQL no Supabase** desde o início; **workers Python agendados no GitHub Actions**;
+  admin rodando localmente no MVP; UI online depois em `app.scorpionbits.com` (ADR-010).
+- **IA por tarefa**, com "sem IA" como padrão e Gemini como provedor principal de extração (ADR-003, ADR-011).
+- **Memória comercial** (interações, relacionamento) e **portfólio** no núcleo (ADR-012).
+- **Elegibilidade pelo perfil da empresa (MEI)** (ADR-013).
 
-Por quê: 1–3 usuários, volume de dados pequeno (milhares de registros, não milhões),
-equipe mínima. O Django admin entrega listagem, filtros, busca, edição, autenticação e
-histórico **sem escrever frontend** — é o "CRM/planilha estruturada" do MVP.
-Python é a melhor linguagem para coleta, parsing de HTML/PDF e integração com LLMs.
+Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem lock-in
+(Postgres puro + container). Python é o melhor ecossistema para coleta, HTML/PDF e LLMs.
 
 ## Diagrama
 
 ```text
-                       ┌──────────────────────────── cron (semanal/diário) ──────────────────┐
-                       │                                                                      │
- FONTES PÚBLICAS       ▼                                                                      │
- ┌───────────────┐  ┌─────────────────────────── collection/ ───────────────────────────┐    │
- │ APIs abertas  │  │  Connector registry ──► PoliteFetcher ──► RawDocument (cache, hash)│    │
- │ (Devpost, QD, │─►│   (1 classe/fonte)     robots.txt, UA, rate                        │    │
- │  Mapas, INEP) │  │                        limit/domínio, ETag                         │    │
- │ Páginas HTML  │  │        │ normaliza                                                 │    │
- │ (FAPESP,      │  │        ▼                                                           │    │
- │  Sebrae, ...) │  │  Candidate records (Opportunity / Organization) + dedupe           │    │
- │ Seeds CSV     │  └────────┬───────────────────────────────────────────────────────────┘    │
- │ (SESC)        │           │                                                                │
- │ Busca web     │           ▼                                                                │
- │ (cota grátis) │  ┌────────────────── extraction/ ──────────────────┐   ┌──── llm/ ──────┐   │
- └───────────────┘  │ HTML/PDF → texto                                │──►│ Provider iface │   │
-                    │ Regras/regex (datas, valores, contatos)         │   │ cache por hash │   │
-                    │ LLM só p/ campos não estruturados + verificação │◄──│ log de custo   │   │
-                    │   de evidência (citação existe no texto?)       │   │ teto mensal    │   │
-                    └────────┬────────────────────────────────────────┘   │ Gemini/Groq/   │   │
-                             ▼                                            │ Ollama/Claude  │   │
-                    ┌──────────────────── core/ (SQLite) ─────────────┐   └────────────────┘   │
-                    │ Organization  Opportunity  ContactPoint         │                        │
-                    │ Evidence (observed | inferred, fonte, trecho)   │                        │
-                    │ ServiceOffering (catálogo como dado)            │                        │
-                    │ Match (org ↔ serviço + razões)  TriageStatus    │                        │
-                    └────────┬────────────────────────────────────────┘                        │
-                             ▼                                                                 │
-                    ┌──────────────────── scoring/ ───────────────────┐                        │
-                    │ geo (IBGE + distância + perfil por tipo)        │                        │
-                    │ gates (prazo, elegibilidade) → fatores → score  │                        │
-                    │ ScoreBreakdown salvo ("por que 87/100")         │                        │
-                    └────────┬────────────────────────────────────────┘                        │
-                             ▼                                                                 │
-             ┌───────────────┴──────────────┐                                                  │
-             ▼                              ▼                                                  │
-   Django admin (triagem humana)   reports/ digest semanal (HTML/MD, e-mail p/ equipe) ◄───────┘
-             │
-             ▼
-   Humano decide e contata  (Fase 4: pipeline leve + rascunho de mensagem assistido)
+                          ┌──────────── GitHub Actions (cron diário + manual) ────────────┐
+                          │  run_pipeline: collect → extract → match → rescore → digest   │
+                          │  backup: pg_dump semanal → artefato                            │
+                          └───────────────┬───────────────────────────────────────────────┘
+ FONTES PÚBLICAS                          │ (mesmo código roda na máquina do dev)
+ ┌──────────────────┐   ┌─────────── collection/ ───────────┐
+ │ APIs abertas     │──►│ conectores → PoliteFetcher        │  UA: RadarScorpionBits (+scorpionbits.com)
+ │ (Devpost, QD,    │   │ robots.txt, rate limit, ETag      │
+ │  Mapas, INEP,    │   │ RawDocument (hash, URL, texto gz) │
+ │  PNCP*)          │   └──────────────┬────────────────────┘
+ │ Páginas oficiais │                  ▼
+ │ Seeds (SESC,     │   ┌─────────── extraction/ ───────────┐     ┌──────── llm/ ────────┐
+ │  similares,      │   │ texto HTML/PDF · regex · regras   │────►│ tarefa → estratégia  │
+ │  portfólio)      │   │ LLM só no texto livre + citação   │◄────│ rules | gemini |     │
+ │ Busca (cota)     │   │ verificada                        │     │ claude | local       │
+ └──────────────────┘   └──────────────┬────────────────────┘     │ cache·custo·teto     │
+                                       ▼                          └──────────────────────┘
+        ┌────────────── Supabase PostgreSQL (schema do Django) ─────────────────────┐
+        │ Organization (rede/unidade, status de relacionamento)  ContactPoint       │
+        │ Interaction (memória comercial)   Opportunity   Evidence (observed|inferred)│
+        │ ServiceOffering ─ PortfolioItem   Match (org↔serviço↔portfólio)  Score     │
+        │ CompanyProfile (MEI)   Triage   Suppression   LLMCall   SearchQuery        │
+        └──────────────┬──────────────────────────────────────┬─────────────────────┘
+                       ▼                                      ▼
+        scoring/ (geo contextual, elegibilidade,     reports/ digest semanal
+        gates, fatores, confiança, breakdown)        (top oportunidades, leads,
+                       │                              follow-ups, prazos, custos)
+                       ▼
+        Django admin (local no MVP; Cloud Run em app.scorpionbits.com depois)
+                       ▼
+        Humano decide e contata → registra Interaction
 ```
+`*` PNCP na Fase 4.
 
 ## Módulos (apps Django)
 
 | Módulo | Responsabilidade | Depende de |
 |---|---|---|
-| `core` | Entidades, evidências, catálogo de serviços, admin | — |
-| `collection` | Fetcher educado, cache, conectores, execuções de coleta | `core` |
+| `core` | Entidades, evidências, catálogo de serviços, portfólio, interações, perfil da empresa, admin | — |
+| `collection` | Fetcher educado, conectores, execuções de coleta | `core` |
 | `extraction` | Texto de HTML/PDF, regras, extração estruturada | `core`, `llm` |
-| `llm` | Interface de provedores, cache, custo, orçamento | — |
-| `scoring` | Geo, gates, fatores, perfis, breakdown | `core` |
-| `reports` | Digest semanal, métricas | `core`, `scoring` |
-| `pipeline` (Fase 4) | Estágios, interações, opt-out | `core` |
-
-Regra: dependências apontam para `core`. `llm` não conhece o domínio (recebe prompt +
-schema, devolve JSON validado).
+| `llm` | Tarefas de IA com estratégias intercambiáveis, provedores, cache, custo, teto | — |
+| `scoring` | Geo, elegibilidade, gates, fatores, perfis, matching | `core` |
+| `reports` | Digest, métricas | `core`, `scoring` |
+| `pipeline` (Fase 4) | Estágios de negócio, funil | `core` |
 
 ## Decisões transversais
 
-| Tema | Decisão MVP | Evolução |
+| Tema | MVP | Evolução |
 |---|---|---|
-| Frontend | Django admin customizado (list_display, filtros, ações) | Views HTMX pontuais se o admin limitar |
-| Banco | SQLite WAL, backups por cópia de arquivo | PostgreSQL no deploy compartilhado (E29) |
-| Filas/workers | Nenhum; comandos `manage.py` sequenciais via cron | `django-q2`/Huey (sem Redis) se jobs > 30 min ou precisarem de paralelismo |
-| Scheduler | cron / systemd timer / Agendador do Windows | Mesmo no VPS |
-| Armazenamento de documentos | Diretório `data/raw/` (conteúdo por hash) + metadado no banco | Objeto S3-compatível barato se passar de alguns GB |
-| Busca web | API com cota gratuita (Brave/Serper), cache permanente por query | Troca de provedor via interface |
-| Scraping | Fetch simples e educado; sem navegador headless no MVP | Playwright só para fonte valiosa que exija JS |
-| Cache | Cache HTTP por URL (ETag/hash), cache LLM por hash(prompt+modelo+versão), cache de busca por query | — |
-| Dedupe | Chave canônica por tipo (URL canônica, CNPJ, código INEP, título+org+prazo normalizados) | Similaridade fuzzy se aparecerem duplicatas reais |
-| Autenticação | Usuários do Django; rodando local | Deploy com HTTPS + senha forte + 2FA via proxy (E29) |
-| Observabilidade | `logging` estruturado para arquivo + tabela `CollectionRun` + `LLMCall` | Sentry free tier se houver deploy |
-| Erros | Cada conector isolado: falha de uma fonte não derruba as outras; erro registrado no run | Alerta no digest ("fonte X falhou 3x") |
-| Segurança | Segredos em `.env`; nenhum dado pessoal sensível; admin não exposto na internet no MVP | Ver E29 |
-| Custos | Teto mensal configurável na camada `llm` e na de busca; bloqueia ao atingir | Relatório de custo no digest |
+| Frontend | Django admin local | Django no Cloud Run (`app.scorpionbits.com`); Next.js/Vercel Pro + Supabase Auth só se houver usuários não técnicos |
+| Banco | Supabase Postgres Free (projetos dev e prod), via pooler | Supabase Pro (US$ 25) quando backups gerenciados/sem pausa forem necessários |
+| Exposição do Supabase | Data API desativada / schema dedicado; só o Django acessa | RLS explícito se um frontend usar o cliente Supabase |
+| Jobs | `run_pipeline` no GitHub Actions (cron) ou local | Worker separado só se jobs > 1 h |
+| Scheduler | GitHub Actions `schedule` + `workflow_dispatch` (fallback: cron externo/local) | — |
+| Documentos brutos | Não guardados; URL + hash + ETag + texto extraído comprimido, com retenção | Supabase Storage/S3 se necessário |
+| Busca web | API com cota grátis (Brave/Serper) + cache permanente; grounding Gemini como experimento | — |
+| Scraping | Fetch simples e educado; sem headless | Playwright só para fonte valiosa com JS |
+| Cache | ETag/hash por URL; LLM por hash (conteúdo+prompt+modelo); busca por query | — |
+| Dedupe | Chaves canônicas (URL, CNPJ, INEP, domínio, nome+município) + consulta à memória comercial | Fuzzy se necessário |
+| Auth | Local: usuários Django | Online: Django auth + HTTPS; opcional camada extra (Cloudflare Access/IAP) |
+| Observabilidade | Logs do job no GitHub Actions + `CollectionRun` + `LLMCall` | Sentry free tier |
+| Erros | Conector isolado; falha registrada; alerta no digest | — |
+| Segredos | `.env` local; GitHub Secrets nos workers | Secret Manager no Cloud Run |
+| Backups | `pg_dump` semanal → artefato do GitHub Actions + cópia local | Backups do Supabase Pro |
+| Custos | Teto mensal na camada `llm/` e de busca | Relatório no digest |
 
-## Quando separar serviços (e por quê não agora)
+## Quando separar serviços
 
-Só considerar separar algo do monólito quando **um** destes for medido:
-
-1. A coleta precisa rodar em horário/máquina diferente da UI (ex.: UI no VPS, coleta
-   pesada de CNPJ em máquina local) → separar **só o worker**, mesmo código, mesmo banco.
-2. Uma fonte exige navegador headless pesado → worker isolado para ela.
-3. Mais de ~5 usuários simultâneos ou acesso externo → Postgres + deploy dedicado.
-
-Nenhum desses se aplica ao MVP.
+Só com gatilho medido: jobs que não cabem no GitHub Actions (> 1 h ou headless pesado) →
+worker dedicado (mesmo código/banco); usuários não técnicos → UI online; muitos usuários
+ou dados → Supabase Pro/infra dedicada. Nenhum se aplica ao MVP.

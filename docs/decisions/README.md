@@ -12,7 +12,7 @@ Regras:
 | ADR | Título | Status |
 |---|---|---|
 | 001 | Monólito modular em Python + Django (admin como UI do MVP) | aceito |
-| 002 | SQLite no MVP, PostgreSQL no deploy compartilhado | aceito |
+| 002 | SQLite no MVP, PostgreSQL no deploy compartilhado | substituído por 010 |
 | 003 | IA como último recurso: pipeline determinístico + camada LLM multi-provedor | aceito |
 | 004 | Evidência obrigatória e separação fato observado × inferência | aceito |
 | 005 | Humano no controle: sem envio automático de mensagens | aceito |
@@ -20,3 +20,7 @@ Regras:
 | 007 | Fontes oficiais/abertas primeiro; sem scraping de LinkedIn/Google | aceito |
 | 008 | Sistema de memória do projeto e limite do CLAUDE.md | aceito |
 | 009 | MVP focado em oportunidades + escolas/SESC; empresas (CNPJ) pós-MVP | aceito |
+| 010 | Hospedagem: Supabase Postgres + workers no GitHub Actions + admin local (sem Vercel no MVP) | aceito |
+| 011 | Seleção de modelos por tarefa; Gemini como provedor principal de extração | aceito |
+| 012 | Memória comercial (interações) e portfólio no MVP | aceito |
+| 013 | MEI: elegibilidade pelo perfil da empresa | aceito |

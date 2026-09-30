@@ -16,6 +16,23 @@
 | 9 | e-MEC (cadastro de IES) | Universidades/faculdades | Consulta pública | Grátis | 5 | Pós-MVP: parcerias, eventos | — |
 | 10 | Google Places API | Estabelecimentos locais | API paga; cotas grátis por SKU (ex. 5.000 Text Search Pro/mês), depois ~US$32–35/1.000; termos restringem armazenamento de dados (exceto `place_id`) | Cota grátis → caro | 4 | **Evitar** como base; uso pontual se necessário | — |
 
+## Organizações parecidas com o SESC (trilha E17b)
+
+Critério de "parecida": oferece educação não formal/cultural ao público, contrata
+oficineiros/instrutores externos e tem unidades na região. Lista semente curada à mão
+(CSV com URL oficial de cada unidade) + monitoramento das páginas de chamamento/credenciamento.
+
+| Rede/organização | O que procurar | Método | Confiab. | Validado |
+|---|---|---|---|---|
+| **SESC-SP** (todas as unidades) | Unidades, programação, credenciamento/chamamentos, contatos institucionais | Seed CSV + `html_watch` | 5 | ⏳ E01 |
+| SENAC-SP | Cursos livres de tecnologia/games, parcerias | Seed CSV | 5 | ⏳ E01 |
+| SESI-SP / SENAI-SP | Atividades de tecnologia/robótica em escolas SESI; eventos | Seed CSV | 5 | ⏳ E01 |
+| Oficinas Culturais do Estado de SP (Poiesis) | Oficinas culturais; chamadas de propostas de oficineiros | `html_watch` | 5 | ⏳ E01 |
+| Fábricas de Cultura / MIS-SP (seleção de projetos) | Programação formativa; seleção de projetos | `html_watch` | 5 | ⏳ E01 |
+| Centro Paula Souza (ETECs/FATECs) e IFSP (campi da região) | Eventos, semanas de tecnologia, extensão, parcerias | Seed CSV + `html_watch` | 5 | ⏳ E01 |
+| Secretarias municipais de cultura/educação, bibliotecas, casas de cultura (polos) | Editais de oficinas culturais (ex.: prefeituras que contratam oficinas por edital) | Querido Diário + `html_watch` | 4 | ⏳ E01 |
+| Museus/centros de ciência, ONGs educativas | Oficinas de tecnologia | Seed CSV | 3–4 | — |
+
 ## Não usar
 
 | Fonte | Motivo |

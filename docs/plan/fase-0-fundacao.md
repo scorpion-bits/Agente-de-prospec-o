@@ -1,162 +1,216 @@
 # Fase 0 — Fundação
 
 ## E00 — Planejamento, pesquisa e documentação ✅
-Concluída em 2026-09-30. Registro: `docs/history/sessions/2026-09-30-E00.md`.
+Concluída em 2026-09-30. Registros: `docs/history/sessions/2026-09-30-E00.md` e
+`2026-09-30-E00b.md` (complemento: domínio, portfólio, SESC, MEI, Supabase/Vercel, Gemini).
 
 ---
 
 ## E01 — Validação de fontes + baseline manual (spike)
 
 **Objetivo:** confirmar, a partir de uma máquina com acesso normal à internet, que as
-fontes prioritárias do MVP são acessíveis, estáveis e permitidas; e registrar um
-**baseline manual** para medir depois se o sistema acha o que não acharíamos.
+fontes prioritárias são acessíveis, estáveis e permitidas; e registrar um **baseline
+manual** para medir depois se o sistema acha o que não acharíamos.
 
-**Por que é a primeira etapa:** toda a Fase 1 e a Fase 3 dependem dessas fontes, e o
-ambiente de planejamento não conseguiu testá-las (egress bloqueado). Descobrir agora que
-uma fonte não funciona custa minutos; descobrir na E08 custa uma etapa.
-**Não é código de produto**: scripts descartáveis em `spikes/E01/` (podem ser apagados depois).
+**Por que é a primeira etapa:** o ambiente de planejamento não conseguiu testar as fontes
+(rede bloqueada). Descobrir agora que uma fonte não funciona custa minutos.
+**Não é código de produto**: scripts descartáveis em `spikes/E01/`.
 
 **Ler antes:** `docs/research/opportunity-sources.md`, `docs/research/organization-sources.md`,
-`docs/research/legal-and-compliance.md` (seção checklist por fonte).
+`docs/research/legal-and-compliance.md` (checklist por fonte).
 
 **Alterações:**
-- `spikes/E01/*.py` ou `*.sh` — chamadas simples (`httpx`/`curl`) a cada fonte, salvando
-  1 resposta de exemplo em `spikes/E01/samples/` (servirão de fixture na Fase 1).
-- `docs/research/opportunity-sources.md` e `organization-sources.md` — preencher coluna
-  "Validado" (✅/❌/⚠ + observação: formato, paginação, campos úteis, robots.txt, termos).
-- `docs/research/baseline-manual.md` — **novo**: o humano (ou Claude com o humano) gasta
-  até 1 h buscando manualmente oportunidades e escolas/SESCs relevantes, e registra o que
-  encontrou (título, link, data) e o tempo gasto.
-- `docs/plan/STATUS.md` — respostas às perguntas abertas que o humano fornecer.
+- `spikes/E01/*.py|*.sh` — chamadas simples a cada fonte, salvando 1 resposta de exemplo em
+  `spikes/E01/samples/` (viram fixtures depois).
+- `opportunity-sources.md` e `organization-sources.md` — preencher "Validado" (✅/❌/⚠ +
+  formato, paginação, campos úteis, robots.txt, termos).
+- `docs/research/baseline-manual.md` — **novo**: até 1 h de busca manual de oportunidades e
+  instituições (SESC, similares, escolas), registrando o que foi achado e o tempo gasto.
 
-**Fontes a validar (mínimo):** Devpost API; itch.io (`/jams`, `.xml`); Querido Diário
-(cobertura de Araraquara, São Carlos, Matão, Américo Brasiliense; exemplo de busca);
-Mapas Culturais (instâncias nacional e SP; `/api/opportunity/find`); páginas FAPESP PIPE,
-ProAC/PNAB, Sebrae-SP, InovAtiva, Prefeitura de Araraquara (URL da página de editais);
-SESC-SP (existe página de credenciamento/chamamento?); INEP Catálogo de Escolas (há
-exportação por município? campos?); IBGE localidades.
+**Fontes a validar (mínimo):** Devpost; itch.io (`/jams`, `.xml`); Querido Diário (cobertura
+de Araraquara, São Carlos, Ribeirão Preto, Bauru, Matão, Américo Brasiliense); Mapas
+Culturais (nacional e SP); FAPESP PIPE; ProAC/PNAB (arquivo de editais, incluindo a linha de
+jogos eletrônicos); Oficinas Culturais (Poiesis); Sebrae-SP; InovAtiva; páginas de editais das
+prefeituras dos polos; SESC-SP (lista de unidades; existe credenciamento/chamamento?);
+SENAC/SESI/Centro Paula Souza/IFSP (listas de unidades); INEP Catálogo de Escolas; IBGE.
+
+**Dependências:** nenhuma. Pode rodar em paralelo com a E01b.
+**Modelo (desenvolvimento):** Claude Sonnet 5.5. **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** baixa.
+**Riscos:** fonte exige JS/login (→ ❌ + alternativa); termos proíbem uso automatizado (→ fora);
+cobertura do Querido Diário ausente em algum polo (→ `html_watch` do diário municipal).
+**Testes:** evidência = amostras salvas + tabelas preenchidas.
+**Critério de conclusão:**
+- [ ] Todas as fontes prioritárias com status e observação.
+- [ ] ≥ 1 amostra real por fonte ✅.
+- [ ] `baseline-manual.md` com ≥ 10 itens e tempo gasto.
+- [ ] Lista de fontes do MVP confirmada/ajustada em STATUS.
+
+---
+
+## E01b — Inventário do negócio e contas
+
+**Objetivo:** reunir os dados reais da Scorpion Bits e preparar as contas gratuitas, para que
+as etapas seguintes não inventem nada.
+**Tarefa majoritariamente humana**; o Claude conduz com um checklist e registra.
+
+**Ler antes:** `docs/research/business-analysis.md` (perguntas em aberto),
+`docs/research/hosting.md`, ADR-010, ADR-011, ADR-013.
+
+**Alterações:**
+- `data/seeds/portfolio.csv` (versionado; só dados públicos): slug, título, tipo, ano,
+  descrição curta, URL pública (itch.io etc.), serviços relacionados, tags de capacidade.
+  Itens: Game Lab SESC, AstroDash, Tirania, protótipo, outros jogos do itch.io.
+- `data/private/interactions.csv` (**fora do git**): histórico SESC (Game Lab — unidade,
+  data, alunos; propostas a Bauru, Ribeirão Preto, São Carlos — data, canal, cargo do contato,
+  serviço, status, próxima ação) e quaisquer outros contatos já feitos.
+- `.env.example` com as chaves previstas; `.gitignore` com `data/private/`.
+- `docs/research/accounts-checklist.md` — **novo**, sem segredos: o que foi criado/ativado e limites confirmados:
+  - Supabase: projetos `radar-dev` e `radar-prod`; string do **pooler**; Data API desativada ou plano de schema dedicado.
+  - Google: benefícios de desenvolvedor do AI Pro **ativados** (créditos ~US$ 10/mês); projeto
+    Gemini API com faturamento pelos créditos; chave do AI Studio (free tier).
+  - GitHub Actions: repositório privado ou público? `schedule` funciona? (teste com workflow vazio).
+  - Busca: Brave (crédito US$ 5/mês) ou Serper (2.500 grátis).
+  - (Opcional) Anthropic API com limite de gasto.
+  - E-mail `@scorpionbits.com` para User-Agent e digest.
+- `CompanyProfile` (valores a carregar na E03b): natureza jurídica MEI, data de abertura,
+  CNAEs, município da sede — **CNPJ só no `.env`/banco**.
 
 **Dependências:** nenhuma.
-**Modelo (desenvolvimento):** Claude Sonnet 5.5 (tarefa de investigação simples).
-**IA em runtime:** nenhuma.
-**Justificativa:** trabalho de leitura/verificação; não exige raciocínio pesado.
-**Custo:** US$ 0 (runtime). ~1 sessão.
-**Complexidade:** baixa.
-**Riscos:** fonte exige JS/login (→ marcar ❌ e propor alternativa); termos proíbem uso
-automatizado (→ remover do MVP); cobertura do Querido Diário não inclui a região
-(→ `html_watch` do diário oficial municipal).
-**Testes:** não há testes automatizados; evidência = amostras salvas + tabela preenchida.
+**Modelo (desenvolvimento):** Claude Sonnet 5.5 (ou Haiku 4.5). **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** baixa.
+**Riscos:** informação incompleta → marcar como pendente, nunca preencher por suposição;
+`schedule` indisponível → registrar e usar cron externo/local (ADR-010).
 **Critério de conclusão:**
-- [ ] Todas as fontes prioritárias com status ✅/❌/⚠ e observação.
-- [ ] Pelo menos 1 amostra real salva por fonte ✅.
-- [ ] `baseline-manual.md` com ≥ 10 itens e tempo gasto.
-- [ ] Lista de fontes do MVP confirmada (ou ajustada) em STATUS.
-- [ ] Perguntas abertas respondidas ou marcadas como pendentes.
+- [ ] `portfolio.csv` com URLs reais conferidas pelo humano.
+- [ ] `interactions.csv` com todo o histórico conhecido (fora do git).
+- [ ] Checklist de contas preenchido; limites relevantes confirmados e divergências anotadas em `hosting.md`/`ai-models-and-costs.md`.
+- [ ] Perguntas em aberto de STATUS respondidas ou marcadas pendentes.
 
 ---
 
 ## E02 — Esqueleto do projeto
 
-**Objetivo:** projeto Python/Django executável, com qualidade automatizada desde o início.
+**Objetivo:** projeto Python/Django executável, conectado ao Postgres, com qualidade
+automatizada desde o início.
 
-**Ler antes:** `CLAUDE.md` (stack/estrutura), `docs/architecture/overview.md` (módulos).
+**Ler antes:** `CLAUDE.md`, `docs/architecture/overview.md`, ADR-010.
 
 **Alterações:**
-- `pyproject.toml` (uv; deps: django, httpx, python-dotenv/django-environ, pydantic;
-  dev: pytest, pytest-django, ruff), `uv.lock`.
-- `radar/` (settings com `.env`, SQLite WAL, `TIME_ZONE="America/Sao_Paulo"`,
-  `LANGUAGE_CODE="pt-br"`), apps vazios `core`, `collection`, `extraction`, `llm`,
-  `scoring`, `reports`.
-- `Makefile` (ou `justfile`): `make setup`, `make run`, `make test`, `make lint`,
-  `make check` (lint + test + docs-check), `make docs-check` (limites de linhas do
-  CLAUDE.md/STATUS.md).
-- `.env.example`, `.gitignore` (inclui `data/`, `.env`, `spikes/**/samples` se grandes).
-- `.github/workflows/ci.yml` — `make check` em push/PR (GitHub Actions, gratuito).
-- `README.md` — seção "Como rodar".
+- `pyproject.toml` (uv; deps: django, psycopg[binary], dj-database-url ou django-environ,
+  httpx, pydantic; dev: pytest, pytest-django, ruff), `uv.lock`.
+- `radar/` settings: `DATABASE_URL` (Supabase via pooler; `CONN_MAX_AGE` e opções
+  compatíveis com o modo do pooler; `sslmode=require`), `TIME_ZONE="America/Sao_Paulo"`,
+  `LANGUAGE_CODE="pt-br"`; apps vazios `core`, `collection`, `extraction`, `llm`, `scoring`, `reports`.
+- Schema: usar schema dedicado (ex. `radar`) **ou** Data API desativada — decidir, testar e
+  documentar em `overview.md`.
+- `Makefile`: `setup`, `run`, `test`, `lint`, `check` (lint + test + docs-check), `docs-check`
+  (limites de linhas do CLAUDE.md/STATUS.md), `migrate`.
+- `.env.example`, `.gitignore` (`.env`, `data/private/`, caches).
+- `.github/workflows/ci.yml` — `make check` com **PostgreSQL em service container**.
+- `README.md` — "Como rodar" (local apontando para `radar-dev`).
 
-**Dependências:** E01 (não bloqueante tecnicamente; pode rodar em paralelo).
-**Modelo (desenvolvimento):** Claude Sonnet 5.5.
-**IA em runtime:** nenhuma.
-**Justificativa:** boilerplate bem conhecido.
-**Custo:** US$ 0.
-**Complexidade:** baixa.
-**Riscos:** versão de Python ausente na máquina do usuário (documentar instalação via uv).
-**Testes:** teste de fumaça (`/admin/` responde 302/200; `manage.py check` sem erros).
+**Dependências:** E01b (projeto Supabase criado; senão, Postgres local para começar).
+**Modelo (desenvolvimento):** Claude Sonnet 5.5. **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** baixa.
+**Riscos:** IPv6 da conexão direta → usar string do pooler; incompatibilidades do modo
+transação do pooler (prepared statements/cursors) → preferir modo sessão ou ajustar opções.
+**Testes:** fumaça (`manage.py check`, `/admin/` responde); migrations aplicam no Postgres do CI.
 **Critério de conclusão:**
-- [ ] `make setup && make check` passa numa máquina limpa.
-- [ ] `make run` abre o admin; superusuário criado via comando documentado.
-- [ ] CI verde no GitHub.
+- [ ] `make setup && make check` passa numa máquina limpa e no CI.
+- [ ] `make run` abre o admin conectado ao `radar-dev`.
+- [ ] Supabase não expõe as tabelas pela Data API (verificado).
 - [ ] CLAUDE.md "Estrutura" confere com o que existe.
 
 ---
 
 ## E03 — Modelo de dados núcleo + admin básico + catálogo de serviços
 
-**Objetivo:** criar as entidades centrais com evidência e o catálogo de serviços como dado.
+**Objetivo:** entidades centrais com evidência e o catálogo de serviços como dado.
 
 **Ler antes:** `docs/architecture/data-model.md`, ADR-004.
 
 **Alterações:**
-- `core/models.py`: `Source`, `Organization`, `ContactPoint`, `Opportunity`, `Evidence`,
-  `ServiceOffering`, `Match`, `Triage`, `Suppression` (Score fica para E13; Municipality para E12
-  — usar `CharField` provisório `municipality_name`/`uf` ou FK nula adicionada na E12).
-- `core/admin.py`: listas com filtros (tipo, status, UF), busca, inlines de `Evidence` e
-  `ContactPoint`; inferências destacadas (ícone/cor).
-- `core/fixtures/services.json` ou data migration: catálogo inicial de serviços —
-  `course_gamedev` (curso de desenvolvimento de jogos), `workshop_gamedev` (oficina),
-  `game_jam_org` (organização de game jam), `extracurricular_school` (atividade
-  extracurricular), `educational_game`, `institutional_game`, `gamification`,
-  `custom_software`, `web_app`, `landing_page`, `institutional_site`, com palavras-chave
-  e perfis geográficos.
-- `core/services/evidence.py`: helper `record_evidence(entity, field, value, kind, source, ...)`.
-- Testes de modelo e do helper.
+- `core/models.py`: `Source`, `Organization` (com `network`, `parent`, `similarity_tags`;
+  campos derivados de relacionamento podem ficar nulos até a E03b), `ContactPoint`,
+  `Opportunity` (inclui campos de requisitos de empresa), `Evidence`, `ServiceOffering`,
+  `Match`, `Triage`, `Suppression`. (`Score` na E13; `Municipality` na E12 — até lá
+  `municipality_name`/`uf` provisórios.)
+- `core/admin.py`: listas com filtros, busca, inlines de `Evidence` e `ContactPoint`;
+  inferências visualmente distintas.
+- `core/fixtures/services.json`: `course_gamedev`, `workshop_gamedev`, `game_jam_org`,
+  `extracurricular_school`, `educational_game`, `institutional_game`, `gamification`,
+  `custom_software`, `web_app`, `landing_page`, `institutional_site` (palavras-chave, perfis geográficos).
+- `core/services/evidence.py`: `record_evidence(...)`. Testes.
 
 **Dependências:** E02.
-**Modelo (desenvolvimento):** Claude Opus 5.5 (decisões de modelagem que afetam todo o resto).
-**IA em runtime:** nenhuma.
-**Custo:** US$ 0.
-**Complexidade:** média.
-**Riscos:** modelagem excessiva → criar só campos listados em `data-model.md`; `Evidence`
-genérica (entity_type/id) pode complicar admin → usar `GenericForeignKey` ou par de campos simples
-e documentar a escolha.
-**Testes:** criação de entidades; dedupe por chaves únicas; helper de evidência; fixture de serviços carrega.
+**Modelo (desenvolvimento):** Claude Opus 5.5. **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** média.
+**Riscos:** modelagem excessiva → só o que está em `data-model.md`; `Evidence` genérica →
+documentar a escolha (GenericForeignKey ou par de campos).
+**Testes:** entidades; unicidade/dedupe; helper de evidência; fixture carrega.
 **Critério de conclusão:**
-- [ ] Migrations aplicam do zero.
-- [ ] Admin permite cadastrar manualmente uma oportunidade com 2 evidências (1 observed, 1 inferred) e elas aparecem distintas.
-- [ ] Catálogo de serviços carregado e editável no admin.
-- [ ] `data-model.md` atualizado com qualquer desvio.
+- [ ] Migrations aplicam do zero no Postgres.
+- [ ] Admin cadastra oportunidade com 2 evidências (observed e inferred) exibidas de forma distinta.
+- [ ] Catálogo de serviços editável no admin.
+
+---
+
+## E03b — Memória comercial, portfólio e perfil da empresa
+
+**Objetivo:** o sistema passa a **lembrar** — quem já contatamos, quando, sobre o quê,
+resultado, próximo passo — e conhece o **portfólio** e o **perfil MEI**. Primeiro marco útil (M1).
+
+**Ler antes:** ADR-012, ADR-013, `data-model.md` (Interaction, PortfolioItem, CompanyProfile, Organization).
+
+**Alterações:**
+- `core/models.py`: `Interaction`, `PortfolioItem` (M2M com `ServiceOffering`),
+  `CompanyProfile` (linha única), `Match.portfolio_refs`; cálculo de `relationship_status`,
+  `last_interaction_at`, `next_action_at` na `Organization` ao salvar interação.
+- Admin: inline de interações na organização (mais recente primeiro); filtro por status de
+  relacionamento; lista "próximas ações" ordenada por data; `PortfolioItem` editável;
+  `CompanyProfile` como singleton.
+- Comandos: `import_portfolio data/seeds/portfolio.csv`;
+  `import_interactions data/private/interactions.csv` (cria organizações SESC com
+  `network="SESC-SP"` e `parent`, e as interações — idempotente).
+- Regra de dedupe: criar organização sempre passa por busca de existente (nome normalizado +
+  município + rede) — base para "nunca redescobrir".
+
+**Dependências:** E03, E01b.
+**Modelo (desenvolvimento):** Claude Opus 5.5. **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** média.
+**Riscos:** dados pessoais no CSV de interações → nunca commitar; manter mínimo (cargo > nome).
+**Testes:** status derivado correto para cada tipo de interação; importação idempotente; dedupe de organização.
+**Critério de conclusão:**
+- [ ] No admin, SESC Bauru/Ribeirão Preto/São Carlos mostram proposta enviada, data e próxima ação.
+- [ ] Game Lab aparece como `PortfolioItem` e como interação `course_delivered` na unidade correta.
+- [ ] `CompanyProfile` preenchido (sem CNPJ no git).
 
 ---
 
 ## E04 — Infra de coleta
 
-**Objetivo:** base comum para todos os conectores: fetch educado, cache, registro de
-execuções e runner.
+**Objetivo:** base comum para todos os conectores.
 
-**Ler antes:** `docs/architecture/connectors.md`, `docs/research/legal-and-compliance.md` (scraping).
+**Ler antes:** `docs/architecture/connectors.md`, `legal-and-compliance.md` (scraping).
 
 **Alterações:**
-- `collection/fetcher.py`: `PoliteFetcher` (User-Agent do settings, robots.txt com cache,
-  rate limit por domínio, ETag/If-Modified-Since, retries com backoff, limite de tamanho).
-- `collection/models.py`: `CollectionRun`, `RawDocument` (+ armazenamento em `data/raw/`).
-- `collection/base.py`: `Connector` (Protocol), `RunContext`, `RawItem`, `CandidateRecord`.
-- `collection/registry.py` + `collection/management/commands/collect.py`
-  (`collect <slug>`, `collect --all`, `--dry-run`, `--limit`).
-- `collection/upsert.py`: dedupe por `canonical_key`, upsert + evidências.
-- Conector de exemplo `seed_csv` genérico (lê CSV de `data/seeds/`) — útil já na E17.
-- Testes com `respx`/transport mock do httpx (sem rede).
+- `collection/fetcher.py`: `PoliteFetcher` (User-Agent com contato `@scorpionbits.com`,
+  robots.txt com cache, rate limit por domínio, ETag/If-Modified-Since usando valores
+  guardados no banco, retries com backoff, limite de tamanho).
+- `collection/models.py`: `CollectionRun`, `RawDocument` (URL, hash, ETag, texto extraído
+  comprimido, retenção — **sem binários**; ver ADR-010).
+- `collection/base.py`, `registry.py`, comando `collect` (`<slug>`, `--all`, `--dry-run`, `--limit`).
+- `collection/upsert.py`: dedupe por `canonical_key` **e consulta à memória comercial**
+  (organização existente nunca vira nova).
+- Conector genérico `seed_csv`. Testes com transport mock do httpx (sem rede).
 
-**Dependências:** E03.
-**Modelo (desenvolvimento):** Claude Sonnet 5.5.
-**IA em runtime:** nenhuma.
-**Custo:** US$ 0.
-**Complexidade:** média.
-**Riscos:** robots.txt com sintaxe estranha (usar `urllib.robotparser` + fallback conservador);
-cache crescer (limite e limpeza documentados).
-**Testes:** robots bloqueia; rate limit respeitado (tempo simulado); 304 reutiliza cache;
-retry em 503; upsert idempotente (rodar 2× não duplica).
+**Dependências:** E03 (E03b recomendado).
+**Modelo (desenvolvimento):** Claude Sonnet 5.5. **IA em runtime:** nenhuma.
+**Custo:** US$ 0. **Complexidade:** média.
+**Riscos:** robots.txt estranho (fallback conservador); crescimento do banco (retenção).
+**Testes:** robots bloqueia; rate limit; 304 reutiliza; retry em 503; upsert idempotente.
 **Critério de conclusão:**
-- [ ] `manage.py collect seed_csv --dry-run` funciona com CSV de exemplo.
-- [ ] Execução registrada em `CollectionRun` com contagens.
-- [ ] Rodar duas vezes não cria duplicatas.
+- [ ] `collect seed_csv --dry-run` funciona; execução registrada em `CollectionRun`.
+- [ ] Rodar duas vezes não duplica; organização existente é reconhecida.
 - [ ] Nenhum teste faz acesso de rede.

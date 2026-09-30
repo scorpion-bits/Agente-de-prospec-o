@@ -16,12 +16,14 @@ guarda (status de triagem, logs de coleta, logs de custo LLM).
 | M6 | **Tempo de triagem semanal** | Autodeclarado no fim da semana (nota em STATUS) | Economia de tempo | ≤ 30 min |
 | M7 | **Saúde das fontes** | Coletas com erro / total, por conector | Fonte quebrada = oportunidade perdida | < 10% erro |
 | M8 | **Motivos de descarte** | Distribuição de `discard_reason` | Diz o que ajustar (fonte, score, geo) | — (diagnóstico) |
+| M9 | **Follow-ups em dia** | Interações com `next_action_at` vencido sem nova interação | Memória comercial funcionando; nenhuma proposta esquecida | 0 vencidos há > 7 dias |
 
 ## Métricas pós-MVP (Fase 4, quando houver pipeline)
 
 | Métrica | Observação |
 |---|---|
-| Contatos realizados / respostas / reuniões | Requer registro de interações (E23) |
+| Contatos realizados / respostas / reuniões | Já possível com `Interaction` (E03b); relatório na E23 |
+| Taxa de resposta por item de portfólio citado | Qual trabalho convence mais |
 | Propostas enviadas / contratos fechados | Funil real |
 | Receita potencial em aberto / receita conquistada atribuída ao radar | A métrica que realmente importa |
 | Taxa de resposta por segmento e por serviço | Direciona onde prospectar |

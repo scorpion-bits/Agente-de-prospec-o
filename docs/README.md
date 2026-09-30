@@ -34,7 +34,7 @@ docs/
     README.md                catálogo de agentes: quais existem, quais NÃO, por quê
   decisions/                 ADRs — decisões que podem ser questionadas depois
   research/                  pesquisas que embasam as decisões (negócio, ferramentas,
-                             fontes, IA/custos, legal; baseline-manual.md vem na E01)
+                             fontes, IA/custos, hospedagem, legal; baseline-manual.md vem na E01)
   history/                   conteúdo arquivado do CLAUDE.md, sessões, decisões antigas
   operations/                como operar: ciclo /clear, manutenção do CLAUDE.md (runbook vem na E16)
 ```

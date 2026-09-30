@@ -1,7 +1,7 @@
 # Legalidade, ética e compliance
 
 > Não é parecer jurídico. É o conjunto de regras de engenharia que reduz risco jurídico e
-> reputacional. Revisar com profissional quando houver formalização/receita.
+> reputacional. Revisar com profissional quando houver receita recorrente (a empresa já é MEI).
 
 ## LGPD — pontos que afetam o design
 
@@ -25,9 +25,10 @@
 | Opt-out | Tabela `Suppression` (e-mail, telefone, domínio, organização) consultada sempre; pedido de remoção atendido em até 15 dias com exclusão dos dados pessoais |
 | Retenção | Dados pessoais de leads sem interação em 12 meses → anonimizar/excluir (job na Fase 4) |
 | Transparência na abordagem | Toda mensagem identifica a Scorpion Bits, explica por que estamos contatando e oferece forma simples de não ser mais contatado |
+| Histórico de interações | Nomes/cargos de contatos só no banco (nunca em git/CSV versionado); mínimo necessário; enviados apenas a provedores de IA pagos ou locais |
 | Sem sensíveis | Nenhum dado sensível (art. 5º, II) é coletado |
 | Segurança | Banco local/servidor com acesso restrito; segredos fora do git; backups protegidos |
-| Registro | Manter este documento como "registro de tratamento" simplificado; ao formalizar, avaliar RIPD |
+| Registro | Manter este documento como "registro de tratamento" simplificado; com receita/escala, avaliar RIPD |
 
 ## Scraping, robots.txt e termos de uso
 

@@ -23,13 +23,14 @@ Terminologia neste repositório:
 |---|---|---|---|---|---|
 | Discovery Agent | **Workers de coleta** (conectores) | Encontra oportunidades/organizações em fontes | Nenhum | 0 | MVP (E05–E09, E17) |
 | Research Agent | **Worker de enriquecimento** (fetch + texto) + Extrator LLM | Baixa e lê a página/PDF do item | Nenhum / ver abaixo | 0 | MVP |
-| Opportunity Analysis Agent | **Extrator LLM** `extract_opportunity_fields` | Extrai prazo, elegibilidade, prêmio, exige CNPJ, benefícios, esforço | Gemini Flash-Lite free → Haiku 4.5 | US$0–6 | MVP (E11) |
+| Opportunity Analysis Agent | **Extrator LLM** `extract_opportunity_fields` | Extrai prazo, elegibilidade (aceita MEI? idade do CNPJ? CNAE?), prêmio, benefícios, esforço, resumo | Gemini Flash-Lite free → Gemini Flash (créditos AI Pro) → Haiku 4.5 | US$0–6 | MVP (E11) |
 | Qualification Agent | **Gates + fatores** do scoring | Descarta inviável, qualifica o resto | Nenhum | 0 | MVP (E13) |
 | Contact Discovery Agent | **Worker** `extract_contacts` | Contatos públicos institucionais do próprio site | Nenhum | 0 (+ busca na cota grátis) | MVP (E18–E19) |
-| Matching Agent | **Regras** `match_services_v1` (+ justificativa LLM opcional) | Necessidade provável ↔ serviço | Nenhum (opcional Flash-Lite) | 0–1 | MVP (E20) |
+| Matching Agent | **Regras** `match_services_v1` (+ justificativa LLM opcional) | Necessidade provável ↔ serviço ↔ **item de portfólio** que prova a capacidade | Nenhum (opcional Flash-Lite) | 0–1 | MVP (E20) |
 | Prioritization Agent | **Scoring determinístico** | Ordena por retorno esperado | Nenhum | 0 | MVP (E13, E21) |
-| Outreach Preparation Agent | **Extrator LLM** `draft_outreach` (1 chamada) | Rascunho de mensagem com base só em evidências | Claude Sonnet 5.5 | < US$1 | Fase 4 (E24) |
-| (novo) Deep Research Agent | **Agente de verdade**, sob demanda | Investiga 1 organização/edital a fundo quando o humano pede | Claude Sonnet 5.5 + ferramentas restritas | US$1–10 com teto | Fase 4 (E28), só se houver lacuna medida |
+| Outreach Preparation Agent | **Extrator LLM** `draft_outreach` (1 chamada) | Rascunho com base só em evidências + portfólio + histórico de interações | A/B: Claude Sonnet 5.5 × Gemini 3.1 Pro (créditos) | < US$1 | Fase 4 (E24) |
+| (novo) Deep Research Agent | **Agente de verdade**, sob demanda | Investiga 1 organização/edital a fundo quando o humano pede | Gemini + Search grounding (cota grátis) ou Claude Sonnet 5.5 + API de busca; ferramentas restritas | US$0–10 com teto | Fase 4 (E28), só se houver lacuna medida. Até lá: Gemini Deep Research manual (assinatura) |
+| (novo) Memória comercial | **Não é agente**: dados + regras | "Já falamos com eles?", follow-ups, carência de recontato | Nenhum | 0 | MVP (E03b) |
 
 ## Fichas
 
@@ -67,6 +68,9 @@ Terminologia neste repositório:
   (ex. `nome.sobrenome@`); nunca busca pessoas no LinkedIn.
 
 ### 4. Regras `match_services_v1` (ex-Matching)
+- **Portfólio como prova**: cada match aponta os `PortfolioItem` que demonstram a capacidade
+  (Game Lab SESC → cursos/oficinas; AstroDash/Tirania → jogos; sites futuros → web).
+  Sem item de portfólio relevante, o match é mais fraco (Fit menor).
 - **Problema**: "empresa X provavelmente compraria serviço Y".
 - **Por que regras**: o catálogo é pequeno e as correlações são explícitas
   (escola privada com ensino fundamental II/médio → curso extracurricular de jogos;
@@ -80,7 +84,7 @@ Ver `docs/architecture/scoring.md`. Determinístico, explicável, versionado.
 
 ### 6. Extrator `draft_outreach` (Fase 4)
 - **Problema**: escrever uma primeira mensagem boa leva tempo.
-- **Modelo**: Claude Sonnet 5.5 (qualidade de texto importa; volume baixo).
+- **Modelo**: A/B Claude Sonnet 5.5 × Gemini 3.1 Pro (créditos do AI Pro); empate → Gemini (ADR-011).
 - **Input**: só `Evidence` da organização + serviço do match + portfólio da Scorpion Bits
   (texto fixo, cacheável). **Proibido** inventar fatos: cada afirmação sobre o
   destinatário deve citar uma evidência.

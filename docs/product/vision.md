@@ -27,10 +27,12 @@ externos usando a plataforma.
 1. **Descobre** oportunidades e organizações em fontes públicas e confiáveis.
 2. **Pesquisa** cada item: o que é, onde fica, quem é, como contatar — sempre com fonte.
 3. **Qualifica e relaciona** a necessidade provável da organização com o serviço da
-   Scorpion Bits que a atende ("Escola X → curso extracurricular de jogos, porque…").
+   Scorpion Bits que a atende e com o **trabalho do portfólio que prova a capacidade**
+   ("Escola X → curso extracurricular de jogos, porque…; referência: Game Lab SESC").
 4. **Prioriza** com pontuação explicável e relevância geográfica contextual.
 5. **Prepara** o contato (mensagem personalizada) — humano revisa e envia.
-6. **Acompanha** o funil (pipeline leve) e mede o que gera receita.
+6. **Lembra** de tudo: com quem já falamos, quando, sobre o quê, resultado e próximo passo
+   (memória comercial desde o MVP); evolui para um funil leve e mede o que gera receita.
 
 ## O que o produto NÃO é
 
@@ -41,8 +43,8 @@ externos usando a plataforma.
 ## Princípio de evolução
 
 ```
-MVP (radar de oportunidades + leads institucionais + score)
- → contatos → pipeline leve → preparação de abordagem
+MVP (memória comercial + portfólio + leads SESC/escolas + radar de oportunidades + score)
+ → pipeline leve → preparação de abordagem
  → empresas (CNPJ) e sinais de necessidade → agentes sob demanda → automações
  → inteligência comercial (aprendizado com resultados)
 ```
@@ -55,9 +57,10 @@ Análise completa em `docs/research/business-analysis.md`. Resumo:
 
 | Linha | Por que importa agora | Proximidade importa? |
 |---|---|---|
-| Cursos/oficinas em SESCs | Tração comprovada (Game Lab); modelo replicável | Alta (presencial) |
+| Cursos/oficinas em SESCs | **Validado**: Game Lab realizado; propostas enviadas a Bauru, Ribeirão Preto e São Carlos | Alta (presencial; polos) |
+| Organizações parecidas com o SESC | Mesmo modelo educacional (Sistema S, Oficinas Culturais, ETECs/IFSP…) | Alta (presencial) |
 | Escolas particulares (extracurricular) | Mercado grande e local; ciclo anual de planejamento (out–dez) | Alta |
-| Editais (cultura, inovação, educação) | Dinheiro não reembolsável; muitas vezes exige CNPJ | Depende da abrangência |
+| Editais (cultura, inovação, educação) | Dinheiro não reembolsável; empresa é MEI → elegibilidade por requisito | Depende da abrangência |
 | Game jams / hackathons | Portfólio, visibilidade, prêmios; baixo custo | Baixa (maioria online) |
 | Software/web para empresas | Mercado enorme, concorrência alta | Baixa |
-| Jogos educativos / gamificação para empresas e instituições | Ticket maior, ciclo longo | Baixa |
+| Jogos educativos / gamificação para empresas e instituições | Ticket maior, ciclo longo; AstroDash/Tirania como prova | Baixa |

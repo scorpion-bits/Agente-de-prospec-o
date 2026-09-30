@@ -1,84 +1,92 @@
-# Estratégia de IA (LLM)
+# Estratégia de IA (multimodelo)
 
-> Regra de ouro: **se código, SQL, regex ou heurística resolvem, não use IA.**
-> Preços e cotas mudam rápido: fonte e data em `docs/research/ai-models-and-costs.md`
-> (levantamento de 30/09/2026). Revalidar antes de ativar provedor pago.
+> Regra de ouro: **"isso realmente precisa de inteligência generativa?"** Se código, SQL,
+> regex ou heurística resolvem, não use IA. Preços/cotas: `docs/research/ai-models-and-costs.md`
+> (levantamento de 30/09/2026 — revalidar antes de ativar provedor pago).
+> Decisões: ADR-003 (IA como último recurso) e ADR-011 (seleção por tarefa, Gemini).
 
-## Escada de modelos (usar o degrau mais baixo que funciona)
+## Não precisam de IA (nunca)
 
-| Degrau | Opção | Custo | Uso |
-|---|---|---|---|
-| 0 | **Sem IA** (código/regex/regras) | 0 | Padrão para tudo |
-| 1 | **Gratuito em nuvem**: Gemini Flash-Lite (free tier), Groq free, OpenRouter `:free` | 0 (cotas/dia; dados podem ser usados pelo provedor) | Extração de campos de documentos **públicos** |
-| 2 | **Local**: Ollama + modelo 7–14B (ex. Qwen3, Gemma) | 0 (hardware/tempo) | Fallback offline; depende do hardware (pergunta aberta) |
-| 3 | **Barato pago**: Claude Haiku 4.5 (US$1/US$5 por 1M tokens in/out; Batch −50%) | centavos | Quando o gratuito falha na validação ou estoura cota |
-| 4 | **Forte**: Claude Sonnet 5.5 (US$2/US$10) | baixo volume | Texto que um humano vai ler/enviar (rascunho de abordagem), documentos longos de alto valor |
-| 5 | **Topo**: Claude Opus 5.5 (US$4/US$20) | — | **Não usar em produção.** Só desenvolvimento/planejamento via Claude Code |
+Calcular/ordenar por distância · deduplicar · verificar se URL/documento já foi processado ·
+armazenar leads · filtrar categorias · scores · detectar duplicatas · controlar status e
+follow-ups · agendar coletas · regras determinísticas · extrair e-mails/telefones · achar
+datas e valores em R$ (regex) · montar o digest.
 
-Claude Code (assinatura) é usado para **desenvolver** o sistema. Pesquisa manual
-assistida em sessões interativas do Claude Code é aceitável (humano no comando);
-automação de produção **não** deve depender da assinatura.
+## Camada de IA: tarefas com estratégias intercambiáveis
 
-## Tarefa por tarefa
+A aplicação **não conhece fornecedores**; conhece **tarefas**. Cada tarefa tem estratégias
+configuráveis — inclusive uma sem LLM:
 
-| Tarefa | IA? | Modelo recomendado | Alternativa gratuita | Alternativa local | Volume estimado | Custo/mês estimado | Risco de custo | Quando subir de modelo |
-|---|---|---|---|---|---|---|---|---|
-| Coleta via API/feed, normalização | **Não** | — | — | — | — | 0 | — | — |
-| Detectar novidade em página monitorada | **Não** (diff de links/hash) | — | — | — | — | 0 | — | — |
-| Classificar relevância (é sobre jogos/educação/tecnologia?) | Regras primeiro; LLM só para ambíguos | Gemini Flash-Lite | Groq | Ollama 7B | ~20–60 ambíguos/sem | 0 (free) / < US$0,50 (Haiku) | Baixo | Nunca (se regras + barato não bastam, revisar regras) |
-| **Extrair campos de edital/chamada** (prazo, elegibilidade, exige CNPJ, prêmio, benefícios, esforço) | **Sim** (texto livre, PDFs) — datas/valores por regex primeiro | Gemini Flash-Lite (free) → fallback Claude Haiku 4.5 (Batch) | Groq / OpenRouter free | Ollama 8–14B | 50–150 docs/sem × ~6k tokens in / ~0,8k out | 0 (free) / ~US$3–6 (Haiku, ~US$1,5–3 com Batch) | Médio (PDFs longos) → truncar por seções relevantes + teto | Doc de alto valor (>R$100 mil) com validação falhando 2× → Sonnet 5.5 |
-| Encontrar site da organização | **Não** (API de busca + validação por regras) | — (desempate por LLM opcional) | — | — | ~200–500 buscas no total (uma vez por org) | Dentro de cotas grátis (Brave US$5 crédito/mês; Serper 2.500 grátis) | Baixo (cache permanente) | — |
-| Extrair contatos do site | **Não** (regex, `mailto:`, `tel:`, `wa.me`, schema.org, links sociais) | — | — | — | — | 0 | — | — |
-| Matching organização ↔ serviço | **Não** no MVP (regras: tipo, CNAE, palavras-chave, etapas de ensino) | Opcional: 2 frases de justificativa para top-20/sem | Gemini Flash-Lite | Ollama | ≤ 20/sem × 2k in/0,3k out | ~0 / < US$1 | Baixo | — |
-| Pontuação | **Não** (determinística — ver `scoring.md`) | — | — | — | — | 0 | — | — |
-| Digest semanal | **Não** (template) | — | — | — | 1/sem | 0 | — | — |
-| Rascunho de abordagem (Fase 4) | **Sim** (texto persuasivo, personalizado) | Claude Sonnet 5.5 | Gemini Flash | Ollama 14B (qualidade inferior) | 10–40/mês × 3k in/0,5k out | ~US$0,15–0,50 | Baixo | Já está no degrau 4; humano sempre revisa |
-| Pesquisa profunda sob demanda (Fase 4, opcional) | **Sim** (agente com ferramentas) | Claude Sonnet 5.5 com teto por execução | Sessão manual no Claude Code | — | ≤ 10/mês | ~US$1–10 (teto) | **Alto** se sem teto → teto rígido por execução e por mês | Nunca Opus em produção |
-
-## Camada `llm/` (implementada na E10)
-
-```python
-result = llm.complete_json(
-    task="extract_opportunity_fields",      # chave de roteamento e de log
-    prompt_version="v1",
-    system=SYSTEM_PROMPT,                   # estável → cacheável
-    user=document_text,                     # já pré-filtrado
-    schema=OpportunityFields,               # JSON Schema / Pydantic
-    max_output_tokens=1200,
-)
+```text
+                    AI SERVICE (llm/)
+   tarefa: "extract_opportunity_fields" | "classify_relevance" | "draft_outreach" | ...
+                          │  (config: lista ordenada de estratégias + teto de custo)
+      ┌──────────┬────────┼──────────┬──────────────┐
+      ▼          ▼        ▼          ▼              ▼
+   rules      gemini   claude    local (Ollama)   fake (testes)
+ (sem LLM)  (free/pago) (pago)   (grátis, lento)
 ```
 
-Responsabilidades:
-1. **Roteamento por tarefa** (config): lista ordenada de provedores, ex.
-   `extract_opportunity_fields: [gemini_flash_lite_free, groq_free, anthropic_haiku]`;
-   passa ao próximo em rate limit/erro/validação falha.
-2. **Cache** por `sha256(provider_family + model + prompt_version + system + user)`:
-   resultado reaproveitado para sempre (conteúdo igual ⇒ resposta igual).
-3. **Validação de schema** (Pydantic). Falhou → 1 retry com mensagem de erro → próximo provedor.
-4. **Verificação de evidência**: cada campo extraído traz `quote`; o sistema confere se a
-   citação existe no texto-fonte (normalizando espaços/acentos). Sem citação válida ⇒
-   campo marcado `verified=false` e não entra no score como `observed`.
-5. **Log de custo** (`LLMCall`) com tokens e US$ calculados por tabela de preços em config.
-6. **Orçamento**: teto mensal (padrão **US$ 5**) e teto por execução. Ao atingir → para de
-   chamar provedores pagos, registra e avisa no digest. Provedores gratuitos continuam.
-7. **Provedor falso** (`FakeProvider`) para testes — nenhum teste chama rede.
-8. **Privacidade**: provedores gratuitos só recebem **documentos públicos**. Nunca enviar
-   listas de contatos ou dados pessoais para provedores cujo free tier usa dados para treino.
+```python
+result = ai.run(
+    task="extract_opportunity_fields",   # roteamento, cache, log e orçamento por tarefa
+    input=DocumentInput(text=..., pdf_bytes=None, url=...),
+    schema=OpportunityFields,            # Pydantic; cada campo {value|"unknown", quote}
+)
+# result.data, result.strategy ("rules"/"gemini:flash-lite"/...), result.cost_usd, result.cached
+```
 
-## Redução de tokens (antes de chamar qualquer LLM)
+Trocar `Claude → Gemini`, `API → local` ou `LLM → regras` = mudar a configuração da tarefa.
+Adapters de provedor ficam isolados em `llm/providers/`; nenhum outro módulo importa SDK.
 
-- Extrair texto principal (trafilatura) e remover menus/rodapés.
-- Para PDFs longos: selecionar janelas ao redor de palavras-chave (`inscrição`, `prazo`,
-  `elegibilidade`, `proponente`, `valor`, `prêmio`, `CNPJ`, `MEI`, `pessoa física`, `cronograma`).
-- Limite duro de entrada por documento (ex. 12k tokens); acima disso, só janelas.
+Responsabilidades da camada (implementada na E10):
+1. **Roteamento por tarefa**: estratégias em ordem; passa à seguinte em rate limit, erro ou validação falha.
+2. **Cache** por `sha256(estratégia + modelo + prompt_version + entrada)` — conteúdo igual ⇒ nunca paga duas vezes.
+3. **Validação de schema** (Pydantic) com 1 retry.
+4. **Verificação de evidência**: cada campo traz `quote`; a citação precisa existir no texto-fonte;
+   senão `verified=false` → vira inferência.
+5. **Log de custo** (`LLMCall`) com tokens e US$ (tabela de preços em config).
+6. **Orçamento**: teto mensal (padrão US$ 5 de dinheiro novo; créditos Gemini contabilizados
+   à parte) e por execução. Atingiu → só estratégias gratuitas/regras.
+7. **Classe de dados**: `public` (documentos públicos) pode ir a free tiers; `internal`
+   (contatos, interações, rascunhos com nomes) **só** a provedores pagos (Gemini com
+   faturamento/créditos, Claude API) ou local.
+8. `FakeProvider` para testes (nenhum teste chama rede).
+
+## Seleção de modelos por tarefa
+
+Legenda: ✅ escolhido · ↪ fallback · ◯ viável, não escolhido · ✗ inadequado
+
+| Tarefa | Sem IA | Gemini | Claude | Local | Escolha e motivo |
+|---|---|---|---|---|---|
+| Coleta, dedupe, status, distância, score, digest | ✅ | ✗ | ✗ | ✗ | Determinístico por definição |
+| Detectar novidades em páginas | ✅ diff | ✗ | ✗ | ✗ | Hash/diff de links basta |
+| **Classificar relevância** (é sobre jogos/educação/tecnologia?) | ✅ palavras-chave primeiro | ✅ Flash-Lite (free) só p/ ambíguos | ↪ Haiku 4.5 | ◯ | Classificação curta; free tier suficiente |
+| **Extrair campos de edital** (prazo, elegibilidade/MEI, prêmio, benefícios, esforço, resumo 2–4 linhas) | Regex p/ datas/valores | ✅ Flash-Lite (free) → Flash (créditos AI Pro) | ↪ Haiku 4.5 (Batch) | ◯ 8–14B | Texto livre; Gemini: free tier, contexto longo, barato. O resumo sai na **mesma** chamada |
+| **PDF escaneado** (sem texto) | ✗ | ✅ Flash com PDF nativo | ◯ Haiku/Sonnet (visão, mais caro) | ✗ | Elimina OCR próprio |
+| **Identificar necessidade comercial** a partir do site de uma organização | ✅ regras (termos: robótica, maker, programação, extracurricular, tecnologia, curso livre) | ✅ Flash-Lite só p/ top-N sem sinal claro | ↪ Haiku | ◯ | Regras cobrem a maioria; LLM só onde há dúvida |
+| **Justificativa do match** ("por que esta escola → curso de jogos") | ✅ template com evidências | ◯ Flash-Lite p/ top-20 (opcional) | ◯ | ◯ | Template já é explicável; LLM só se melhorar a leitura |
+| **Achar site oficial** | ✅ API de busca + validação | ◯ Search grounding (5 mil/mês grátis nos 3.x) — experimento na E18, conferir termos sobre armazenamento | ✗ | ✗ | Busca simples com cache é mais barata e previsível |
+| **Rascunho de abordagem** (Fase 4) | ✗ | ✅ 3.1 Pro (créditos AI Pro) — A/B | ✅ Sonnet 5.5 — A/B | ◯ (qualidade menor) | Texto lido por clientes: testar os dois com 10 casos; empate → Gemini (já pago) |
+| **Pesquisa profunda sob demanda** (Fase 4) | ✗ | ✅ Flash/Pro + Search grounding (cota grátis) | ↪ Sonnet 5.5 + API de busca | ✗ | Busca embutida e cota grátis; teto rígido por execução |
+| **Pesquisa manual pelo humano** | — | ✅ Gemini app: Deep Research, NotebookLM (assinatura) | ✅ Claude Code (assinatura) | — | Custo marginal zero; humano no comando; **não** automatizar via assinatura |
+| Desenvolvimento do sistema | — | ◯ | ✅ Claude Code | — | Já disponível |
+
+Quando subir de modelo: somente se a amostra revisada (E11, E24) mostrar que o degrau
+inferior erra em campos que importam (prazo, elegibilidade) — nunca por "parecer melhor".
+
+## Redução de tokens (antes de qualquer LLM)
+
+- Texto principal (trafilatura) sem menus/rodapés.
+- PDFs longos: janelas ao redor de `inscrição`, `prazo`, `elegibilidade`, `proponente`,
+  `MEI`, `pessoa jurídica`, `CNAE`, `valor`, `prêmio`, `cronograma`, `sede`.
+- Limite duro por documento (ex. 12k tokens de texto); PDF nativo só quando não há texto.
 - Nunca reprocessar documento com mesmo `content_hash` + `prompt_version`.
-- Usar Batch API (−50%) para extração paga — nada no radar é urgente ao minuto.
+- Processamento em lote/assíncrono quando pago (Claude Batch −50%).
 
 ## Tratamento de alucinação
 
-- Schema estrito com `unknown` permitido em todo campo (o modelo não é forçado a inventar).
-- Instrução explícita: "Se não estiver no texto, responda `unknown`."
-- Verificação de citação (item 4 acima).
-- Datas extraídas por LLM conferidas contra regex de datas do próprio texto.
-- Inferências (ex. "esforço alto") sempre gravadas como `Evidence(kind=inferred)`.
-- Amostragem humana: na E11, revisar 20 extrações e medir acurácia por campo; registrar.
+- Schema com `unknown` permitido em todo campo; instrução "se não está no texto, `unknown`".
+- Citação verificada (item 4); datas conferidas por regex.
+- Inferências sempre `Evidence(kind=inferred, method=llm:<modelo>@<versão>)`.
+- Amostra humana de 20 extrações por versão de prompt (E11), acurácia por campo registrada.

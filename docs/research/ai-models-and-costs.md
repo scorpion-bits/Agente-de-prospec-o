@@ -20,12 +20,25 @@ system prompt de extração pode não atingir o mínimo; medir). Ferramenta de w
 server-side da Anthropic é cobrada à parte por busca (≈ US$10/1.000 — conferir) — **não
 usar** no pipeline; buscar via API de busca própria com cache.
 
-### Google Gemini (free tier)
+### Google Gemini
 
-- Desde 01/04/2026, modelos Pro saíram do free tier; **Flash e Flash-Lite continuam grátis**.
-- Gemini 2.5 Flash-Lite: ~15 RPM, ~1.000 req/dia, 250k TPM (fontes variam).
-- Gemini 3.1 Flash-Lite: ~500 req/dia (set/2026).
-- ⚠ No free tier, o Google pode usar entradas para melhorar produtos → **só documentos públicos**.
+**Assinatura "Gemini Pro" (Google AI Pro) ≠ API.**
+| Via | O que dá | Uso no projeto |
+|---|---|---|
+| App Gemini / Deep Research / NotebookLM (assinatura) | Uso interativo com limites do produto | Pesquisa **manual** de editais e leads de alto valor; não automatizar |
+| **Créditos Google Cloud do AI Pro** (benefício de desenvolvedor, **precisa ativar** em google.dev) | ~US$ 10/mês em créditos para Gemini API/Vertex e outros serviços Google Cloud | Paga Gemini Flash/Pro na API em **plano pago** (dados não usados para treino) e sobras do Cloud Run |
+| API free tier (AI Studio) | Flash e Flash-Lite com cotas diárias; Pro saiu do free tier em 01/04/2026 | Extração de **documentos públicos** |
+
+Free tier (varia por modelo e muda com frequência): Gemini 2.5 Flash-Lite ~15 RPM /
+~1.000 req/dia / 250k TPM; Gemini 3.1 Flash-Lite ~500 req/dia (set/2026).
+⚠ No free tier o Google pode usar as entradas → **só documentos públicos**.
+
+Preços pagos (referência set/2026): Gemini 3.1 Pro ≈ US$ 2,00 entrada / US$ 12,00 saída por
+1M tokens (até 200k de contexto). Flash/Flash-Lite custam uma fração disso.
+**Grounding com Google Search** (modelos 3.x): ~5.000 requisições grátis/mês, depois
+≈ US$ 14/1.000 — útil para pesquisa sob demanda; conferir termos de armazenamento de
+resultados antes de usar para popular o banco.
+Diferenciais relevantes: entrada nativa de PDF (inclusive escaneado), contexto longo, cota gratuita.
 
 ### Groq (free tier)
 - ~30 RPM, ~6k TPM, até ~14.400 req/dia (varia por modelo; modelos maiores ~1.000/dia).
@@ -59,12 +72,18 @@ Premissas MVP: 50–150 documentos de oportunidade novos/semana; ~6k tokens de e
 ~0,8k de saída por documento após pré-filtro; ~300 escolas + ~40 SESCs na base; busca de
 site uma vez por organização.
 
-| Cenário | Infra | LLM | Busca | Total/mês |
+Já pagos/existentes (não entram como custo novo): domínio `scorpionbits.com`, assinatura
+Google AI Pro (inclui ~US$ 10/mês de créditos Cloud), Claude Code.
+
+| Cenário | Infra | LLM | Busca | Total/mês (dinheiro novo) |
 |---|---|---|---|---|
-| **MVP** (roda em máquina própria; Gemini/Groq free; Haiku só fallback) | US$ 0 | US$ 0–3 | US$ 0 (cotas grátis) | **US$ 0–5** (teto configurado US$ 5–10) |
-| MVP todo em Haiku (sem free tier) | US$ 0 | ~US$ 3–6 (≈ metade com Batch) | US$ 0 | ~US$ 3–6 |
-| **Operação pequena** (VPS 2–4 GB; + rascunhos Sonnet; + CNPJ região) | US$ 5–10 (VPS) + domínio ~US$1 | US$ 5–15 | US$ 0–10 | **US$ 15–35** |
-| **Operação maior** (Postgres gerenciado ou VPS maior, várias regiões/segmentos, agente de pesquisa sob demanda, mais buscas) | US$ 20–40 | US$ 30–100 (teto) | US$ 20–50 | **US$ 80–200** |
+| **MVP** — Supabase Free + GitHub Actions + admin local; Gemini free/créditos; Haiku só fallback | US$ 0 | US$ 0–3 | US$ 0 (cotas grátis) | **US$ 0–5** (teto US$ 5) |
+| MVP todo em Claude Haiku (sem Gemini) | US$ 0 | ~US$ 3–6 (≈ metade com Batch) | US$ 0 | ~US$ 3–6 |
+| **Operação pequena** — UI no Cloud Run (`app.scorpionbits.com`), rascunhos, CNPJ da região, Supabase ainda Free | US$ 0–5 | US$ 0–10 (créditos cobrem boa parte) | US$ 0–10 | **US$ 0–25** |
+| Operação pequena com Supabase Pro (backups gerenciados, sem pausa) | US$ 25–30 | US$ 0–10 | US$ 0–10 | US$ 25–50 |
+| **Operação maior** — Supabase Pro + compute, Vercel Pro se houver front Next.js (US$ 20/membro), agente de pesquisa, mais regiões | US$ 45–100 | US$ 30–100 (teto) | US$ 20–50 | **US$ 100–250** |
+
+Plataformas de hospedagem: ver `docs/research/hosting.md` (Vercel Hobby é **não comercial**).
 
 Cálculo de referência (Haiku 4.5): 600 docs × (6.000 × US$1/1M + 800 × US$5/1M)
 = 600 × (US$0,006 + US$0,004) = **US$ 6,00/mês** (US$ 3,00 com Batch).
@@ -83,6 +102,8 @@ Rascunhos (Sonnet 5.5): 40 × (3.000 × US$2/1M + 500 × US$10/1M) = 40 × US$0,
 ## Fontes
 
 - Anthropic: pricing de modelos (skill `claude-api`, cache de 25/09/2026) — docs.anthropic.com/pricing
+- Google AI Pro + créditos Cloud: https://blog.google/innovation-and-ai/technology/developers-tools/gdp-premium-ai-pro-ultra/ ; https://github.com/takeshy/obsidian-gemini-helper/discussions/60
+- Gemini preços pagos e grounding: https://ai.google.dev/gemini-api/docs/pricing ; https://devtk.ai/en/models/gemini-3-1-pro/ ; https://costgoat.com/pricing/gemini-api
 - Gemini free tier 2026: https://www.aifreeapi.com/en/posts/gemini-api-free-tier-rate-limits ; https://tokenmix.ai/blog/gemini-api-free-tier-limits ; https://www.cloudzero.com/blog/gemini-pricing/
 - Groq: https://tokenmix.ai/blog/groq-free-tier-limits-2026 ; https://www.cloudzero.com/blog/groq-pricing/
 - OpenRouter: https://openrouter.zendesk.com/hc/en-us/articles/39501163636379-OpenRouter-Rate-Limits-What-You-Need-to-Know ; https://costgoat.com/pricing/openrouter-free-models

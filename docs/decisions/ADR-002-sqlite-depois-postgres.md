@@ -1,6 +1,6 @@
 # ADR-002 — SQLite no MVP, PostgreSQL no deploy compartilhado
 
-- **Status:** aceito
+- **Status:** substituído por ADR-010 (2026-09-30)
 - **Data:** 2026-09-30
 
 ## Contexto
