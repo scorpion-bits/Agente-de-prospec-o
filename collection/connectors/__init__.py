@@ -5,6 +5,7 @@ from collection.connectors import (  # noqa: F401
     html_watch,
     inep_schools,
     itch_jams,
+    mapas_culturais,
     querido_diario,
     seed_csv,
     sesc_sp,

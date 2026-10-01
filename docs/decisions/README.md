@@ -42,3 +42,4 @@ Regras:
 | 029 | Conector itch.io (listagem HTML) e medição de tempo/prazo no fetcher | aceito |
 | 030 | Conector `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert | aceito |
 | 031 | Conector Querido Diário: consultas por termos, janela incremental e sondagem de cobertura | aceito |
+| 032 | Conector Mapas Culturais: uma `Source`, várias instâncias, datas só se informadas | aceito |

@@ -9,7 +9,7 @@ sem mexer no resto do sistema.
 
 | Tipo | Exemplo | Como funciona |
 |---|---|---|
-| `api` | Devpost, Querido Diário, Mapas Culturais, PNCP | Chama endpoint JSON público, pagina, normaliza (Querido Diário: janela incremental pela última execução `ok`, ADR-031) |
+| `api` | Devpost, Querido Diário, Mapas Culturais, PNCP | Chama endpoint JSON público, pagina, normaliza (Querido Diário: janela incremental pela última execução `ok`, ADR-031; Mapas Culturais: várias instâncias numa só `Source`, ADR-032) |
 | `feed` | itch.io (listagem `.xml`, não confirmado; o conector E06 lê a listagem HTML como `html_watch`) | Lê RSS/Atom |
 | `html_watch` | FAPESP/PIPE, Sebrae-SP, InovAtiva, ProAC, prefeituras | Baixa a página, extrai os links da listagem (config em `Source.config`, sem código por página; ADR-030); novidade = o que o upsert cria |
 | `dataset` | INEP (Catálogo de Escolas / microdados), IBGE municípios, CNPJ aberto | Download de arquivo, filtro local, import |

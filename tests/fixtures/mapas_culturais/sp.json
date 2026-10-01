@@ -1,0 +1,13 @@
+[
+  {"_comment": "FIXTURE SINTETICA (outra instancia, campos mais pobres: sem type/terms/ownerEntity, datas ISO).",
+   "id": 7,
+   "name": "Fomento a Oficinas Culturais de Software Livre",
+   "shortDescription": "",
+   "registrationFrom": "2020-03-01T00:00:00-03:00",
+   "registrationTo": null,
+   "singleUrl": "https://mapa.sp.exemplo.invalid/oportunidade/7/"},
+  {"id": 8,
+   "name": "Concurso de Cartazes",
+   "shortDescription": "Artes graficas.",
+   "singleUrl": "https://mapa.sp.exemplo.invalid/oportunidade/8/"}
+]
