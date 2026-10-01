@@ -15,6 +15,7 @@ docs/
     mvp.md                   escopo do MVP e fora do MVP
     metrics.md               métricas de sucesso
     risks.md                 riscos de produto, técnicos, financeiros e legais
+    ui-direction.md          direção da interface futura (web + API) e identidade visual do site
   plan/                      QUANDO e EM QUE ORDEM
     STATUS.md                estado vivo: onde estamos, próxima etapa (atualizar sempre)
     PLAN.md                  índice de fases e etapas + template de etapa
@@ -36,7 +37,8 @@ docs/
   research/                  pesquisas que embasam as decisões (negócio, ferramentas,
                              fontes, IA/custos, hospedagem, legal; baseline-manual.md vem na E01)
   history/                   conteúdo arquivado do CLAUDE.md, sessões, decisões antigas
-  operations/                como operar: ciclo /clear, manutenção do CLAUDE.md (runbook vem na E16)
+  operations/                como operar: ciclo /clear, manutenção do CLAUDE.md, aplicar o banco no
+                             Supabase (supabase-setup.md); runbook geral vem na E16
 ```
 
 ## Regras de manutenção

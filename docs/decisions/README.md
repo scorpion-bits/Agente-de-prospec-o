@@ -27,3 +27,6 @@ Regras:
 | 014 | Repositório público: higiene de dados, logs e backups | aceito |
 | 015 | Cobertura de atividades do MEI (CNAE) como fator de elegibilidade | aceito |
 | 016 | Schema dedicado `radar` e conexão pelo pooler em modo sessão | aceito |
+| 017 | `Evidence` e `Triage` apontam para a entidade por `GenericForeignKey` | aceito |
+| 018 | Listas de strings como `ArrayField` do PostgreSQL; JSON só para estruturas | aceito |
+| 019 | Interface nova: web (sem executável), consumindo uma API do Django | aceito (princípios) |

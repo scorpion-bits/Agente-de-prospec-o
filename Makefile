@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -13,6 +13,9 @@ setup:  ## Instala dependências (uv) e cria o .env a partir do exemplo
 
 migrate:  ## Aplica migrations (cria o schema dedicado se preciso)
 	$(UV) run python manage.py migrate
+
+seed:  ## Carrega o catálogo inicial de serviços (não sobrescreve edições do admin)
+	$(UV) run python manage.py load_services
 
 superuser:  ## Cria um usuário administrador
 	$(UV) run python manage.py createsuperuser

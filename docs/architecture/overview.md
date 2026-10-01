@@ -43,7 +43,7 @@ Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem l
         gates, fatores, confiança, breakdown)        (top oportunidades, leads,
                        │                              follow-ups, prazos, custos)
                        ▼
-        Django admin (local no MVP; Cloud Run em app.scorpionbits.com depois)
+        Django admin (local no MVP); depois, front web → API do Django (ADR-019)
                        ▼
         Humano decide e contata → registra Interaction
 ```
@@ -65,9 +65,10 @@ Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem l
 
 | Tema | MVP | Evolução |
 |---|---|---|
-| Frontend | Django admin local | Django no Cloud Run (`app.scorpionbits.com`); Next.js/Vercel Pro + Supabase Auth só se houver usuários não técnicos |
+| Frontend | Django admin local | Front **web** (sem executável) com o visual do site, consumindo uma **API do Django**; hospedagem e tecnologia a decidir (ADR-019, `docs/product/ui-direction.md`) |
+| Bibliotecas (decididas) | `httpx` (HTTP); `selectolax` e `trafilatura` (HTML); `pypdf` e `pdfplumber` (PDF); `ruff` e `pytest` + `pytest-django` (qualidade; CI no GitHub Actions) | — |
 | Banco | Supabase Postgres Free (projetos dev e prod), via pooler | Supabase Pro (US$ 25) quando backups gerenciados/sem pausa forem necessários |
-| Exposição do Supabase | Schema dedicado `radar` (fora da Data API), criado por `pre_migrate`; pooler em modo sessão (ADR-016); só o Django acessa | RLS explícito se um frontend usar o cliente Supabase |
+| Exposição do Supabase | Schema dedicado `radar` (fora da Data API), criado por `pre_migrate`; pooler em modo sessão (ADR-016); só o Django acessa | Nenhum front usa o cliente/Data API do Supabase: fala com a API do Django (ADR-019). Mudar isso exige ADR novo com RLS por linha |
 | Jobs | `run_pipeline` no GitHub Actions (cron) ou local | Worker separado só se jobs > 1 h |
 | Scheduler | GitHub Actions `schedule` + `workflow_dispatch` (fallback: cron externo/local) | — |
 | Documentos brutos | Não guardados; URL + hash + ETag + texto extraído comprimido, com retenção | Supabase Storage/S3 se necessário |
@@ -75,7 +76,7 @@ Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem l
 | Scraping | Fetch simples e educado; sem headless | Playwright só para fonte valiosa com JS |
 | Cache | ETag/hash por URL; LLM por hash (conteúdo+prompt+modelo); busca por query | — |
 | Dedupe | Chaves canônicas (URL, CNPJ, INEP, domínio, nome+município) + consulta à memória comercial | Fuzzy se necessário |
-| Auth | Local: usuários Django | Online: Django auth + HTTPS; opcional camada extra (Cloudflare Access/IAP) |
+| Auth | Local: usuários Django | Online: autenticação no Django (sessão ou token — a decidir) + HTTPS; opcional camada extra (Cloudflare Access/IAP) |
 | Observabilidade | Logs do job no GitHub Actions + `CollectionRun` + `LLMCall` | Sentry free tier |
 | Erros | Conector isolado; falha registrada; alerta no digest | — |
 | Segredos e dados | `.env` local; GitHub Secrets nos workers; **repositório público**: nada pessoal em git/logs/artefatos (ADR-014) | Secret Manager no Cloud Run |

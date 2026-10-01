@@ -153,10 +153,16 @@ transação do pooler (prepared statements/cursors) → preferir modo sessão ou
 **Riscos:** modelagem excessiva → só o que está em `data-model.md`; `Evidence` genérica →
 documentar a escolha (GenericForeignKey ou par de campos).
 **Testes:** entidades; unicidade/dedupe; helper de evidência; fixture carrega.
+**Status (2026-10-01): concluída**, exceto aplicar as migrations no **Supabase real**, que fica
+com o titular (a rede do ambiente do Claude bloqueia `*.supabase.co`): `docs/operations/supabase-setup.md`.
+Também entregue: `core/fields.py` (`ChoiceArrayField`), `core/services/{normalize,canonical,suppression}.py`,
+comando `load_services` (+ `make seed`), ADR-017/018. Estado e desvios do modelo: `data-model.md`.
 **Critério de conclusão:**
-- [ ] Migrations aplicam do zero no Postgres.
-- [ ] Admin cadastra oportunidade com 2 evidências (observed e inferred) exibidas de forma distinta.
-- [ ] Catálogo de serviços editável no admin.
+- [x] Migrations aplicam do zero no Postgres (banco vazio → tabelas do núcleo só no schema `radar`; 202 testes).
+- [x] Admin cadastra oportunidade com 2 evidências (observed e inferred) exibidas de forma distinta
+  (teste automatizado e conferido no navegador: ✅ borda cheia × 🔮 borda tracejada).
+- [x] Catálogo de serviços editável no admin (cobertura do MEI e "ativo" direto na lista).
+- [ ] Migrations aplicadas no Supabase — **a cargo do titular** (P4).
 
 ---
 
