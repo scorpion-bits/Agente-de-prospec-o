@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E18)
+> Última atualização: **2026-10-01** (E19)
 
 ## Onde estamos
 
@@ -17,13 +17,15 @@ runner e `collect`, conector `seed_csv`, `purge_raw_documents`. **E12 (geografia
 (vocabulário fechado) e filtro «parecida com o SESC» no admin.
 **E18 (site oficial)**: `SearchProvider` (Serper/Brave) com cache em `SearchQuery`, validação determinística
 e `find_websites` / `make websites` (ADR-025).
+**E19 (contatos públicos)**: `extract_contacts` / `make contacts` lê até 5 páginas do site oficial e grava
+`ContactPoint` com evidência e opt-out (ADR-026); migration `core.0005`.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase pelo titular; faltam outras ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E19 — Contatos públicos institucionais** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`: **M2**).
-Depende de E18. Antes, o humano roda a amostra de 20 da E18 (P13).
+➡️ **E20 — Matching serviço ↔ organização ↔ portfólio** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`).
+Antes, o humano roda `make websites` (P13) e `make contacts` (P14): sem sites e contatos reais o M2 não fecha.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co). Ela também
@@ -44,6 +46,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | E17 | 2026-10-01 | `sesc-sp-unidades` (42 unidades curadas, mãe "SESC-SP", dedupe com E03b), `inep-escolas` (privadas ativas ≤ 150 km + polos, colunas por nome, arquivo local), `parent_name` no upsert, `load_sources`, `count_organizations`; 418 testes; ADR-023. **Lista SESC e layout do INEP não conferidos na fonte (P11)** | `…-10-01-E17.md` |
 | E17b | 2026-10-01 | `similar_orgs.csv` (redes, prefeituras e universidades dos 4 polos), conector `orgs-parecidas-sesc`, tags de vocabulário fechado que somam no upsert, filtro no admin; 431 testes; ADR-024. **Lista e URLs de memória, não conferidas (P12)** | `…-10-01-E17b.md` |
 | E18 | 2026-10-01 | `collection/search/` (Serper/Brave, cache `SearchQuery`, teto por execução), `extraction/website.py` (bloqueio, nome+município na página), `find_websites`; evidência inferida; 31 testes novos; ADR-025. **Busca real e amostra de 20 não testadas (P13)** | `…-10-01-E18.md` |
+| E19 | 2026-10-01 | `extraction/contacts.py` (e-mail, telefone E.164, WhatsApp, JSON-LD, redes, formulário), `collection/contact_finder.py`, `extract_contacts`, `contacts_checked_at`; evidência observada, opt-out antes e depois, idempotente; 40 testes novos; ADR-026. **Sites reais e amostra de 20 não testados (P14)** | `…-10-01-E19.md` |
 
 ## Pendências do humano
 
@@ -62,6 +65,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P11 | **E17:** (a) conferir `data/seeds/sesc_sp.csv` contra sescsp.org.br (unidades faltando/sobrando) e preencher `website`/`source_url`; (b) baixar o Catálogo de Escolas do INEP para `data/inep/catalogo_escolas.csv`, rodar `make seed`, habilitar a fonte `inep-escolas` no admin, `make collect`, e `uv run python manage.py count_organizations school`; conferir 5 escolas à mão; se o CSV tiver outros nomes de coluna, o erro aponta qual | `docs/decisions/ADR-023-sesc-sp-e-escolas-inep.md` |
 | P12 | **E17b:** conferir `data/seeds/similar_orgs.csv` (unidades faltando/sobrando, URLs oficiais) e rodar `make seed` seguido de `make collect` no terminal da sua máquina (não no SQL Editor); sem migration nova | `docs/decisions/ADR-024-organizacoes-parecidas-com-o-sesc.md` |
 | P13 | **E18:** criar a chave Serper (ou Brave) em `.env` (`SEARCH_PROVIDER`, `SERPER_API_KEY`); rodar `make migrate` e `make websites DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os `found` (meta ≥ 85%) e anotar erros; depois `make websites` | `docs/decisions/ADR-025-descoberta-de-site-oficial.md` |
+| P14 | **E19:** depois do P13, rodar `make migrate` e `make contacts DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os contatos contra os sites (meta: todos conferem) e a linha «Cobertura»; depois `make contacts`. Revisar `is_personal` no admin | `docs/decisions/ADR-026-contatos-publicos-institucionais.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -77,7 +81,8 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 022 municípios do IBGE: texto × FK e perfis geográficos como dado ·
 023 SESC-SP (CSV curado) e escolas do INEP (arquivo local) ·
 024 parecidas com o SESC ·
-**025 site oficial: busca com cache + validação que erra para «ambíguo»**.
+025 site oficial: busca com cache + validação que erra para «ambíguo» ·
+**026 contatos públicos: por regra, só do domínio da organização, opt-out antes e depois**.
 
 ## Problemas abertos
 
@@ -85,6 +90,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Lista SESC-SP escrita de memória e layout do INEP supostos: nada conferido na fonte (P11, ADR-023).
 - Lista de organizações parecidas e URLs oficiais também de memória (P12, ADR-024); `html_watch` das páginas de chamamento só na E07.
 - E18: formatos de Serper/Brave só da documentação (nada testado com chave real); sites só em JavaScript caem em ambíguo (ADR-025).
+- E19: nenhum site real testado; heurística pessoal × institucional pode errar; e-mail ofuscado/JS não é lido (ADR-026).
 - Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
 - Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;

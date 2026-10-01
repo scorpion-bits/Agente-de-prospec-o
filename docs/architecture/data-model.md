@@ -37,6 +37,7 @@ Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de bin
 | **E04 (feita)** | `CollectionRun`, `RawDocument`, `Evidence.raw_document` (app `collection`) |
 | **E12 (feita)** | `Municipality` (IBGE) + FK `municipality` em `Organization`/`Opportunity` |
 | **E18 (feita)** | `SearchQuery` (cache permanente de buscas web; app `collection`) |
+| **E19 (feita)** | `Organization.contacts_checked_at` (última leitura do site; `extract_contacts`) |
 | E10 · E13 | `LLMCall` · `Score` |
 
 **Desvios do modelo alvo feitos na E03/E03b** (as seções abaixo continuam descrevendo o alvo):

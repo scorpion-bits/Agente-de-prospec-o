@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -30,6 +30,9 @@ collect:  ## Roda os conectores das fontes habilitadas (collect --all); DRY=1 si
 
 websites:  ## Acha o site oficial de escolas sem site (E18); N=20 organizações, DRY=1 simula
 	$(UV) run python manage.py find_websites --kind school --limit $(or $(N),20) $(if $(DRY),--dry-run)
+
+contacts:  ## Extrai contatos públicos do site oficial (E19); N=20 organizações, DRY=1 simula
+	$(UV) run python manage.py extract_contacts --limit $(or $(N),20) $(if $(DRY),--dry-run)
 
 superuser:  ## Cria um usuário administrador
 	$(UV) run python manage.py createsuperuser
