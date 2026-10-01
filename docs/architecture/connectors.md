@@ -101,5 +101,8 @@ Evidence); o histórico não é apagado.
 - **Busca de site oficial (E18, ADR-025):** `collection/search/` (`SearchProvider`: Serper e Brave) com cache
   permanente em `SearchQuery` e teto de buscas pagas por execução; `extraction/website.py` valida
   (domínio bloqueado, nome no começo da página, município); `manage.py find_websites` / `make websites`.
+- **Contatos públicos (E19, ADR-026):** `extraction/contacts.py` (puro) lê `mailto:`, `tel:`, `wa.me`, texto, JSON-LD,
+  redes e formulário em até 5 páginas do site (`PoliteFetcher`); `manage.py extract_contacts` / `make contacts`
+  grava `ContactPoint` com `Evidence` observada (`regex:contacts`), respeitando `Suppression`.
 - **Fontes iniciais:** `make seed` roda `load_sources` (cria `Source` que faltam, sem sobrescrever edições).
 - **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.

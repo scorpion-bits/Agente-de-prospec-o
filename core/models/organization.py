@@ -126,6 +126,14 @@ class Organization(models.Model):
         default=WebsiteStatus.UNKNOWN,
     )
 
+    contacts_checked_at = models.DateTimeField(
+        "contatos verificados em",
+        null=True,
+        blank=True,
+        editable=False,
+        help_text="Última vez que `extract_contacts` leu o site (E19).",
+    )
+
     network = models.CharField(
         "rede",
         max_length=80,

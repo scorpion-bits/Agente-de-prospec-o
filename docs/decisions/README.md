@@ -36,3 +36,4 @@ Regras:
 | 023 | Rede SESC-SP (CSV curado) e escolas do INEP (dataset local) | aceito |
 | 024 | Organizações parecidas com o SESC (CSV curado + vocabulário fechado de tags) | aceito |
 | 025 | Descoberta de site oficial: busca com cache + validação determinística | aceito |
+| 026 | Contatos públicos institucionais: extração por regra, só do domínio da organização | aceito |

@@ -98,8 +98,12 @@ telefone E.164; `Suppression`.
 **Riscos:** e-mails ofuscados → aceitar perda; e-mails de terceiros → ignorar domínios alheios.
 **Testes:** fixtures HTML variadas; nunca cria contato sem evidência; suppression respeitada.
 **Critério de conclusão:**
-- [ ] Amostra de 20: contatos conferem com o site.
-- [ ] % de organizações com ≥ 1 contato institucional registrada em STATUS.
+- [ ] Amostra de 20: contatos conferem com o site (**pendente, P14**: precisa de rede real e do humano).
+- [x] % de organizações com ≥ 1 contato institucional: o comando imprime a «Cobertura»; o número real
+  entra no STATUS depois da amostra (a base ainda não tem sites).
+
+**Feita (2026-10-01, ADR-026):** `extraction/contacts.py`, `collection/contact_finder.py`,
+`extract_contacts`, `make contacts`, `Organization.contacts_checked_at` (migration `core.0005`).
 
 ---
 
