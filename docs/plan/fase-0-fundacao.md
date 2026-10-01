@@ -105,14 +105,14 @@ automatizada desde o início.
 - `radar/` settings: `DATABASE_URL` (Supabase via pooler; `CONN_MAX_AGE` e opções
   compatíveis com o modo do pooler; `sslmode=require`), `TIME_ZONE="America/Sao_Paulo"`,
   `LANGUAGE_CODE="pt-br"`; apps vazios `core`, `collection`, `extraction`, `llm`, `scoring`, `reports`.
-- Schema: usar schema dedicado (ex. `radar`) **ou** Data API desativada — decidir, testar e
-  documentar em `overview.md`.
+- Schema: **dedicado `radar`** (decidido e testado; ADR-016, `overview.md`).
 - `Makefile`: `setup`, `run`, `test`, `lint`, `check` (lint + test + docs-check), `docs-check`
   (limites de linhas do CLAUDE.md/STATUS.md), `migrate`.
 - `.env.example`, `.gitignore` (`.env`, `data/private/`, caches).
 - `.github/workflows/ci.yml` — `make check` com **PostgreSQL em service container**.
 - `README.md` — "Como rodar" (local apontando para `radar-dev`).
 
+**Status (2026-10-01): concluída, exceto a verificação contra o Supabase real** (aguarda P4).
 **Dependências:** E01b (projeto Supabase criado; senão, Postgres local para começar).
 **Modelo (desenvolvimento):** Claude Sonnet 5.5. **IA em runtime:** nenhuma.
 **Custo:** US$ 0. **Complexidade:** baixa.
@@ -120,10 +120,10 @@ automatizada desde o início.
 transação do pooler (prepared statements/cursors) → preferir modo sessão ou ajustar opções.
 **Testes:** fumaça (`manage.py check`, `/admin/` responde); migrations aplicam no Postgres do CI.
 **Critério de conclusão:**
-- [ ] `make setup && make check` passa numa máquina limpa e no CI.
-- [ ] `make run` abre o admin conectado ao `radar-dev`.
-- [ ] Supabase não expõe as tabelas pela Data API (verificado).
-- [ ] CLAUDE.md "Estrutura" confere com o que existe.
+- [x] `make check` passa em PostgreSQL 16 (8 testes) e o admin responde (login verificado). CI do GitHub verde (run 1).
+- [ ] `make run` conectado ao `radar-dev` do Supabase — **pendente de P4**.
+- [ ] Supabase não expõe as tabelas pela Data API — **pendente de P4** (schema `radar` testado localmente).
+- [x] CLAUDE.md "Estrutura" confere com o que existe.
 
 ---
 

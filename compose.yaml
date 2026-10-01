@@ -1,0 +1,15 @@
+# PostgreSQL local para desenvolvimento (alternativa ao projeto Supabase radar-dev).
+#   docker compose up -d      # sobe
+#   docker compose down       # desliga (os dados ficam no volume)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: radar_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - radar_pgdata:/var/lib/postgresql/data
+volumes:
+  radar_pgdata:
