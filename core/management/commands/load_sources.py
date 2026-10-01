@@ -6,7 +6,9 @@ habilitadas. `inep-escolas` nasce
 (ignorado pelo git), confira os termos e habilite no admin (docs/research/organization-sources.md).
 `devpost` (API pública, E05) também nasce **desabilitada** e sem `robots_ok`: confira os termos
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
-`itch-jams` (listagem pública de game jams, E06) segue a mesma regra.
+`itch-jams` (listagem pública de game jams, E06) segue a mesma regra. As páginas monitoradas pelo
+`html_watch` genérico (E07, ADR-030) também nascem **desabilitadas**, e as URLs são de memória/da
+pesquisa: confirme cada uma (e o `selector`, se a listagem tiver área própria) antes de habilitar.
 """
 
 from django.core.management.base import BaseCommand
@@ -72,8 +74,105 @@ INITIAL_SOURCES = [
 ]
 
 
+CALL_WORDS = ["edital", "editais", "chamada", "chamamento", "credenciamento", "inscri", "seleção"]
+
+
+def watched_page(slug, name, url, *, reliability=4, keywords=None, **opportunity):
+    """Fonte do `html_watch` genérico: só configuração, nenhum código por página (E07)."""
+    return {
+        "slug": slug,
+        "name": name,
+        "kind": Source.Kind.HTML_WATCH,
+        "base_url": url,
+        "reliability": reliability,
+        "enabled": False,  # habilite só depois de conferir termos, robots.txt e a URL (P18)
+        "config": {
+            "url": url,
+            "keywords": keywords if keywords is not None else CALL_WORDS,
+            "min_interval_seconds": 5,
+            "opportunity": {"kind": "edital", **opportunity},
+        },
+    }
+
+
+INITIAL_SOURCES += [
+    watched_page(
+        "fapesp-pipe",
+        "FAPESP — chamadas do PIPE",
+        "https://fapesp.br/pipe/chamadas",
+        reliability=5,
+        keywords=[],  # a página já é só de chamadas
+        organizer_name="FAPESP",
+        scope="state",
+        uf="SP",
+        categories=["innovation", "technology"],
+    ),
+    watched_page(
+        "proac-editais",
+        "Secretaria de Cultura SP — ProAC e PNAB (editais)",
+        "https://www.cultura.sp.gov.br/sec_cultura/Fomento/Fomento_Editais_e_PNAB",
+        reliability=5,
+        organizer_name="Secretaria de Cultura, Economia e Indústria Criativas de SP",
+        scope="state",
+        uf="SP",
+        categories=["culture"],
+    ),
+    watched_page(
+        "oficinas-culturais",
+        "Oficinas Culturais do Estado de SP — chamadas",
+        "https://oficinasculturais.org.br/",
+        reliability=5,
+        organizer_name="Oficinas Culturais do Estado de SP",
+        kind="call_for_partners",
+        scope="state",
+        uf="SP",
+        categories=["culture", "education"],
+    ),
+    watched_page(
+        "sebrae-sp-editais",
+        "Sebrae-SP — editais e programas",
+        "https://www.sebraesp.com.br/",
+        organizer_name="Sebrae-SP",
+        scope="state",
+        uf="SP",
+        categories=["entrepreneurship"],
+    ),
+    watched_page(
+        "inovativa-chamadas",
+        "InovAtiva Brasil — chamadas",
+        "https://www.inovativabrasil.com.br/",
+        reliability=5,
+        kind="program",
+        organizer_name="InovAtiva Brasil",
+        scope="national",
+        categories=["innovation", "entrepreneurship"],
+    ),
+    *[
+        watched_page(
+            f"prefeitura-{slug}-editais",
+            f"Prefeitura de {city} — editais e chamamentos",
+            url,
+            reliability=4,
+            organizer_name=f"Prefeitura de {city}",
+            scope="municipal",
+            uf="SP",
+            municipality_name=city,
+            categories=["culture", "education"],
+        )
+        for slug, city, url in (
+            ("araraquara", "Araraquara", "https://www.araraquara.sp.gov.br/"),
+            ("sao-carlos", "São Carlos", "https://www.saocarlos.sp.gov.br/"),
+            ("ribeirao-preto", "Ribeirão Preto", "https://www.ribeiraopreto.sp.gov.br/"),
+            ("bauru", "Bauru", "https://www.bauru.sp.gov.br/"),
+        )
+    ],
+]
+
+
 class Command(BaseCommand):
-    help = "Cria as fontes iniciais (SESC-SP, parecidas, INEP, Devpost e itch.io) que faltam."
+    help = (
+        "Cria as fontes iniciais (SESC-SP, parecidas, INEP, Devpost, itch.io e páginas) que faltam."
+    )
 
     def handle(self, *args, **options):
         created = 0

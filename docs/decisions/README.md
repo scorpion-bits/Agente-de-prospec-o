@@ -39,3 +39,5 @@ Regras:
 | 026 | Contatos públicos institucionais: extração por regra, só do domínio da organização | aceito |
 | 027 | Matching por regras em dados: razões com evidência, prova de portfólio, máx. 3 por organização | aceito |
 | 028 | Conector Devpost: API pública, filtro de relevância e datas sem chute | aceito |
+| 029 | Conector itch.io (listagem HTML) e medição de tempo/prazo no fetcher | aceito |
+| 030 | Conector `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert | aceito |

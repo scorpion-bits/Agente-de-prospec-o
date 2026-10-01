@@ -2,6 +2,7 @@
 
 from collection.connectors import (  # noqa: F401
     devpost,
+    html_watch,
     inep_schools,
     itch_jams,
     seed_csv,
