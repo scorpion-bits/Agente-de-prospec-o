@@ -10,7 +10,7 @@ sem mexer no resto do sistema.
 | Tipo | Exemplo | Como funciona |
 |---|---|---|
 | `api` | Devpost, Querido Diário, Mapas Culturais, PNCP | Chama endpoint JSON público, pagina, normaliza |
-| `feed` | itch.io (páginas de listagem com `.xml`) | Lê RSS/Atom |
+| `feed` | itch.io (listagem `.xml`, não confirmado; o conector E06 lê a listagem HTML como `html_watch`) | Lê RSS/Atom |
 | `html_watch` | FAPESP/PIPE, Sebrae-SP, InovAtiva, ProAC, prefeituras | Baixa página de listagem, extrai links/itens, detecta novidades por diff |
 | `dataset` | INEP (Catálogo de Escolas / microdados), IBGE municípios, CNPJ aberto | Download de arquivo, filtro local, import |
 | `seed_csv` | Unidades SESC-SP, fontes curadas à mão | CSV versionado em `data/seeds/` |
@@ -51,6 +51,7 @@ Erro em um item não interrompe os demais; erro no conector não interrompe outr
 7. **Sem** contornar login, captcha, paywall ou bloqueio. Bloqueou → fonte desabilitada e
    registrada para revisão humana.
 8. **Sem navegador headless** no MVP.
+9. **Prazo total por requisição** (90 s, com retries e esperas) e `fetcher.stats`; `collect` imprime a linha `tempo —` (busca × gravação) para diagnosticar demora (ADR-029).
 
 ## Deduplicação (`canonical_key`)
 

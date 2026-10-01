@@ -10,6 +10,9 @@ Regras (docs/architecture/connectors.md e legal-and-compliance.md):
 6. Limites: tamanho do download e número de páginas por execução. Só texto (sem binários).
 7. Não contorna login, captcha, paywall ou bloqueio: 401/403 levanta `FetchBlocked`.
 8. Sem navegador headless.
+9. Cada requisição (com retries e esperas) tem prazo total (`max_seconds`, padrão 90 s): passou
+   disso, `FetchError`. `stats` conta requisições, retries e segundos de rede × espera, para
+   separar «fonte lenta» de «rate limit/backoff» ao investigar demora (ADR-029).
 """
 
 from __future__ import annotations
@@ -29,6 +32,8 @@ from collection.models import RawDocument
 
 DEFAULT_MIN_INTERVAL = 5.0
 DEFAULT_MAX_BYTES = 20 * 1024 * 1024
+DEFAULT_MAX_SECONDS = 90.0
+CONNECT_TIMEOUT = 10.0
 ROBOTS_TTL = 24 * 3600
 ROBOTS_MAX_BYTES = 512 * 1024
 MAX_REDIRECTS = 5
@@ -75,6 +80,24 @@ class PageBudgetExceeded(FetchError):
 
 
 @dataclass
+class FetchStats:
+    """Contadores de uma execução (só números: nada de URL com dado pessoal)."""
+
+    requests: int = 0  # chamadas a `fetch`
+    attempts: int = 0  # requisições HTTP de fato (inclui robots.txt e retries)
+    retries: int = 0
+    network_seconds: float = 0.0  # dentro da requisição HTTP (conexão + download)
+    wait_seconds: float = 0.0  # rate limit + backoff + Retry-After
+
+    def summary(self) -> str:
+        return (
+            f"{self.requests} página(s), {self.attempts} requisição(ões) HTTP, "
+            f"{self.retries} retry, "
+            f"rede {self.network_seconds:.1f} s, espera {self.wait_seconds:.1f} s"
+        )
+
+
+@dataclass
 class FetchResult:
     url: str
     status_code: int
@@ -106,22 +129,28 @@ class PoliteFetcher:
         max_bytes: int = DEFAULT_MAX_BYTES,
         max_requests: int | None = None,
         timeout: float = 20.0,
+        max_seconds: float = DEFAULT_MAX_SECONDS,
         backoff_base: float = 2.0,
         sleep=time.sleep,
         monotonic=time.monotonic,
     ):
         self.user_agent = user_agent or settings.USER_AGENT
-        self.client = client or httpx.Client(timeout=timeout, follow_redirects=False)
+        self.client = client or httpx.Client(
+            timeout=httpx.Timeout(timeout, connect=min(timeout, CONNECT_TIMEOUT)),
+            follow_redirects=False,
+        )
         self.min_interval = min_interval
         self.max_retries = max_retries
         self.max_bytes = max_bytes
         self.max_requests = max_requests
+        self.max_seconds = max_seconds
         self.backoff_base = backoff_base
         self._sleep = sleep
         self._monotonic = monotonic
         self._last_request: dict[str, float] = {}
         self._robots: dict[str, tuple[float, RobotFileParser | None]] = {}
         self.requests = 0
+        self.stats = FetchStats()
 
     def close(self):
         self.client.close()
@@ -161,15 +190,22 @@ class PoliteFetcher:
         if last is not None:
             wait = self.min_interval - (self._monotonic() - last)
             if wait > 0:
-                self._sleep(wait)
+                self._pause(wait)
+
+    def _pause(self, seconds: float):
+        self.stats.wait_seconds += seconds
+        self._sleep(seconds)
 
     def _send(self, url: str, headers: dict, *, max_bytes: int) -> _Response:
         """Uma requisição com rate limit, retries e limite de tamanho (sem redirecionar)."""
         domain = urlsplit(url).netloc
         headers = {"User-Agent": self.user_agent, "Accept": "*/*", **headers}
+        started = self._monotonic()
         for attempt in range(self.max_retries + 1):
             self._wait_turn(domain)
             retry_after = None
+            self.stats.attempts += 1
+            attempt_started = self._monotonic()
             try:
                 with self.client.stream("GET", url, headers=headers) as response:
                     self._last_request[domain] = self._monotonic()
@@ -182,7 +218,13 @@ class PoliteFetcher:
                 self._last_request[domain] = self._monotonic()
                 if attempt == self.max_retries:
                     raise FetchError(f"Falha de rede em {domain}: {type(exc).__name__}") from exc
-            self._sleep(retry_after or self.backoff_base ** (attempt + 1))
+            finally:
+                self.stats.network_seconds += self._monotonic() - attempt_started
+            delay = retry_after or self.backoff_base ** (attempt + 1)
+            if self._monotonic() - started + delay > self.max_seconds:
+                raise FetchError(f"Prazo de {self.max_seconds:.0f} s esgotado em {domain}.")
+            self.stats.retries += 1
+            self._pause(delay)
         raise AssertionError("inalcançável")  # pragma: no cover
 
     def _read(self, response: httpx.Response, max_bytes: int) -> _Response:
@@ -207,6 +249,7 @@ class PoliteFetcher:
         if self.max_requests is not None and self.requests >= self.max_requests:
             raise PageBudgetExceeded(f"Limite de {self.max_requests} páginas por execução.")
         self.requests += 1
+        self.stats.requests += 1
         limit = max_bytes or self.max_bytes
         document = RawDocument.objects.filter(url=url).first()
 

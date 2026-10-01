@@ -48,8 +48,10 @@ conforme E01), fixtures, testes, `Source`.
 feed; se só HTML, respeitar rate limit.
 **Testes:** normalização com fixture; filtro; dedupe.
 **Critério de conclusão:**
-- [ ] Coleta real traz jams futuras; 10 revisadas.
-- [ ] Filtro documentado e configurável em `Source.config`.
+- [ ] Coleta real traz jams futuras; 10 revisadas (P17, depende do humano).
+- [x] Filtro documentado e configurável em `Source.config`.
+
+> Feita (ADR-029): listagem HTML `/jams/upcoming` e `/jams/in-progress`; sem feed `.xml` confirmado.
 
 ---
 
