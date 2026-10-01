@@ -73,7 +73,7 @@ docs/             memória do projeto (ver docs/README.md)
 
 ## Comandos
 
-`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make run` (admin) · `make test` ·
+`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make extract` (E11) · `make run` (admin) · `make test` ·
 `make lint`/`make fmt` · `make check` (ruff, pytest, migrations, repo_checks: o que o CI roda).
 Testes precisam de `DATABASE_URL` (PostgreSQL, ex. `docker compose up -d`).
 

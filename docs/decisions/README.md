@@ -44,3 +44,4 @@ Regras:
 | 031 | Conector Querido Diário: consultas por termos, janela incremental e sondagem de cobertura | aceito |
 | 032 | Conector Mapas Culturais: uma `Source`, várias instâncias, datas só se informadas | aceito |
 | 033 | Camada de IA: tarefas × estratégias, HTTP sem SDK, classe do dado, teto; Ollama Cloud não adotado | aceito |
+| 034 | Extração de oportunidades: citação obrigatória, conferência por regras, campo crítico só verificado | aceito |

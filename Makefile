@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites contacts match superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts match extract superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -37,7 +37,10 @@ match:  ## Gera hipóteses serviço × organização × portfólio (E20); DRY=1 
 contacts:  ## Extrai contatos públicos do site oficial (E19); N=20 organizações, DRY=1 simula
 	$(UV) run python manage.py extract_contacts --limit $(or $(N),20) $(if $(DRY),--dry-run)
 
-llm-smoke:  ## Chamada real de fumaça à IA (E10); S=gemini-free:gemini-2.5-flash-lite escolhe a estratégia
+extract:  ## Extrai campos das oportunidades candidatas (E11); N=20 itens, DRY=1 simula
+	$(UV) run python manage.py extract_opportunities --limit $(or $(N),20) $(if $(DRY),--dry-run)
+
+llm-smoke:  ## Chamada real de fumaça à IA (E10); S=gemini-free:gemini-3.1-flash-lite escolhe a estratégia
 	$(UV) run python manage.py llm_smoke $(if $(S),--strategy $(S))
 
 llm-usage:  ## Custo e uso da IA no mês (E10)
