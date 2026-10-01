@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E12)
+> Última atualização: **2026-10-01** (E17)
 
 ## Onde estamos
 
@@ -11,19 +11,19 @@ admin + catálogo de serviços (E03)** e **memória comercial, portfólio e perf
 `make memory`, `core/models/` em pacote. **E04 (infra de coleta)**: `PoliteFetcher`, `CollectionRun`/`RawDocument`,
 runner e `collect`, conector `seed_csv`, `purge_raw_documents`. **E12 (geografia)**: tabela `Municipality` (IBGE),
 `scoring/geo.py` com anéis R0–R5 e os 5 perfis, `make seed` carrega os municípios.
+**E17 (SESC-SP + escolas)**: 42 unidades SESC em `data/seeds/sesc_sp.csv` (filhas de "SESC-SP"), conector `inep-escolas`
+(arquivo local do Catálogo de Escolas), `load_sources`, `count_organizations`.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase pelo titular; faltam outras ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E17 — Rede SESC-SP + escolas privadas (INEP)** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`:
-E17 → E17b → E18 → E19, **M2**). Usa o runner da E04, o dedupe da E03b e a geografia da E12. A coleta do INEP
-precisa de rede (E01 pendente); a parte do SESC pode começar por `seed_csv`.
+➡️ **E17b — Organizações parecidas com o SESC** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`:
+E17b → E18 → E19, **M2**). Reusa `seed_csv`, `parent_name` e `load_sources` da E17.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
-normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario e supabase.co). Só bloqueia a Fase 1/3.
-
-Depois (ordem em `PLAN.md`): E17b → E18 → E19 (**M2**).
+normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co). Ela também
+confere a lista SESC e o layout real do INEP (P11).
 
 ## Concluído
 
@@ -37,6 +37,7 @@ Depois (ordem em `PLAN.md`): E17b → E18 → E19 (**M2**).
 | E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
 | E04 | 2026-10-01 | `collection/`: fetcher educado (robots, rate limit, 304, retry, limites), `CollectionRun`/`RawDocument`/`Evidence.raw_document`, runner + `collect` (`--all/--dry-run/--limit`), `seed_csv`, retenção; 337 testes; ADR-021 | `…-10-01-E04.md` |
 | E12 | 2026-10-01 | `Municipality` (5.571 linhas, `load_municipalities`), FK `municipality` com resolução ao salvar (`resolve_municipalities`), `scoring/geo.py` (R0–R5, 5 perfis, gate, dado ausente); 395 testes; ADR-022. **Bauru está a ≈ 111 km, não ~100** | `…-10-01-E12.md` |
+| E17 | 2026-10-01 | `sesc-sp-unidades` (42 unidades curadas, mãe "SESC-SP", dedupe com E03b), `inep-escolas` (privadas ativas ≤ 150 km + polos, colunas por nome, arquivo local), `parent_name` no upsert, `load_sources`, `count_organizations`; 418 testes; ADR-023. **Lista SESC e layout do INEP não conferidos na fonte (P11)** | `…-10-01-E17.md` |
 
 ## Pendências do humano
 
@@ -52,6 +53,7 @@ Depois (ordem em `PLAN.md`): E17b → E18 → E19 (**M2**).
 | P8 | Decidir: manter repositório público (recomendado agora, com ADR-014) ou privado | ADR-014 |
 | P9 | **Vercel** está conectado a este repositório (ADR-010: sem Vercel no MVP): tenta um deploy a cada push, sem ter o que construir, e, se receber `DATABASE_URL`, exporia o admin com contatos (LGPD). Desconectar ou usar *Ignored Build Step* até existir o front | painel do Vercel |
 | P10 | **UI nova** decidida: web + API do Django, visual do site (ADR-019). Falta replanejar a E29 (front + API) e escolher tecnologia/hospedagem, **depois** de E03b/E04 | `docs/product/ui-direction.md` |
+| P11 | **E17:** (a) conferir `data/seeds/sesc_sp.csv` contra sescsp.org.br (unidades faltando/sobrando) e preencher `website`/`source_url`; (b) baixar o Catálogo de Escolas do INEP para `data/inep/catalogo_escolas.csv`, rodar `make seed`, habilitar a fonte `inep-escolas` no admin, `make collect`, e `uv run python manage.py count_organizations school`; conferir 5 escolas à mão; se o CSV tiver outros nomes de coluna, o erro aponta qual | `docs/decisions/ADR-023-sesc-sp-e-escolas-inep.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -64,13 +66,15 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
 020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
 021 regras da coleta (robots, bloqueio, dry-run, retenção) ·
-**022 municípios do IBGE: texto × FK e perfis geográficos como dado**.
+022 municípios do IBGE: texto × FK e perfis geográficos como dado ·
+**023 SESC-SP (CSV curado) e escolas do INEP (arquivo local)**.
 
 ## Problemas abertos
 
 - Coordenadas dos municípios vêm de conjunto derivado do IBGE (sedes), não do IBGE direto (rede bloqueada): conferir quando possível (ADR-022).
+- Lista SESC-SP escrita de memória e layout do INEP supostos: nada conferido na fonte (P11, ADR-023).
 - Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
-- Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04.
+- Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
 - `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env` do titular: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.

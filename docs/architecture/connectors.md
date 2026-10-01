@@ -93,4 +93,8 @@ Evidence); o histórico não é apagado.
   `purge_raw_documents` apaga o texto vencido e mantém URL/hash. `Evidence.raw_document` aponta para ele.
 - **Evidência de CSV curado:** linha com `source_url` → observado (`connector:<slug>`); sem URL → manual
   (`human`). Nunca "observado" sem fonte (ADR-004).
+- **Redes e hierarquia (E17, ADR-023):** `fields["parent_name"]` liga a unidade à organização-mãe da rede
+  (criada se faltar; mãe já definida não é trocada). Conectores específicos: `sesc-sp-unidades`
+  (`seed_csv`) e `inep-escolas` (`dataset`, arquivo local em `config.path`; sem `url` não usa rede).
+- **Fontes iniciais:** `make seed` roda `load_sources` (cria `Source` que faltam, sem sobrescrever edições).
 - **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.

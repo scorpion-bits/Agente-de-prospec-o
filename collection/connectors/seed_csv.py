@@ -50,14 +50,16 @@ def _choice(choices, value: str, field: str) -> str:
 @register(kind="seed_csv")
 class SeedCsvConnector:
     kind = "seed_csv"
+    default_path = ""  # conectores de uma fonte específica fixam o CSV padrão
 
     def __init__(self, source):
         self.source = source
         self.slug = source.slug
         config = source.config or {}
-        if not config.get("path"):
+        path = config.get("path") or self.default_path
+        if not path:
             raise SeedCsvError('Configure {"path": "..."} na fonte.')
-        self.path = Path(config["path"])
+        self.path = Path(path)
         if not self.path.is_absolute():
             self.path = Path(settings.BASE_DIR) / self.path
         self.entity = config.get("entity", "organization")

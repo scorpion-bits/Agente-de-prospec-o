@@ -25,8 +25,10 @@ confiança média; lista SESC desatualiza → data de curadoria.
 **Testes:** filtro (privadas, ativas, escopo); idempotência por `inep_code`; unidades SESC já
 existentes (E03b) não duplicam.
 **Critério de conclusão:**
-- [ ] Todas as unidades SESC-SP no admin, com status de relacionamento correto nas já contatadas.
-- [ ] Contagem de escolas por município registrada em STATUS; 5 conferidas por amostragem.
+- [x] Todas as unidades SESC-SP no admin, com status de relacionamento correto nas já contatadas
+  (lista curada de memória: **conferir contra sescsp.org.br**, P11).
+- [ ] Contagem de escolas por município registrada em STATUS; 5 conferidas por amostragem
+  (`make collect` com o CSV do INEP baixado + `count_organizations school`; depende de rede, P11).
 
 ---
 

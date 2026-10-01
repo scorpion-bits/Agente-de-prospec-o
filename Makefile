@@ -14,9 +14,10 @@ setup:  ## Instala dependências (uv) e cria o .env a partir do exemplo
 migrate:  ## Aplica migrations (cria o schema dedicado se preciso)
 	$(UV) run python manage.py migrate
 
-seed:  ## Carrega o catálogo de serviços (não sobrescreve edições do admin) e os municípios do IBGE
+seed:  ## Carrega catálogo de serviços, municípios do IBGE e fontes de coleta (não sobrescreve edições)
 	$(UV) run python manage.py load_services
 	$(UV) run python manage.py load_municipalities
+	$(UV) run python manage.py load_sources
 
 memory:  ## Carrega perfil da empresa, portfólio e (se existir) o histórico privado de interações
 	$(UV) run python manage.py load_company_profile
