@@ -9,14 +9,22 @@ from django.contrib import admin
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import OuterRef, Subquery
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 
 from core.models import (
+    CompanyProfile,
     ContactPoint,
     Evidence,
+    FollowUp,
+    Interaction,
     Match,
     Opportunity,
     Organization,
+    PortfolioItem,
     ServiceOffering,
     Source,
     Suppression,
@@ -135,6 +143,23 @@ class ContactPointInline(admin.StackedInline):
         return formfield
 
 
+class InteractionInline(admin.StackedInline):
+    """Memória comercial na própria organização: a interação mais recente aparece primeiro."""
+
+    model = Interaction
+    extra = 0
+    fields = (
+        ("occurred_at", "kind", "channel", "outcome"),
+        ("service", "contact_name_role", "data_status"),
+        "summary",
+        ("next_action", "next_action_at"),
+        "attachments_url",
+    )
+    autocomplete_fields = ("service",)
+    ordering = Interaction._meta.ordering
+    show_change_link = True
+
+
 class EntityLabelMixin:
     """Mostra a entidade de uma `Evidence`/`Triage` (relação genérica), sem consulta por linha."""
 
@@ -172,6 +197,8 @@ class OrganizationAdmin(admin.ModelAdmin):
         "municipality_name",
         "uf",
         "relationship_status",
+        "last_interaction_at",
+        "next_action_at",
         "website_status",
     )
     list_filter = ("kind", "relationship_status", "uf", "network", "website_status", "size_hint")
@@ -185,7 +212,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
-    inlines = (ContactPointInline, EvidenceInline)
+    inlines = (InteractionInline, ContactPointInline, EvidenceInline)
     save_on_top = True
     fieldsets = (
         (
@@ -357,12 +384,117 @@ class ServiceOfferingAdmin(SlugLockedMixin, admin.ModelAdmin):
     search_fields = ("name", "slug", "description")
 
 
+@admin.register(Interaction)
+class InteractionAdmin(admin.ModelAdmin):
+    """Histórico comercial completo: "já falamos com eles?"."""
+
+    list_display = (
+        "organization",
+        "kind",
+        "occurred_at",
+        "outcome",
+        "next_action",
+        "next_action_at",
+        "data_status",
+    )
+    list_filter = (
+        "kind",
+        "outcome",
+        "data_status",
+        "channel",
+        "organization__relationship_status",
+        "organization__network",
+    )
+    search_fields = ("organization__name", "summary", "next_action")
+    autocomplete_fields = ("organization", "service")
+    raw_id_fields = ("contact_point",)
+    date_hierarchy = "occurred_at"
+    readonly_fields = ("created_by", "created_at", "updated_at")
+
+    def save_model(self, request, obj, form, change):
+        if not change and obj.created_by_id is None:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(FollowUp)
+class FollowUpAdmin(admin.ModelAdmin):
+    """Próximas ações: o que fazer em seguida, a mais urgente primeiro. Somente leitura."""
+
+    list_display = ("name", "next_action_at", "due", "next_action", "relationship_status")
+    list_filter = ("relationship_status", "network")
+    search_fields = ("name", "network")
+    ordering = ("next_action_at", "name")
+    list_display_links = ("name",)
+
+    def get_queryset(self, request):
+        latest = Interaction.objects.filter(organization=OuterRef("pk")).values("next_action")[:1]
+        return (
+            super()
+            .get_queryset(request)
+            .filter(next_action_at__isnull=False)
+            .annotate(_next_action=Subquery(latest))
+        )
+
+    @admin.display(description="próxima ação", ordering="_next_action")
+    def next_action(self, obj):
+        return obj._next_action
+
+    @admin.display(description="prazo")
+    def due(self, obj):
+        today = timezone.localdate()
+        if obj.next_action_at < today:
+            return format_html('<strong style="color:#b91c1c">{}</strong>', "⏰ vencida")
+        if obj.next_action_at == today:
+            return format_html('<strong style="color:#b45309">{}</strong>', "📌 hoje")
+        return "a vencer"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PortfolioItem)
+class PortfolioItemAdmin(SlugLockedMixin, admin.ModelAdmin):
+    list_display = ("title", "kind", "year", "public", "status", "public_url")
+    list_filter = ("kind", "public", "status", "services")
+    search_fields = ("title", "slug", "description")
+    filter_horizontal = ("services",)
+
+
+@admin.register(CompanyProfile)
+class CompanyProfileAdmin(admin.ModelAdmin):
+    """Perfil da empresa: linha única (MEI, abertura, CNAEs). CNPJ só aqui/.env, nunca no git."""
+
+    save_on_top = True
+
+    def has_add_permission(self, request):
+        return not CompanyProfile.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        profile = CompanyProfile.get()
+        if profile is not None:
+            return HttpResponseRedirect(
+                reverse("admin:core_companyprofile_change", args=[profile.pk])
+            )
+        return super().changelist_view(request, extra_context)
+
+
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
     list_display = ("organization", "service", "strength", "method", "created_at")
     list_filter = ("method", "service")
     search_fields = ("organization__name", "service__name")
     autocomplete_fields = ("organization", "service")
+    filter_horizontal = ("portfolio_refs",)
 
 
 @admin.register(Triage)

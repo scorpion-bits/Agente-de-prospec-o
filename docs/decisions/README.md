@@ -30,3 +30,4 @@ Regras:
 | 017 | `Evidence` e `Triage` apontam para a entidade por `GenericForeignKey` | aceito |
 | 018 | Listas de strings como `ArrayField` do PostgreSQL; JSON só para estruturas | aceito |
 | 019 | Interface nova: web (sem executável), consumindo uma API do Django | aceito (princípios) |
+| 020 | Regras do relacionamento derivado da memória comercial (datas, pendentes, dedupe) | aceito |

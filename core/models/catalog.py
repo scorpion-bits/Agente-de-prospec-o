@@ -128,7 +128,7 @@ class ServiceOffering(models.Model):
 class Match(models.Model):
     """Hipótese "a organização X provavelmente compraria o serviço Y" (E20).
 
-    `portfolio_refs` (trabalhos que provam a capacidade) entra na E03b, com `PortfolioItem`.
+    `portfolio_refs` aponta os trabalhos do portfólio que provam a capacidade (ADR-012).
     """
 
     organization = models.ForeignKey(
@@ -149,6 +149,12 @@ class Match(models.Model):
     strength = models.FloatField("força", validators=UNIT_INTERVAL, help_text="De 0 a 1.")
     method = models.CharField(
         "método", max_length=30, default="rules_v1", help_text="Ex.: rules_v1, llm_v1."
+    )
+    portfolio_refs = models.ManyToManyField(
+        "core.PortfolioItem",
+        verbose_name="portfólio como prova",
+        blank=True,
+        related_name="matches",
     )
     created_at = models.DateTimeField("criado em", auto_now_add=True)
 

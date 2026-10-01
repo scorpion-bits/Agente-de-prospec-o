@@ -10,6 +10,8 @@ from django.urls import reverse
 
 from core.models import (
     ContactPoint,
+    FollowUp,
+    Interaction,
     Opportunity,
     Organization,
     ServiceOffering,
@@ -77,7 +79,9 @@ class TestEveryModelIsManageable:
     @pytest.mark.parametrize("model", CORE_MODELS, ids=lambda m: m._meta.model_name)
     def test_changelist_and_add_form_render(self, admin_client, model):
         assert admin_client.get(url(model, "changelist")).status_code == 200
-        assert admin_client.get(url(model, "add")).status_code == 200
+        # "Próximas ações" é uma visão somente leitura: não tem formulário de criação.
+        expected_add = 403 if model is FollowUp else 200
+        assert admin_client.get(url(model, "add")).status_code == expected_add
 
     def test_anonymous_users_are_sent_to_login(self, client):
         response = client.get(url(Opportunity, "changelist"))
@@ -334,6 +338,7 @@ class TestOrganizationAdmin:
         page = admin_client.get(change_url)
         evidence_prefix = inline_prefix(page, type(evidence))
         contact_prefix = inline_prefix(page, ContactPoint)
+        interaction_prefix = inline_prefix(page, Interaction)
         data = {
             "name": organization.name,
             "kind": "school",
@@ -341,6 +346,10 @@ class TestOrganizationAdmin:
             "website_status": "unknown",
             "municipality_name": "Araraquara",
             "uf": "SP",
+            f"{interaction_prefix}-TOTAL_FORMS": "0",
+            f"{interaction_prefix}-INITIAL_FORMS": "0",
+            f"{interaction_prefix}-MIN_NUM_FORMS": "0",
+            f"{interaction_prefix}-MAX_NUM_FORMS": "1000",
             # evidência já existente (linha inicial do inline genérico)
             f"{evidence_prefix}-TOTAL_FORMS": "1",
             f"{evidence_prefix}-INITIAL_FORMS": "1",

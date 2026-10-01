@@ -193,9 +193,11 @@ resultado, próximo passo — e conhece o **portfólio** e o **perfil MEI**. Pri
 **Riscos:** dados pessoais no CSV de interações → nunca commitar; manter mínimo (cargo > nome).
 **Testes:** status derivado correto para cada tipo de interação; importação idempotente; dedupe de organização.
 **Critério de conclusão:**
-- [ ] No admin, SESC Bauru/Ribeirão Preto/São Carlos mostram proposta enviada, data e próxima ação.
-- [ ] Game Lab aparece como `PortfolioItem` e como interação `course_delivered` na unidade correta.
-- [ ] `CompanyProfile` preenchido (sem CNPJ no git).
+- [x] No admin, SESC Bauru/Ribeirão Preto/São Carlos mostram proposta enviada, data e próxima ação
+  (status `proposal_sent` já; **data e próxima ação aguardam P2**: linhas `pendente`, sem data inventada).
+- [x] Game Lab aparece como `PortfolioItem` e como interação `course_delivered` na unidade correta (SESC Araraquara).
+- [x] `CompanyProfile` preenchido (sem CNPJ no git: `COMPANY_CNPJ` no `.env`).
+- [x] `core/models/` dividido em pacote; `make check` passa (271 testes). Regras em ADR-020.
 
 ---
 

@@ -7,6 +7,7 @@ Decisões herdadas da E03:
 - `Evidence` e `Triage` apontam para a entidade por `GenericForeignKey` (ADR-017).
 - Listas de strings são `ArrayField` do PostgreSQL; JSON só para estruturas aninhadas (ADR-018).
 - Município é provisório (`municipality_name` + `uf`) até a E12 trazer a tabela do IBGE.
+- `Interaction`, `PortfolioItem` e `CompanyProfile` (E03b): memória comercial, portfólio e perfil.
 - `Evidence.raw_document` entra na E04, junto com `RawDocument`.
 - Identificadores externos únicos e opcionais ficam NULL (nunca "") quando ausentes.
 """
@@ -23,10 +24,13 @@ from core.models.common import (
     LegalForm,
     missing_entity_error,
 )
+from core.models.company import CompanyProfile
 from core.models.contact import ContactPoint, Suppression
 from core.models.evidence import Evidence, Triage
+from core.models.interaction import FollowUp, Interaction
 from core.models.opportunity import Opportunity
 from core.models.organization import Organization
+from core.models.portfolio import PortfolioItem
 from core.models.source import Source
 
 __all__ = [
@@ -36,13 +40,17 @@ __all__ = [
     "EVIDENCE_METHOD_PATTERN",
     "UF_VALIDATOR",
     "UNIT_INTERVAL",
+    "CompanyProfile",
     "ContactPoint",
     "Evidence",
+    "FollowUp",
     "GeoProfile",
+    "Interaction",
     "LegalForm",
     "Match",
     "Opportunity",
     "Organization",
+    "PortfolioItem",
     "ServiceOffering",
     "Source",
     "Suppression",

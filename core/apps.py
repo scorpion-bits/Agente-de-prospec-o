@@ -23,3 +23,4 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         pre_migrate.connect(ensure_schema, dispatch_uid="core.ensure_schema")
+        from core import signals  # noqa: F401  (registra os receivers)

@@ -61,7 +61,7 @@ Visão completa: `docs/product/vision.md` · MVP: `docs/product/mvp.md`
 ```
 radar/            projeto Django (settings, urls)
 tests/            testes (pytest); scripts/ verificações do repositório; Makefile; compose.yaml
-core/             modelos núcleo (Organization, Opportunity, Evidence, ServiceOffering…), admin,
+core/             modelos núcleo em pacote `models/` (Organization, Opportunity, Evidence, Interaction…), admin,
                   services/ (evidência, opt-out, normalização), fixtures/ (catálogo de serviços)
 collection/       fetcher educado, cache, RawDocument, conectores (fontes)
 extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
@@ -73,7 +73,7 @@ docs/             memória do projeto (ver docs/README.md)
 
 ## Comandos
 
-`make setup` · `make migrate` · `make seed` (catálogo) · `make run` (admin) · `make test` ·
+`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make run` (admin) · `make test` ·
 `make lint`/`make fmt` · `make check` (ruff, pytest, migrations, repo_checks: o que o CI roda).
 Testes precisam de `DATABASE_URL` (PostgreSQL, ex. `docker compose up -d`).
 

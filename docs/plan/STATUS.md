@@ -1,26 +1,27 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E03)
+> Última atualização: **2026-10-01** (E03b)
 
 ## Onde estamos
 
-**Fase 0 — Fundação.** Prontos: planejamento (E00, E00b), esqueleto (E02) e **modelo de dados núcleo +
-admin + catálogo de serviços (E03)**: 9 entidades, `record_evidence`, opt-out, 12 serviços.
+**Fase 0 — Fundação.** Prontos: planejamento (E00, E00b), esqueleto (E02), **modelo de dados núcleo +
+admin + catálogo de serviços (E03)** e **memória comercial, portfólio e perfil da empresa (E03b, marco M1)**:
+`Interaction`, `PortfolioItem`, `CompanyProfile`, status de relacionamento derivado, "próximas ações" no admin,
+`make memory`, `core/models/` em pacote.
 **E01b parcial** e **P4 parcial** (faltam ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E03b — Memória comercial, portfólio e perfil da empresa** (`fase-0-fundacao.md`) → **M1: "Já falamos
-com eles?" respondido no admin**. O código não depende do humano (linhas `pendente` entram sem datas
-inventadas), mas o resultado útil depende de P1–P3. Dica: `core/models.py` tem ~1.000 linhas; ao somar
-`Interaction`/`PortfolioItem`/`CompanyProfile`, dividir em pacote `core/models/` (não gera migration).
+➡️ **E04 — Infra de coleta** (`fase-0-fundacao.md`): `PoliteFetcher`, `CollectionRun`/`RawDocument`,
+`collect`, conector `seed_csv`; o upsert **consulta a memória comercial** via
+`core.services.organizations.get_or_create_organization` (já pronto, ADR-020). Não precisa do humano.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario e supabase.co). Só bloqueia a Fase 1/3.
 
-Depois (ordem em `PLAN.md`): E04 → E12 → E17 → E17b → E18 → E19 (**M2**).
+Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
 
 ## Concluído
 
@@ -31,12 +32,13 @@ Depois (ordem em `PLAN.md`): E04 → E12 → E17 → E17b → E18 → E19 (**M2*
 | E01b (parcial) | 2026-09-30 | Seeds (portfólio, perfil MEI, template de interações), `.env.example`, checklist de contas, ADR-014/015 | `…-E01b.md` |
 | E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks`, ADR-016. CI verde | `…-10-01-E02.md` |
 | E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. **Falta aplicar no Supabase (titular, P4)** | `…-10-01-E03.md` |
+| E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
 
 ## Pendências do humano
 
 | # | Ação | Onde registrar |
 |---|---|---|
-| P1 | Game Lab (SESC Araraquara): data, nº de alunos, cargo do contato | copiar `data/seeds/interactions.template.csv` → `data/private/interactions.csv` |
+| P1 | Game Lab (SESC Araraquara): data, nº de alunos, cargo do contato | copiar `data/seeds/interactions.template.csv` → `data/private/interactions.csv`, preencher e rodar `make memory` (completa os registros `pendente`) |
 | P2 | Propostas SESC Bauru, Ribeirão Preto, São Carlos: data, canal, cargo, serviço proposto, status, próxima ação | idem (**não** commitar) |
 | P3 | Protótipo: nome e URL; gênero/ano/engine de AstroDash e Tirania; confirmar se scorpionbits.com foi feito por vocês | `data/seeds/portfolio.csv` |
 | P4 | **PARCIAL.** Projeto Supabase criado (identificador e chaves ficam **fora do git**). Falta: **você** rodar `make migrate` e `make seed` com a string do pooler em modo sessão, conferir pelo SQL Editor, e dizer se é `radar-dev` ou `radar-prod` (criar o outro) | `docs/operations/supabase-setup.md` |
@@ -54,8 +56,9 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 010 Supabase + GitHub Actions + admin local · 011 modelo por tarefa (Gemini na extração) ·
 012 memória comercial e portfólio · 013 elegibilidade MEI · 014 repositório público ·
 015 cobertura de atividades do MEI (CNAE) · 016 schema `radar` + pooler em modo sessão ·
-**017 Evidence/Triage por GenericForeignKey** · **018 listas como ArrayField** ·
-**019 UI web + API do Django (sem executável, sem acesso direto ao Supabase)**.
+017 Evidence/Triage por GenericForeignKey · 018 listas como ArrayField ·
+019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
+**020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe)**.
 
 ## Problemas abertos
 
@@ -63,7 +66,9 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Conexão ao **Supabase real** e Data API sem as tabelas: não verificado (P4); validado só em PostgreSQL 16 local.
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
-- `core/models.py` com ~1.000 linhas: dividir em pacote na E03b (ver Próxima etapa).
+- `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env` do titular: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.
+- Dedupe de organização por nome varre a tabela em Python (ADR-020): indexar chave normalizada quando a base crescer (E04+).
+- Sair de `do_not_contact` exige editar no banco/shell (derivado não é editável; tela de `Suppression` na Fase 4).
 - Aviso do Django 6 sobre `URLField` (http→https) filtrado nos testes (`pyproject.toml`); remover ao migrar para o Django 6.
 - CI usa `actions/checkout@v4` e `setup-uv@v5`, que o GitHub avisa serem Node 20 (hoje forçados para Node 24 e funcionando): subir as versões quando conveniente.
 - Limites de free tier (Supabase, Gemini, Serper/Brave) por fontes secundárias — confirmar ao criar as contas.

@@ -140,15 +140,16 @@ class Organization(models.Model):
         help_text="Separe por vírgula. Ex.: sistema_s, cultural_publico, educacao_nao_formal.",
     )
 
-    # Derivados das interações (memória comercial, ADR-012): calculados na E03b, não editáveis.
+    # Derivados das interações (memória comercial, ADR-012): recalculados por
+    # `core.services.relationship.refresh_relationship`, não editáveis.
     relationship_status = models.CharField(
         "relacionamento",
         max_length=20,
         choices=RelationshipStatus.choices,
         default=RelationshipStatus.NEVER_CONTACTED,
     )
-    last_interaction_at = models.DateTimeField("última interação", null=True, blank=True)
-    next_action_at = models.DateTimeField("próxima ação em", null=True, blank=True)
+    last_interaction_at = models.DateField("última interação", null=True, blank=True)
+    next_action_at = models.DateField("próxima ação em", null=True, blank=True)
 
     first_seen_source = models.ForeignKey(
         Source,
