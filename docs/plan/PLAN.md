@@ -24,7 +24,7 @@ radar de oportunidades (análise de impacto: `docs/history/sessions/2026-09-30-E
 | 8 | E17 Rede SESC-SP + escolas privadas (INEP) | |
 | 9 | E17b Organizações parecidas com o SESC | |
 | 10 | E18 Site oficial · 11. E19 Contatos institucionais | **M2: lista de instituições com contatos para a janela out–dez** |
-| 12 | E20 Matching serviço ↔ organização ↔ portfólio | |
+| 12 | E20 Matching serviço ↔ organização ↔ portfólio | feita (ADR-027) |
 | 13 | E05 Devpost · 14. E06 itch.io · 15. E07 páginas monitoradas · 16. E08 Querido Diário · 17. E09 Mapas Culturais | |
 | 18 | E10 Camada de IA · 19. E11 Extração de oportunidades (inclui requisitos MEI) | **M3: radar de oportunidades** |
 | 20 | E13 Score de oportunidades · 21. E21 Score de leads | |
