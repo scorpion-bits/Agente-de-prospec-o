@@ -68,6 +68,6 @@ SMOKE = register_task(
         name="smoke_ping",
         schema=SmokePing,
         system="Verificador de conexão: responda ok=true e repita em echo o texto recebido.",
-        strategies=["gemini-free:gemini-2.5-flash-lite"],
+        strategies=["gemini-free:gemini-3.1-flash-lite"],
     )
 )

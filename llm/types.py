@@ -48,7 +48,7 @@ class ProviderResponse:
 @dataclass
 class LLMResult:
     data: Any  # instância do schema Pydantic da tarefa
-    strategy: str  # "rules", "gemini-free:gemini-2.5-flash-lite", ...
+    strategy: str  # "rules", "gemini-free:gemini-3.1-flash-lite", ...
     cost_usd: Decimal = Decimal("0")
     cached: bool = False
     input_tokens: int = 0

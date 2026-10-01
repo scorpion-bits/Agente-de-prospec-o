@@ -236,11 +236,11 @@ def test_internal_data_never_reaches_free_tier(settings):
     free = GeminiProvider(paid=False, client=httpx.Client(transport=httpx.MockTransport(refuse)))
     ai = service(**{"gemini-free": free, "anthropic": paid([GOOD])})
     result = ai.run(
-        make_task(["gemini-free:gemini-2.5-flash-lite", "anthropic:claude-haiku-4-5"]), INTERNAL
+        make_task(["gemini-free:gemini-3.1-flash-lite", "anthropic:claude-haiku-4-5"]), INTERNAL
     )
     assert result.strategy == "anthropic:claude-haiku-4-5"
     with pytest.raises(NoStrategyAvailable, match="não pode ir"):
-        ai.run(make_task(["gemini-free:gemini-2.5-flash-lite"]), INTERNAL)
+        ai.run(make_task(["gemini-free:gemini-3.1-flash-lite"]), INTERNAL)
 
 
 def test_data_class_policy_per_provider(settings):
@@ -258,7 +258,7 @@ def test_data_class_policy_per_provider(settings):
 def test_provider_without_key_is_skipped(settings):
     settings.GEMINI_API_KEY_FREE = ""
     with pytest.raises(NoStrategyAvailable, match="sem chave"):
-        AIService().run(make_task(["gemini-free:gemini-2.5-flash-lite"]), PUBLIC)
+        AIService().run(make_task(["gemini-free:gemini-3.1-flash-lite"]), PUBLIC)
 
 
 # --- adapters (HTTP simulado) --------------------------------------------------------------------
@@ -418,7 +418,7 @@ def test_llm_smoke_logs_a_call(monkeypatch):
     )
     out = StringIO()
     call_command("llm_smoke", stdout=out)
-    assert "OK · gemini-free:gemini-2.5-flash-lite" in out.getvalue()
+    assert "OK · gemini-free:gemini-3.1-flash-lite" in out.getvalue()
     assert LLMCall.objects.filter(task="smoke_ping", status="ok").count() == 1
 
 
