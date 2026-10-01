@@ -67,6 +67,7 @@ def record_evidence(
     confidence: float | None = None,
     verified: bool = False,
     source_text: str | None = None,
+    raw_document=None,
 ) -> Evidence:
     """Registra (ou renova) a afirmação "`entity.field` vale `value`" com sua origem.
 
@@ -78,6 +79,7 @@ def record_evidence(
       caracteres é cortado (um prefixo continua sendo literal).
     - `source_text`: texto de onde veio o trecho. Se informado, `verified` é **calculado**
       (a citação está no texto?) e o argumento `verified` é ignorado.
+    - `raw_document`: `collection.RawDocument` de onde o dado veio (opcional).
     - Saída de LLM (`llm:`) só vale como `observed` se a citação for encontrada em
       `source_text`; caso contrário é registrada como `inferred` (ADR-004), sem perder o dado.
 
@@ -107,6 +109,7 @@ def record_evidence(
         method=method,
         confidence=confidence,
         verified=bool(verified),
+        raw_document=raw_document,
     )
     try:
         candidate.full_clean()
@@ -138,5 +141,8 @@ def record_evidence(
     if candidate.confidence is not None:
         existing.confidence = candidate.confidence
         update_fields.append("confidence")
+    if raw_document is not None:
+        existing.raw_document = raw_document
+        update_fields.append("raw_document")
     existing.save(update_fields=update_fields)
     return existing

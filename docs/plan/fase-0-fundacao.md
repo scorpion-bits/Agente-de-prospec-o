@@ -224,6 +224,6 @@ resultado, próximo passo — e conhece o **portfólio** e o **perfil MEI**. Pri
 **Riscos:** robots.txt estranho (fallback conservador); crescimento do banco (retenção).
 **Testes:** robots bloqueia; rate limit; 304 reutiliza; retry em 503; upsert idempotente.
 **Critério de conclusão:**
-- [ ] `collect seed_csv --dry-run` funciona; execução registrada em `CollectionRun`.
-- [ ] Rodar duas vezes não duplica; organização existente é reconhecida.
-- [ ] Nenhum teste faz acesso de rede.
+- [x] `collect seed_csv --dry-run` funciona; execução registrada em `CollectionRun`.
+- [x] Rodar duas vezes não duplica; organização existente (inclusive já contatada) é reconhecida.
+- [x] Nenhum teste faz acesso de rede (transport mock do httpx). Decisões em ADR-021.

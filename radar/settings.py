@@ -107,6 +107,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 CONTACT_EMAIL = env.str("CONTACT_EMAIL", default="")
 # CNPJ da empresa: dado sensível (ADR-014), só no .env; carregado por `load_company_profile`.
 COMPANY_CNPJ = env.str("COMPANY_CNPJ", default="")
+# Retenção do texto dos documentos coletados (ADR-010: o banco do plano Free tem 500 MB).
+RAW_DOCUMENT_RETENTION_DAYS = env.int("RAW_DOCUMENT_RETENTION_DAYS", default=180)
 USER_AGENT = f"RadarScorpionBits/0.1 (+https://scorpionbits.com; {CONTACT_EMAIL})".replace(
     "; )", ")"
 )

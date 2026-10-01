@@ -1,27 +1,27 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E03b)
+> Última atualização: **2026-10-01** (E04)
 
 ## Onde estamos
 
 **Fase 0 — Fundação.** Prontos: planejamento (E00, E00b), esqueleto (E02), **modelo de dados núcleo +
 admin + catálogo de serviços (E03)** e **memória comercial, portfólio e perfil da empresa (E03b, marco M1)**:
 `Interaction`, `PortfolioItem`, `CompanyProfile`, status de relacionamento derivado, "próximas ações" no admin,
-`make memory`, `core/models/` em pacote.
-**E01b parcial** e **P4 parcial** (faltam ações do humano, abaixo).
+`make memory`, `core/models/` em pacote. **E04 (infra de coleta)**: `PoliteFetcher`, `CollectionRun`/`RawDocument`,
+runner e `collect`, conector `seed_csv`, `purge_raw_documents`.
+**E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase pelo titular; faltam outras ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E04 — Infra de coleta** (`fase-0-fundacao.md`): `PoliteFetcher`, `CollectionRun`/`RawDocument`,
-`collect`, conector `seed_csv`; o upsert **consulta a memória comercial** via
-`core.services.organizations.get_or_create_organization` (já pronto, ADR-020). Não precisa do humano.
+➡️ **E12 — Municípios, polos e geografia contextual** (`fase-2-priorizacao.md`; ordem do `PLAN.md`: E12 → E17 → E17b → E18 → E19, **M2**). A E04 deixou o runner pronto: conectores novos são uma classe +
+fixture gravada (`docs/architecture/connectors.md`).
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario e supabase.co). Só bloqueia a Fase 1/3.
 
-Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
+Depois (ordem em `PLAN.md`): E17 → E17b → E18 → E19 (**M2**).
 
 ## Concluído
 
@@ -31,8 +31,9 @@ Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
 | E00b | 2026-09-30 | Complemento: Supabase/GitHub Actions, Gemini, memória comercial, MEI; ADR-010–013 | `…-E00b.md` |
 | E01b (parcial) | 2026-09-30 | Seeds (portfólio, perfil MEI, template de interações), `.env.example`, checklist de contas, ADR-014/015 | `…-E01b.md` |
 | E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks`, ADR-016. CI verde | `…-10-01-E02.md` |
-| E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. **Falta aplicar no Supabase (titular, P4)** | `…-10-01-E03.md` |
+| E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. Aplicado no Supabase pelo titular (P4) | `…-10-01-E03.md` |
 | E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
+| E04 | 2026-10-01 | `collection/`: fetcher educado (robots, rate limit, 304, retry, limites), `CollectionRun`/`RawDocument`/`Evidence.raw_document`, runner + `collect` (`--all/--dry-run/--limit`), `seed_csv`, retenção; 337 testes; ADR-021 | `…-10-01-E04.md` |
 
 ## Pendências do humano
 
@@ -41,7 +42,7 @@ Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
 | P1 | Game Lab (SESC Araraquara): data, nº de alunos, cargo do contato | copiar `data/seeds/interactions.template.csv` → `data/private/interactions.csv`, preencher e rodar `make memory` (completa os registros `pendente`) |
 | P2 | Propostas SESC Bauru, Ribeirão Preto, São Carlos: data, canal, cargo, serviço proposto, status, próxima ação | idem (**não** commitar) |
 | P3 | Protótipo: nome e URL; gênero/ano/engine de AstroDash e Tirania; confirmar se scorpionbits.com foi feito por vocês | `data/seeds/portfolio.csv` |
-| P4 | **PARCIAL.** Projeto Supabase criado (identificador e chaves ficam **fora do git**). Falta: **você** rodar `make migrate` e `make seed` com a string do pooler em modo sessão, conferir pelo SQL Editor, e dizer se é `radar-dev` ou `radar-prod` (criar o outro) | `docs/operations/supabase-setup.md` |
+| P4 | **CONCLUÍDO (2026-10-01).** O titular aplicou as migrations no Supabase pela própria máquina e funcionou. O projeto se chama **Prospection** (não `radar-dev`/`radar-prod`: não há par dev/prod por enquanto). Identificador e chaves seguem **fora do git** | `docs/operations/supabase-setup.md` |
 | P5 | Ativar benefícios Google AI Pro (conta pessoal do titular) + chaves AI Studio | A2, A3 |
 | P6 | Escolher busca (Serper ou Brave); gerar chaves age para backup | A4, A5 |
 | P7 | Falar com o **contador** sobre CNAEs de software/web/jogos e migração para ME; ajustar `mei_coverage` no admin | ADR-015 |
@@ -58,12 +59,13 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 015 cobertura de atividades do MEI (CNAE) · 016 schema `radar` + pooler em modo sessão ·
 017 Evidence/Triage por GenericForeignKey · 018 listas como ArrayField ·
 019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
-**020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe)**.
+020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
+**021 regras da coleta (robots, bloqueio, dry-run, retenção)**.
 
 ## Problemas abertos
 
-- Endpoints das fontes **não testados** (E01).
-- Conexão ao **Supabase real** e Data API sem as tabelas: não verificado (P4); validado só em PostgreSQL 16 local.
+- Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
+- Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04.
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
 - `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env` do titular: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.

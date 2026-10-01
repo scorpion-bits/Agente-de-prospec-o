@@ -34,11 +34,12 @@ Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de bin
 |---|---|
 | **E03 (feita)** | `Source`, `Organization`, `ContactPoint`, `Opportunity`, `Evidence`, `ServiceOffering`, `Match`, `Triage`, `Suppression` |
 | **E03b (feita)** | `Interaction`, `PortfolioItem`, `CompanyProfile`, `Match.portfolio_refs`; `relationship_status`, `last_interaction_at`, `next_action_at` derivados (ADR-020); visão `FollowUp` (proxy de `Organization`) |
-| E04 | `CollectionRun`, `RawDocument`, `Evidence.raw_document` |
+| **E04 (feita)** | `CollectionRun`, `RawDocument`, `Evidence.raw_document` (app `collection`) |
 | E10 · E12 · E13 · E18 | `LLMCall` · `Municipality` · `Score` · `SearchQuery` |
 
 **Desvios do modelo alvo feitos na E03/E03b** (as seções abaixo continuam descrevendo o alvo):
 - E03b: `Interaction.occurred_at`/`next_action_at` e os derivados da organização são **datas** (`DateField`); `occurred_at` pode ser nulo com `data_status=pending` (sem data inventada). `Interaction.data_status` e `PortfolioItem.status` registram o que ainda falta confirmar. `CompanyProfile` é linha única (`pk=1`, constraint) e guarda `cnpj`/`legal_name`/`contact_email` só no banco (vêm do `.env`). `PortfolioItem.slug` é a chave estável da importação. `Interaction.created_by` é preenchido pelo admin.
+- E04: `RawDocument` é único por URL (re-coleta atualiza a linha; o histórico fica nas `Evidence`) e guarda só texto comprimido; a retenção apaga o texto, não a linha. `CollectionRun` tem `dry_run` e `error_log` sem conteúdo dos itens.
 - Município provisório: `municipality_name` + `uf` em `Organization` e `Opportunity` (a FK vem na E12).
 - `ServiceOffering.typical_ticket_brl` (faixa) virou `typical_ticket_min_brl` e `typical_ticket_max_brl`,
   nulos: valores comerciais ficam no banco, não no repositório público (ADR-014).

@@ -86,6 +86,16 @@ class Evidence(models.Model):
         help_text="O trecho foi encontrado no texto da fonte?",
     )
 
+    raw_document = models.ForeignKey(
+        "collection.RawDocument",
+        verbose_name="documento bruto",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="evidence_items",
+        help_text="Cópia (texto) da página de onde a afirmação saiu, se foi coletada.",
+    )
+
     class Meta:
         ordering = ["-retrieved_at", "-id"]
         verbose_name = "evidência"
