@@ -155,9 +155,11 @@ se não houver hardware; Gemini com suporte a entrada de PDF); `llm/router.py`; 
 falha de schema → retry → fallback; custo calculado corretamente; entrada `internal` nunca
 roteada a free tier; trocar a estratégia de uma tarefa só por configuração.
 **Critério de conclusão:**
-- [ ] Todos os testes sem rede.
-- [ ] Chamada real de fumaça registrada em `LLMCall` com custo.
-- [ ] Nenhum outro módulo importa SDK de provedor diretamente.
+- [x] Todos os testes sem rede.
+- [ ] Chamada real de fumaça registrada em `LLMCall` com custo. *(pendente do humano: P21, `make llm-smoke`)*
+- [x] Nenhum outro módulo importa SDK de provedor diretamente (teste `test_only_llm_providers_talk_to_model_apis_or_import_sdks`).
+
+> Feita (ADR-033): HTTP direto com `httpx` em vez de SDKs; Ollama como adapter genérico (`OLLAMA_BASE_URL`); tarefas reais chegam na E11.
 
 ---
 

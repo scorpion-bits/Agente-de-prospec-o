@@ -37,6 +37,12 @@ match:  ## Gera hipóteses serviço × organização × portfólio (E20); DRY=1 
 contacts:  ## Extrai contatos públicos do site oficial (E19); N=20 organizações, DRY=1 simula
 	$(UV) run python manage.py extract_contacts --limit $(or $(N),20) $(if $(DRY),--dry-run)
 
+llm-smoke:  ## Chamada real de fumaça à IA (E10); S=gemini-free:gemini-2.5-flash-lite escolhe a estratégia
+	$(UV) run python manage.py llm_smoke $(if $(S),--strategy $(S))
+
+llm-usage:  ## Custo e uso da IA no mês (E10)
+	$(UV) run python manage.py llm_usage
+
 superuser:  ## Cria um usuário administrador
 	$(UV) run python manage.py createsuperuser
 

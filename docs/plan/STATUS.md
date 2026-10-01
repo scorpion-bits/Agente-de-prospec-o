@@ -1,20 +1,20 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E09)
+> Última atualização: **2026-10-01** (E10)
 
 ## Onde estamos
 
 **Fase 0 — Fundação.** Prontos E00–E04, E12 (geografia), E17/E17b (SESC-SP, escolas e parecidas), E18 (site oficial),
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
-**E05 Devpost** (rodou de verdade: formato bateu, 45 vistos, 21 novos), **E06 itch.io** (ADR-029), **E07 `html_watch`** (ADR-030),
-**E08 Querido Diário** (ADR-031) e **E09 Mapas Culturais** (ADR-032) são conectores de oportunidades, com fontes desabilitadas até conferir termos; sem migration.
-**E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase). **Repositório público** → regras de dados em ADR-014.
+**E05–E09** (Devpost, itch.io, `html_watch`, Querido Diário, Mapas Culturais; ADR-028–032) são conectores de oportunidades, com
+fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta, sem uso real ainda; migration `llm.0001`.
+**E01b parcial**; migrations aplicadas no Supabase pelo titular (P4 concluído). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E10 — Camada de IA (`llm/`)** (próxima na ordem do `PLAN.md`), em thread nova.
+➡️ **E11 — Extração estruturada de oportunidades** (próxima na ordem do `PLAN.md`), em thread nova: usa `llm/` (P21 antes).
 Antes, o humano roda `make websites` (P13), `make contacts` (P14), `make match` (P15) e confere P16–P20: sem dados reais o M2 não fecha.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
@@ -43,6 +43,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | E07 | 2026-10-01 | `collection/connectors/html_watch.py` (por `kind`): links da listagem (seletor CSS simples, padrões, palavras, exclusões) → `Opportunity` candidata `unknown`; «novo» = o que o upsert cria; página só-JS = erro; 9 `Source` desabilitadas; 20 testes; ADR-030. **URLs de memória, nada rodado (P18)** | `…-10-01-E07.md` |
 | E08 | 2026-10-01 | `collection/connectors/querido_diario.py`: 1 requisição por consulta para 6 municípios, trecho = candidata `unknown` sem datas, dedupe `município+data+hash`, janela pela última execução `ok`, sondagem de cobertura; `Source` desabilitada; 29 testes (fixture **sintética**); ADR-031. **API real não alcançada (P19)** | `…-10-01-E08.md` |
 | E09 | 2026-10-01 | `collection/connectors/mapas_culturais.py`: uma `Source`, várias instâncias em `config` (nacional + SP, endereços de memória), `/api/opportunity/find` com `registrationTo=GTE(hoje)`; prazo/abertura só se a instância informa (status derivado); filtro por palavras-chave; falha de uma instância não derruba as outras; `Source` `mapas-culturais` desabilitada; 24 testes (fixture **sintética**); ADR-032. **API real não alcançada (P20)** | `…-10-01-E09.md` |
+| E10 | 2026-10-01 | `llm/`: `AIService.run(tarefa, entrada)` com estratégias por tarefa (`rules`, Gemini free/pago, Claude, Ollama, fake), cache por hash, retry de schema, classe `public`/`internal`, teto mensal/por execução, `LLMCall`, citações verificadas, `llm_smoke`/`llm_usage`; HTTP direto, sem SDK; 32 testes; ADR-033. **Nenhuma chamada real feita (P21)** | `…-10-01-E10.md` |
 
 ## Pendências do humano
 
@@ -51,7 +52,6 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P1 | Game Lab (SESC Araraquara): data, nº de alunos, cargo do contato | copiar `data/seeds/interactions.template.csv` → `data/private/interactions.csv`, preencher e rodar `make memory` (completa os registros `pendente`) |
 | P2 | Propostas SESC Bauru, Ribeirão Preto, São Carlos: data, canal, cargo, serviço proposto, status, próxima ação | idem (**não** commitar) |
 | P3 | Protótipo: nome e URL; gênero/ano/engine de AstroDash e Tirania; confirmar se scorpionbits.com foi feito por vocês | `data/seeds/portfolio.csv` |
-| P4 | **CONCLUÍDO (2026-10-01).** O titular aplicou as migrations no Supabase pela própria máquina e funcionou. O projeto se chama **Prospection** (não `radar-dev`/`radar-prod`: não há par dev/prod por enquanto). Identificador e chaves seguem **fora do git** | `docs/operations/supabase-setup.md` |
 | P5 | Ativar benefícios Google AI Pro (conta pessoal do titular) + chaves AI Studio | A2, A3 |
 | P6 | Escolher busca (Serper ou Brave); gerar chaves age para backup | A4, A5 |
 | P7 | Falar com o **contador** sobre CNAEs de software/web/jogos e migração para ME; ajustar `mei_coverage` no admin | ADR-015 |
@@ -68,6 +68,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P18 | **E07:** conferir as 9 URLs de `html_watch` (de memória) e os termos/robots.txt; `make seed`, marcar «coleta permitida» e habilitar **uma** página por vez no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); ajustar `selector`/`link_patterns` em `Source.config` se vier ruído; revisar 10 itens e salvar uma página real como fixture | `docs/decisions/ADR-030-conector-html-watch-generico.md` |
 | P19 | **E08:** conferir termos da API do Querido Diário; `git pull`, `make seed`, marcar «coleta permitida» e habilitar `querido-diario` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); veja a linha «Cobertura» (município sem diário vira erro) e revise 10 ocorrências, anotando a taxa de relevância aqui; ajuste `queries`/`exclude_patterns` em `Source.config`; salve uma resposta real como fixture | `docs/decisions/ADR-031-conector-querido-diario.md` |
 | P20 | **E09:** conferir as instâncias de `config.instances` (URLs de memória; achar as de SP/Araraquara/São Carlos) e os termos; `git pull`, `make seed`, marcar «coleta permitida» e habilitar `mapas-culturais` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); revise 10 oportunidades (prazo certo? relevantes?), ajuste `keywords` e salve uma resposta real como fixture | `docs/decisions/ADR-032-conector-mapas-culturais.md` |
+| P21 | **E10:** `git pull`, `make migrate` (cria `llm_llmcall`), chaves só no `.env` (`GEMINI_API_KEY_FREE`, opcional `GEMINI_API_KEY_PAID`/`ANTHROPIC_API_KEY`; nunca no chat); `make llm-smoke` (1 chamada real, ~100 tokens) e `make llm-usage`; confira preços em `llm/pricing.py` | `docs/decisions/ADR-033-camada-de-ia.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -87,22 +88,22 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 028 conector Devpost: filtro de relevância, datas sem chute, fonte desabilitada até conferir ·
 029 itch.io e prazo/medição no fetcher · 030 `html_watch` genérico (uma página = uma `Source`) ·
 031 Querido Diário: consultas combinadas, janela incremental, cobertura ·
-**032 Mapas Culturais: uma `Source`, várias instâncias; datas só se informadas; erro por instância**.
+032 Mapas Culturais: uma `Source`, várias instâncias, datas só se informadas ·
+**033 camada de IA: tarefas × estratégias, HTTP sem SDK, dado interno só em pago/local, Ollama Cloud não adotado**.
 
 ## Problemas abertos
 
 - Coordenadas dos municípios vêm de conjunto derivado do IBGE (sedes), não do IBGE direto (rede bloqueada): conferir quando possível (ADR-022).
-- Lista SESC-SP escrita de memória e layout do INEP supostos: nada conferido na fonte (P11, ADR-023).
-- Lista de organizações parecidas e URLs oficiais também de memória (P12, ADR-024); páginas de chamamento do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
+- Lista SESC-SP, layout do INEP, organizações parecidas e URLs oficiais são de memória, nada conferido na fonte (P11, P12, ADR-023/024); chamamentos do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
 - E18: Serper/Brave só da documentação, sites só em JS caem em ambíguo (ADR-025). E19: nenhum site real testado; e-mail ofuscado/JS não é lido (ADR-026). E20: regras e forças não calibradas (ADR-027).
 - Endpoints das fontes **não testados** (E01); E08: formato da API do Querido Diário só da documentação (ADR-031); E09: instâncias e JSON do Mapas Culturais só de memória (ADR-032); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
-- Demora do Devpost (2–3 min/página): causa não reproduzida (rede bloqueada aqui); ver P16 e ADR-029.
-- Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
+- Demora do Devpost (2–3 min/página): causa não reproduzida (rede bloqueada aqui); ver P16 e ADR-029. E10: nenhum provedor testado de verdade; preços de Gemini pago conferir (P21, ADR-033).
+- Supabase (projeto **Prospection**): migrations aplicadas pelo titular até a E03b. **Não conferido por nós:** a Data API sem as tabelas expostas; migrations seguintes só no PostgreSQL local, então `make migrate` após cada merge (P21 para `llm`).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
 - `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env`: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.
 - Dedupe de organização por nome varre a tabela em Python (ADR-020): indexar chave normalizada quando a base crescer (E04+).
-- Aviso do Django 6 sobre `URLField` filtrado nos testes (`pyproject.toml`); remover ao migrar. CI usa `checkout@v4`/`setup-uv@v5` (Node 20, forçado para 24): subir quando conveniente.
+- Aviso do Django 6 sobre `URLField` nos testes (`pyproject.toml`); CI usa `checkout@v4`/`setup-uv@v5` (Node 20): subir quando conveniente.
 - Limites de free tier (Supabase, Gemini, Serper/Brave) e créditos do AI Pro: confirmar ao criar as contas/Billing.
 - `schedule` do GitHub Actions desliga após 60 dias sem commits (repositório público) — mitigação em ADR-014.
 

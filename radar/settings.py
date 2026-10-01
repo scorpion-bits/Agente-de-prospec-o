@@ -129,6 +129,20 @@ SERPER_API_KEY = env.str("SERPER_API_KEY", default="")
 BRAVE_API_KEY = env.str("BRAVE_API_KEY", default="")
 SEARCH_MAX_CALLS_PER_RUN = env.int("SEARCH_MAX_CALLS_PER_RUN", default=100)
 
+# Camada de IA (E10, ADR-033). Chaves só no .env. Teto mensal de dinheiro novo; créditos do Google
+# AI Pro (Gemini pago) contam à parte; o teto por execução soma os dois. Free tier não tem teto.
+LLM_MONTHLY_BUDGET_USD = env.float("LLM_MONTHLY_BUDGET_USD", default=5.0)
+LLM_CREDITS_MONTHLY_USD = env.float("LLM_CREDITS_MONTHLY_USD", default=10.0)
+LLM_RUN_BUDGET_USD = env.float("LLM_RUN_BUDGET_USD", default=1.0)
+GEMINI_API_KEY_FREE = env.str("GEMINI_API_KEY_FREE", default="")  # free tier: só dados públicos
+GEMINI_API_KEY_PAID = env.str("GEMINI_API_KEY_PAID", default="")  # projeto com faturamento/créditos
+ANTHROPIC_API_KEY = env.str("ANTHROPIC_API_KEY", default="")
+# Ollama: local por padrão. Servidor remoto só recebe dados públicos (LGPD).
+OLLAMA_BASE_URL = env.str("OLLAMA_BASE_URL", default="http://localhost:11434")
+OLLAMA_API_KEY = env.str("OLLAMA_API_KEY", default="")
+# Estratégias por tarefa (JSON), ex.: {"extract_opportunity_fields": ["ollama:qwen2.5:7b", "rules"]}
+LLM_TASK_STRATEGIES = env.json("LLM_TASK_STRATEGIES", default={})
+
 # Logs: o GitHub Actions é público — nunca registrar dados pessoais (ADR-014).
 LOG_PII = env.bool("LOG_PII", default=False)
 LOGGING = {
