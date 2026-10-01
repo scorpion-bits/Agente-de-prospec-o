@@ -31,3 +31,4 @@ Regras:
 | 018 | Listas de strings como `ArrayField` do PostgreSQL; JSON só para estruturas | aceito |
 | 019 | Interface nova: web (sem executável), consumindo uma API do Django | aceito (princípios) |
 | 020 | Regras do relacionamento derivado da memória comercial (datas, pendentes, dedupe) | aceito |
+| 021 | Regras da infra de coleta (robots, bloqueio, dry-run, retenção, evidência de CSV) | aceito |

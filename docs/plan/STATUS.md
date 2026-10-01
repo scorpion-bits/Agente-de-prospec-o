@@ -1,27 +1,27 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E03b)
+> Última atualização: **2026-10-01** (E04)
 
 ## Onde estamos
 
 **Fase 0 — Fundação.** Prontos: planejamento (E00, E00b), esqueleto (E02), **modelo de dados núcleo +
 admin + catálogo de serviços (E03)** e **memória comercial, portfólio e perfil da empresa (E03b, marco M1)**:
 `Interaction`, `PortfolioItem`, `CompanyProfile`, status de relacionamento derivado, "próximas ações" no admin,
-`make memory`, `core/models/` em pacote.
+`make memory`, `core/models/` em pacote. **E04 (infra de coleta)**: `PoliteFetcher`, `CollectionRun`/`RawDocument`,
+runner e `collect`, conector `seed_csv`, `purge_raw_documents`.
 **E01b parcial** e **P4 parcial** (faltam ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E04 — Infra de coleta** (`fase-0-fundacao.md`): `PoliteFetcher`, `CollectionRun`/`RawDocument`,
-`collect`, conector `seed_csv`; o upsert **consulta a memória comercial** via
-`core.services.organizations.get_or_create_organization` (já pronto, ADR-020). Não precisa do humano.
+➡️ **E12 — Municípios, polos e geografia contextual** (`fase-2-priorizacao.md`; ordem do `PLAN.md`: E12 → E17 → E17b → E18 → E19, **M2**). A E04 deixou o runner pronto: conectores novos são uma classe +
+fixture gravada (`docs/architecture/connectors.md`).
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario e supabase.co). Só bloqueia a Fase 1/3.
 
-Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
+Depois (ordem em `PLAN.md`): E17 → E17b → E18 → E19 (**M2**).
 
 ## Concluído
 
@@ -33,6 +33,7 @@ Depois (ordem em `PLAN.md`): E12 → E17 → E17b → E18 → E19 (**M2**).
 | E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks`, ADR-016. CI verde | `…-10-01-E02.md` |
 | E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. **Falta aplicar no Supabase (titular, P4)** | `…-10-01-E03.md` |
 | E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
+| E04 | 2026-10-01 | `collection/`: fetcher educado (robots, rate limit, 304, retry, limites), `CollectionRun`/`RawDocument`/`Evidence.raw_document`, runner + `collect` (`--all/--dry-run/--limit`), `seed_csv`, retenção; 337 testes; ADR-021 | `…-10-01-E04.md` |
 
 ## Pendências do humano
 
@@ -58,11 +59,12 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 015 cobertura de atividades do MEI (CNAE) · 016 schema `radar` + pooler em modo sessão ·
 017 Evidence/Triage por GenericForeignKey · 018 listas como ArrayField ·
 019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
-**020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe)**.
+020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
+**021 regras da coleta (robots, bloqueio, dry-run, retenção)**.
 
 ## Problemas abertos
 
-- Endpoints das fontes **não testados** (E01).
+- Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
 - Conexão ao **Supabase real** e Data API sem as tabelas: não verificado (P4); validado só em PostgreSQL 16 local.
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).

@@ -16,7 +16,11 @@ sem mexer no resto do sistema.
 | `seed_csv` | Unidades SESC-SP, fontes curadas à mão | CSV versionado em `data/seeds/` |
 | `search` | Brave/Serper | Consulta de busca com cache (usado para achar sites, não como fonte primária) |
 
-## Contrato (Python, alvo)
+## Contrato (Python) — implementado na E04
+
+Código em `collection/`: `base.py` (contrato e candidatos), `registry.py`, `fetcher.py`, `upsert.py`,
+`runner.py`, `connectors/`. O conector devolve `RawItem`s e `normalize` devolve
+`OrganizationCandidate`/`OpportunityCandidate` com `EvidenceDraft`s; o runner faz o resto.
 
 ```python
 class Connector(Protocol):
@@ -31,7 +35,7 @@ class Connector(Protocol):
         Função pura: testável com fixtures."""
 ```
 
-O runner genérico (`manage.py collect <slug>` / `collect --all`) faz:
+O runner genérico (`manage.py collect <slug>` / `collect --all`, `--dry-run`, `--limit`; `make collect`) faz:
 `fetch → normalize → dedupe (canonical_key) → upsert → Evidence → CollectionRun`.
 Erro em um item não interrompe os demais; erro no conector não interrompe outros conectores.
 
@@ -73,3 +77,20 @@ Evidence); o histórico não é apagado.
 5. Teste de `normalize` com a fixture (sem rede).
 6. Rodar uma coleta real e revisar 10 itens manualmente.
 7. Atualizar `STATUS.md`.
+
+## Como a E04 resolveu (ver ADR-021)
+
+- **Qual conector roda:** o registrado para o `slug` da fonte; se não houver, o genérico do `kind`
+  (`@register(slug=...)` / `@register(kind=...)`). `seed_csv` é genérico: uma `Source` com
+  `config={"path": "data/seeds/x.csv", "entity": "organization"}` já funciona, sem código.
+- **Portões:** `enabled` (o `--all` só roda habilitadas; uma fonte específica exige `enabled`, exceto em
+  `--dry-run`) e, para fontes com rede, `robots_ok` (termos e robots conferidos por humano).
+- **Bloqueio:** robots.txt que proíbe, ou 401/403, desabilita a fonte e registra em `CollectionRun`.
+  robots.txt com 401/403, 5xx ou fora do ar = fallback conservador: nada é baixado daquele site.
+- **Configuração por fonte** (`Source.config`): `min_interval_seconds` (padrão 5), `max_pages` (20),
+  `max_bytes` (20 MB; `dataset`: 200 MB).
+- **Documentos brutos:** `RawDocument` por URL (texto comprimido, hash, ETag, `expires_at`);
+  `purge_raw_documents` apaga o texto vencido e mantém URL/hash. `Evidence.raw_document` aponta para ele.
+- **Evidência de CSV curado:** linha com `source_url` → observado (`connector:<slug>`); sem URL → manual
+  (`human`). Nunca "observado" sem fonte (ADR-004).
+- **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.
