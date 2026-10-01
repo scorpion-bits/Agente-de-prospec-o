@@ -12,6 +12,7 @@ from core.models import (
     ContactPoint,
     FollowUp,
     Interaction,
+    Municipality,
     Opportunity,
     Organization,
     ServiceOffering,
@@ -80,7 +81,7 @@ class TestEveryModelIsManageable:
     def test_changelist_and_add_form_render(self, admin_client, model):
         assert admin_client.get(url(model, "changelist")).status_code == 200
         # "Próximas ações" é uma visão somente leitura: não tem formulário de criação.
-        expected_add = 403 if model is FollowUp else 200
+        expected_add = 403 if model in (FollowUp, Municipality) else 200
         assert admin_client.get(url(model, "add")).status_code == expected_add
 
     def test_anonymous_users_are_sent_to_login(self, client):

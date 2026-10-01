@@ -107,6 +107,16 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 CONTACT_EMAIL = env.str("CONTACT_EMAIL", default="")
 # CNPJ da empresa: dado sensível (ADR-014), só no .env; carregado por `load_company_profile`.
 COMPANY_CNPJ = env.str("COMPANY_CNPJ", default="")
+# Geografia (geo-relevance.md): base da empresa, polos prioritários e raios dos anéis.
+HOME_MUNICIPALITY_IBGE = env.int("HOME_MUNICIPALITY_IBGE", default=3503208)  # Araraquara/SP
+PRIORITY_HUBS_IBGE = env.list(
+    "PRIORITY_HUBS_IBGE",
+    cast=int,
+    default=[3503208, 3548906, 3543402, 3506003],  # Araraquara, São Carlos, Ribeirão Preto, Bauru
+)
+GEO_NEAR_KM = env.float("GEO_NEAR_KM", default=40.0)  # R1: vizinhas de Araraquara
+GEO_REGIONAL_KM = env.float("GEO_REGIONAL_KM", default=150.0)  # R2: interior próximo
+
 # Retenção do texto dos documentos coletados (ADR-010: o banco do plano Free tem 500 MB).
 RAW_DOCUMENT_RETENTION_DAYS = env.int("RAW_DOCUMENT_RETENTION_DAYS", default=180)
 USER_AGENT = f"RadarScorpionBits/0.1 (+https://scorpionbits.com; {CONTACT_EMAIL})".replace(

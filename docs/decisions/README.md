@@ -32,3 +32,4 @@ Regras:
 | 019 | Interface nova: web (sem executável), consumindo uma API do Django | aceito (princípios) |
 | 020 | Regras do relacionamento derivado da memória comercial (datas, pendentes, dedupe) | aceito |
 | 021 | Regras da infra de coleta (robots, bloqueio, dry-run, retenção, evidência de CSV) | aceito |
+| 022 | Municípios do IBGE: texto × FK, polos e perfis geográficos como dado | aceito |

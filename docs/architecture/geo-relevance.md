@@ -18,7 +18,7 @@ o tipo de item (e, para leads, o serviço do match). O perfil combina:
 ## Base de localização
 
 - Base configurável em settings: `HOME_MUNICIPALITY_IBGE = 3503208` (Araraquara/SP —
-  código a confirmar na carga IBGE da E12).
+  confirmado na carga da E12).
 - Distância: haversine entre centróides municipais (IBGE). Precisão de município basta.
 - **Localização é fator de priorização, nunca filtro absoluto.** Única exceção: gate de
   elegibilidade territorial explícita de uma oportunidade. Leads de software, sites, jogos e
@@ -35,8 +35,9 @@ o tipo de item (e, para leads, o serviço do match). O perfil combina:
   - **R3** Estado de SP (inclui capital)
   - **R4** Brasil
   - **R5** Internacional
-- Distâncias aproximadas em linha reta de Araraquara: São Carlos ~40 km, Ribeirão Preto
-  ~80 km, Bauru ~100 km (confirmar na E12 com centróides do IBGE).
+- Distâncias em linha reta de Araraquara (medidas na E12 com a tabela de municípios): São Carlos ≈ 40 km,
+  Ribeirão Preto ≈ 80 km, **Bauru ≈ 111 km** (a estimativa original era ~100). Implementação: `scoring/geo.py`;
+  decisões em ADR-022.
 
 ## Perfis iniciais (valores calibráveis — guardados como dados/config, não código fixo)
 

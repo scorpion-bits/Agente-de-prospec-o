@@ -65,7 +65,7 @@ core/             modelos núcleo em pacote `models/` (Organization, Opportunity
                   services/ (evidência, opt-out, normalização), fixtures/ (catálogo de serviços)
 collection/       fetcher educado, RawDocument, runner (`collect`), conectores em `connectors/`
 extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
-scoring/          geo, gates, fatores, perfis de pontuação
+scoring/          geo (E12: anéis e perfis geográficos), gates, fatores, perfis de pontuação
 llm/              abstração de provedores, cache, log de custo, orçamento
 reports/          digest semanal
 docs/             memória do projeto (ver docs/README.md)

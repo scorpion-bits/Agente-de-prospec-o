@@ -6,7 +6,8 @@ O módulo virou pacote na E03b (eram ~1.000 linhas); os nomes públicos continua
 Decisões herdadas da E03:
 - `Evidence` e `Triage` apontam para a entidade por `GenericForeignKey` (ADR-017).
 - Listas de strings são `ArrayField` do PostgreSQL; JSON só para estruturas aninhadas (ADR-018).
-- Município é provisório (`municipality_name` + `uf`) até a E12 trazer a tabela do IBGE.
+- Município: `municipality_name` + `uf` guardam o texto como veio da fonte; `municipality` (FK, E12)
+  é a versão resolvida pela tabela do IBGE, preenchida ao salvar quando o nome e a UF casam.
 - `Interaction`, `PortfolioItem` e `CompanyProfile` (E03b): memória comercial, portfólio e perfil.
 - `Evidence.raw_document` entra na E04, junto com `RawDocument`.
 - Identificadores externos únicos e opcionais ficam NULL (nunca "") quando ausentes.
@@ -28,6 +29,7 @@ from core.models.company import CompanyProfile
 from core.models.contact import ContactPoint, Suppression
 from core.models.evidence import Evidence, Triage
 from core.models.interaction import FollowUp, Interaction
+from core.models.municipality import UF_BY_IBGE_CODE, Municipality
 from core.models.opportunity import Opportunity
 from core.models.organization import Organization
 from core.models.portfolio import PortfolioItem
@@ -38,6 +40,7 @@ __all__ = [
     "ENTITY_MODELS",
     "EVIDENCE_FIELD_PATTERN",
     "EVIDENCE_METHOD_PATTERN",
+    "UF_BY_IBGE_CODE",
     "UF_VALIDATOR",
     "UNIT_INTERVAL",
     "CompanyProfile",
@@ -48,6 +51,7 @@ __all__ = [
     "Interaction",
     "LegalForm",
     "Match",
+    "Municipality",
     "Opportunity",
     "Organization",
     "PortfolioItem",
