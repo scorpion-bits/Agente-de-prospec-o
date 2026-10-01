@@ -8,6 +8,7 @@ from django.db import models
 
 from core.models.common import UF_VALIDATOR
 from core.models.source import Source
+from core.services.geography import resolve_location
 from core.services.normalize import (
     is_valid_cnpj,
     normalize_cnpj,
@@ -94,6 +95,15 @@ class Organization(models.Model):
     # Provisório até a E12 (tabela `Municipality` do IBGE).
     municipality_name = models.CharField("município", max_length=120, blank=True)
     uf = models.CharField("UF", max_length=2, blank=True, validators=[UF_VALIDATOR])
+    municipality = models.ForeignKey(
+        "core.Municipality",
+        verbose_name="município (IBGE)",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="organizations",
+        help_text="Resolvido sozinho a partir do nome e da UF quando possível; corrija se errado.",
+    )
     address = models.TextField("endereço", blank=True)
     lat = models.FloatField(
         "latitude",
@@ -176,6 +186,7 @@ class Organization(models.Model):
 
     def save(self, *args, **kwargs):
         self._normalize()
+        resolve_location(self, kwargs)
         super().save(*args, **kwargs)
 
     def clean(self):

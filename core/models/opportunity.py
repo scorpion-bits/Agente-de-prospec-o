@@ -10,6 +10,7 @@ from core.fields import ChoiceArrayField
 from core.models.common import UF_VALIDATOR, LegalForm
 from core.models.organization import Organization
 from core.services.canonical import opportunity_canonical_key
+from core.services.geography import resolve_location
 
 
 class Opportunity(models.Model):
@@ -104,6 +105,15 @@ class Opportunity(models.Model):
     # Provisório até a E12 (tabela `Municipality` do IBGE).
     municipality_name = models.CharField("município", max_length=120, blank=True)
     uf = models.CharField("UF", max_length=2, blank=True, validators=[UF_VALIDATOR])
+    municipality = models.ForeignKey(
+        "core.Municipality",
+        verbose_name="município (IBGE)",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="opportunities",
+        help_text="Resolvido sozinho a partir do nome e da UF quando possível; corrija se errado.",
+    )
     scope = models.CharField("abrangência", max_length=15, choices=Scope.choices, blank=True)
 
     # Datas. Quando a fonte traz só o dia: prazo = 23:59 local; início/abertura = 00:00 local.
@@ -201,6 +211,7 @@ class Opportunity(models.Model):
 
     def save(self, *args, **kwargs):
         self._normalize()
+        resolve_location(self, kwargs)
         super().save(*args, **kwargs)
 
     def clean(self):

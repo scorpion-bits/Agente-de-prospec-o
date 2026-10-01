@@ -21,8 +21,8 @@ municípios com acento/homônimos → casar por (nome normalizado, UF).
 –Bauru ≈ 95–105 km; Bauru classificado R1 (polo); `remote_service` nunca zera por distância;
 localização ausente → 0,5 + explicação.
 **Critério de conclusão:**
-- [ ] Carga idempotente; código IBGE de Araraquara confirmado no settings.
-- [ ] Todos os perfis de `geo-relevance.md` implementados e testados.
+- [x] Carga idempotente (5.571 linhas); código IBGE de Araraquara (3503208) confirmado no settings. ADR-022.
+- [x] Todos os perfis de `geo-relevance.md` implementados e testados (`scoring/geo.py`, `tests/test_geo.py`). Medido: Bauru ≈ 111 km (não ~100).
 
 ---
 

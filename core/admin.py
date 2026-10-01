@@ -22,6 +22,7 @@ from core.models import (
     FollowUp,
     Interaction,
     Match,
+    Municipality,
     Opportunity,
     Organization,
     PortfolioItem,
@@ -203,7 +204,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     )
     list_filter = ("kind", "relationship_status", "uf", "network", "website_status", "size_hint")
     search_fields = ("name", "legal_name", "cnpj", "inep_code", "municipality_name", "website")
-    autocomplete_fields = ("parent", "first_seen_source")
+    autocomplete_fields = ("parent", "first_seen_source", "municipality")
     # Derivados das interações (E03b): ninguém digita à mão.
     readonly_fields = (
         "relationship_status",
@@ -220,7 +221,10 @@ class OrganizationAdmin(admin.ModelAdmin):
             {"fields": ("name", "legal_name", "kind", "segment", "size_hint", "cnae_main")},
         ),
         ("Identificadores externos", {"fields": ("cnpj", "inep_code", "osm_id")}),
-        ("Localização", {"fields": (("municipality_name", "uf"), "address", ("lat", "lon"))}),
+        (
+            "Localização",
+            {"fields": (("municipality_name", "uf"), "municipality", "address", ("lat", "lon"))},
+        ),
         ("Presença online", {"fields": ("website", "website_status")}),
         ("Rede e similaridade", {"fields": ("network", "parent", "similarity_tags")}),
         (
@@ -263,7 +267,7 @@ class OpportunityAdmin(admin.ModelAdmin):
     )
     search_fields = ("title", "organizer_name", "description", "canonical_key")
     date_hierarchy = "deadline_at"
-    autocomplete_fields = ("organizer",)
+    autocomplete_fields = ("organizer", "municipality")
     readonly_fields = ("first_seen_at", "last_seen_at")
     inlines = (EvidenceInline,)
     save_on_top = True
@@ -291,6 +295,7 @@ class OpportunityAdmin(admin.ModelAdmin):
                     "modality",
                     "scope",
                     ("municipality_name", "uf"),
+                    "municipality",
                 )
             },
         ),
@@ -486,6 +491,24 @@ class CompanyProfileAdmin(admin.ModelAdmin):
                 reverse("admin:core_companyprofile_change", args=[profile.pk])
             )
         return super().changelist_view(request, extra_context)
+
+
+@admin.register(Municipality)
+class MunicipalityAdmin(admin.ModelAdmin):
+    """Dado de referência do IBGE: consulta e busca (a carga é `load_municipalities`)."""
+
+    list_display = ("name", "uf", "region", "ibge_code", "is_capital")
+    list_filter = ("uf", "region", "is_capital")
+    search_fields = ("name", "ibge_code")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Match)

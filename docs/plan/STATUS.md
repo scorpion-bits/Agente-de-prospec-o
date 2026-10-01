@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E04)
+> Última atualização: **2026-10-01** (E12)
 
 ## Onde estamos
 
@@ -9,19 +9,21 @@
 admin + catálogo de serviços (E03)** e **memória comercial, portfólio e perfil da empresa (E03b, marco M1)**:
 `Interaction`, `PortfolioItem`, `CompanyProfile`, status de relacionamento derivado, "próximas ações" no admin,
 `make memory`, `core/models/` em pacote. **E04 (infra de coleta)**: `PoliteFetcher`, `CollectionRun`/`RawDocument`,
-runner e `collect`, conector `seed_csv`, `purge_raw_documents`.
+runner e `collect`, conector `seed_csv`, `purge_raw_documents`. **E12 (geografia)**: tabela `Municipality` (IBGE),
+`scoring/geo.py` com anéis R0–R5 e os 5 perfis, `make seed` carrega os municípios.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase pelo titular; faltam outras ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E12 — Municípios, polos e geografia contextual** (`fase-2-priorizacao.md`; ordem do `PLAN.md`: E12 → E17 → E17b → E18 → E19, **M2**). A E04 deixou o runner pronto: conectores novos são uma classe +
-fixture gravada (`docs/architecture/connectors.md`).
+➡️ **E17 — Rede SESC-SP + escolas privadas (INEP)** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`:
+E17 → E17b → E18 → E19, **M2**). Usa o runner da E04, o dedupe da E03b e a geografia da E12. A coleta do INEP
+precisa de rede (E01 pendente); a parte do SESC pode começar por `seed_csv`.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario e supabase.co). Só bloqueia a Fase 1/3.
 
-Depois (ordem em `PLAN.md`): E17 → E17b → E18 → E19 (**M2**).
+Depois (ordem em `PLAN.md`): E17b → E18 → E19 (**M2**).
 
 ## Concluído
 
@@ -34,6 +36,7 @@ Depois (ordem em `PLAN.md`): E17 → E17b → E18 → E19 (**M2**).
 | E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. Aplicado no Supabase pelo titular (P4) | `…-10-01-E03.md` |
 | E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
 | E04 | 2026-10-01 | `collection/`: fetcher educado (robots, rate limit, 304, retry, limites), `CollectionRun`/`RawDocument`/`Evidence.raw_document`, runner + `collect` (`--all/--dry-run/--limit`), `seed_csv`, retenção; 337 testes; ADR-021 | `…-10-01-E04.md` |
+| E12 | 2026-10-01 | `Municipality` (5.571 linhas, `load_municipalities`), FK `municipality` com resolução ao salvar (`resolve_municipalities`), `scoring/geo.py` (R0–R5, 5 perfis, gate, dado ausente); 395 testes; ADR-022. **Bauru está a ≈ 111 km, não ~100** | `…-10-01-E12.md` |
 
 ## Pendências do humano
 
@@ -60,10 +63,12 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 017 Evidence/Triage por GenericForeignKey · 018 listas como ArrayField ·
 019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
 020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
-**021 regras da coleta (robots, bloqueio, dry-run, retenção)**.
+021 regras da coleta (robots, bloqueio, dry-run, retenção) ·
+**022 municípios do IBGE: texto × FK e perfis geográficos como dado**.
 
 ## Problemas abertos
 
+- Coordenadas dos municípios vêm de conjunto derivado do IBGE (sedes), não do IBGE direto (rede bloqueada): conferir quando possível (ADR-022).
 - Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
 - Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04.
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;

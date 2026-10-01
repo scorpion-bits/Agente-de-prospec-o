@@ -35,12 +35,13 @@ Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de bin
 | **E03 (feita)** | `Source`, `Organization`, `ContactPoint`, `Opportunity`, `Evidence`, `ServiceOffering`, `Match`, `Triage`, `Suppression` |
 | **E03b (feita)** | `Interaction`, `PortfolioItem`, `CompanyProfile`, `Match.portfolio_refs`; `relationship_status`, `last_interaction_at`, `next_action_at` derivados (ADR-020); visão `FollowUp` (proxy de `Organization`) |
 | **E04 (feita)** | `CollectionRun`, `RawDocument`, `Evidence.raw_document` (app `collection`) |
-| E10 · E12 · E13 · E18 | `LLMCall` · `Municipality` · `Score` · `SearchQuery` |
+| **E12 (feita)** | `Municipality` (IBGE) + FK `municipality` em `Organization`/`Opportunity` |
+| E10 · E13 · E18 | `LLMCall` · `Score` · `SearchQuery` |
 
 **Desvios do modelo alvo feitos na E03/E03b** (as seções abaixo continuam descrevendo o alvo):
 - E03b: `Interaction.occurred_at`/`next_action_at` e os derivados da organização são **datas** (`DateField`); `occurred_at` pode ser nulo com `data_status=pending` (sem data inventada). `Interaction.data_status` e `PortfolioItem.status` registram o que ainda falta confirmar. `CompanyProfile` é linha única (`pk=1`, constraint) e guarda `cnpj`/`legal_name`/`contact_email` só no banco (vêm do `.env`). `PortfolioItem.slug` é a chave estável da importação. `Interaction.created_by` é preenchido pelo admin.
 - E04: `RawDocument` é único por URL (re-coleta atualiza a linha; o histórico fica nas `Evidence`) e guarda só texto comprimido; a retenção apaga o texto, não a linha. `CollectionRun` tem `dry_run` e `error_log` sem conteúdo dos itens.
-- Município provisório: `municipality_name` + `uf` em `Organization` e `Opportunity` (a FK vem na E12).
+- Município: `municipality_name` + `uf` guardam o texto da fonte; a FK `municipality` (E12, ADR-022) é a versão resolvida pela tabela do IBGE (`Municipality`: código de 7 dígitos, UF, região, coordenada da sede).
 - `ServiceOffering.typical_ticket_brl` (faixa) virou `typical_ticket_min_brl` e `typical_ticket_max_brl`,
   nulos: valores comerciais ficam no banco, não no repositório público (ADR-014).
 - `Evidence`/`Triage` apontam para a entidade por `GenericForeignKey` (ADR-017), validando que o ID existe.
