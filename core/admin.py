@@ -33,6 +33,8 @@ from core.models import (
 )
 from core.services.similarity import SIMILARITY_TAGS
 from core.services.suppression import is_suppressed
+from scoring.display import annotate_scores, breakdown_html, label_badge
+from scoring.models import Score
 
 # tipo da evidência -> (rótulo, cor do texto e da borda, fundo, estilo da borda)
 EVIDENCE_BADGES = {
@@ -283,6 +285,7 @@ class OpportunityAdmin(admin.ModelAdmin):
         "organizer_label",
         "modality",
         "location",
+        "score",
     )
     list_filter = (
         "kind",
@@ -295,10 +298,14 @@ class OpportunityAdmin(admin.ModelAdmin):
     search_fields = ("title", "organizer_name", "description", "canonical_key")
     date_hierarchy = "deadline_at"
     autocomplete_fields = ("organizer", "municipality")
-    readonly_fields = ("first_seen_at", "last_seen_at")
+    readonly_fields = ("first_seen_at", "last_seen_at", "score_breakdown")
     inlines = (EvidenceInline,)
     save_on_top = True
     fieldsets = (
+        (
+            "Pontuação (E13)",
+            {"fields": ("score_breakdown",)},
+        ),
         (
             "Identificação",
             {
@@ -367,6 +374,23 @@ class OpportunityAdmin(admin.ModelAdmin):
         fields = super().get_readonly_fields(request, obj)
         # A chave de dedupe é a identidade da oportunidade: depois de criada não se edita.
         return (*fields, "canonical_key") if obj else fields
+
+    def get_queryset(self, request):
+        return annotate_scores(super().get_queryset(request), Opportunity)
+
+    @admin.display(description="pontuação", ordering="_score_total")
+    def score(self, obj):
+        return label_badge(getattr(obj, "_score_label", None), getattr(obj, "_score_total", None))
+
+    @admin.display(description="por que essa nota")
+    def score_breakdown(self, obj):
+        return breakdown_html(
+            Score.objects.filter(
+                content_type=ContentType.objects.get_for_model(Opportunity), object_id=obj.pk
+            ).first()
+            if obj.pk
+            else None
+        )
 
     @admin.display(description="organizador")
     def organizer_label(self, obj):

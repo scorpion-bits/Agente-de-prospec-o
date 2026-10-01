@@ -38,7 +38,8 @@ Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de bin
 | **E12 (feita)** | `Municipality` (IBGE) + FK `municipality` em `Organization`/`Opportunity` |
 | **E18 (feita)** | `SearchQuery` (cache permanente de buscas web; app `collection`) |
 | **E19 (feita)** | `Organization.contacts_checked_at` (última leitura do site; `extract_contacts`) |
-| E10 · E13 | `LLMCall` · `Score` |
+| **E13 (feita)** | `Score` (app `scoring`, migration `scoring.0001`; ADR-035) |
+| E10 | `LLMCall` |
 
 **Desvios do modelo alvo feitos na E03/E03b** (as seções abaixo continuam descrevendo o alvo):
 - E03b: `Interaction.occurred_at`/`next_action_at` e os derivados da organização são **datas** (`DateField`); `occurred_at` pode ser nulo com `data_status=pending` (sem data inventada). `Interaction.data_status` e `PortfolioItem.status` registram o que ainda falta confirmar. `CompanyProfile` é linha única (`pk=1`, constraint) e guarda `cnpj`/`legal_name`/`contact_email` só no banco (vêm do `.env`). `PortfolioItem.slug` é a chave estável da importação. `Interaction.created_by` é preenchido pelo admin.
@@ -199,6 +200,8 @@ Hipótese "organização X provavelmente compraria serviço Y".
   endereço: só no banco/`.env`, nunca no git (repositório público — ADR-014).
 
 ### `Score`
+> Feito na E13 (ADR-035): `content_type`/`object_id` (uma linha por entidade), `total` **nulo** se barrada, mais `label`,
+> `confidence`, `gate_kind`, `alerts`, `raw_sum`. Perfis `opp.*` (E13); `lead.*` na E21.
 - `entity_type`, `entity_id`, `profile` (ex. `opportunity.edital`, `lead.school_course`)
 - `total` (0–100), `gated` (bool) + `gate_reason`
 - `breakdown` (JSON: lista de `{factor, raw, weight, points, explanation, evidence_ids}`)

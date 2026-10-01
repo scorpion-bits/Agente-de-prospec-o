@@ -48,9 +48,9 @@ neutro 0,5 + confiança reduz.
 > 2 anos" com CNPJ mais novo → gate; cota ME/EPP → bônus; valor > limite MEI → alerta); soma de
 pesos = 1 por perfil; determinismo; exemplo de `scoring.md` reproduzido em teste.
 **Critério de conclusão:**
-- [ ] Toda oportunidade não-gated tem score e breakdown.
-- [ ] Humano entende o breakdown de 5 itens sem ler código.
-- [ ] Mudança de pesos → nova versão → `rescore` recalcula tudo.
+- [x] Toda oportunidade não-gated tem score e breakdown (`rescore`; testes em `tests/test_scoring.py`). ADR-035.
+- [ ] Humano entende o breakdown de 5 itens sem ler código (admin pronto; conferir com dados reais, P23).
+- [x] Mudança de pesos → nova versão → `rescore` recalcula tudo (testado).
 
 ---
 

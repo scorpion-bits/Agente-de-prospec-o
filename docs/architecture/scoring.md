@@ -113,12 +113,21 @@ Edital "PIPE Fase 1 — Soberania Digital" (FAPESP)          Perfil: opp.edital 
 ```
 (Números ilustrativos: mostram o formato, não um dado real.)
 
-## Implementação (E13, E21)
+## Implementação (E13 feita para oportunidades; E21 fará os leads — ADR-035)
 
-- `scoring/factors/*.py`: uma função por fator, pura, testável.
-- `scoring/profiles.py`: pesos como dados (dict/JSON versionado).
-- `Score.breakdown` guarda exatamente as linhas acima; o admin as exibe.
-- Comando `manage.py rescore [--profile X]`.
+- `scoring/factors/{value,fit,chance,timing,access,lightness}.py`: uma função por fator, pura, testável.
+- `scoring/eligibility.py` (requisitos × `CompanyProfile`), `scoring/gates.py`, `scoring/engine.py` (`score_opportunity`, `combine`).
+- `scoring/profiles.py`: pesos, faixas e mapa tipo→perfil como dados, com `SCORING_VERSION`.
+- `Score.breakdown` guarda as linhas `{factor, label, raw, weight, points, explanation, evidence_ids, support}`; o admin as mostra.
+- `manage.py rescore [--profile X] [--limit N] [--dry-run]` (`make rescore`).
+- **Valores iniciais dos fatores (hipótese, v1):** V por faixa de prêmio (≥ R$ 250 mil 0,95 · 100 mil 0,85 · 30 mil 0,7 · 10 mil
+  0,55 · 3 mil 0,4 · abaixo 0,3; sem valor, melhor benefício 0,3–0,6); F 0,6–0,9 por palavra-chave do serviço, 0,45 só por
+  categoria, 0,2 sem relação, +0,1 com portfólio público; C base 0,5 ± elegibilidade, abrangência e relacionamento; T por dias até
+  o prazo (≤ 4: 0,1 · 5–6: 0,5 · 7–14: 0,85 · 15–45: 0,95 · 46–90: 0,7 · > 90: 0,5); A = `G` × contatabilidade (e-mail/telefone
+  1,0 · página oficial 0,8 · formulário 0,7 · nada 0,3); L pelo esforço.
+- **Fora desta etapa:** sazonalidade de escolas, `follow-up vencendo` e fatores de leads (E21); frescor de evidência (E22/E30).
+- Gates de leads (opt-out, contato recente, duplicata) não se aplicam a oportunidades e ficam para a E21; a duplicata de
+  oportunidade já é barrada pela `canonical_key` única.
 
 ## Calibração (E30)
 

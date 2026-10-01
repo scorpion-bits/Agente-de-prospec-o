@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E11)
+> Última atualização: **2026-10-01** (E13)
 
 ## Onde estamos
 
@@ -9,13 +9,13 @@
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 **E05–E09** (Devpost, itch.io, `html_watch`, Querido Diário, Mapas Culturais; ADR-028–032) são conectores de oportunidades, com
-fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração de oportunidades, ADR-034)** pronta, sem migration, acurácia a medir (P22).
+fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score de oportunidades, ADR-035)** pronta, com migration `scoring.0001` (P23).
 **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4 concluído). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E13 — Score de oportunidades** (próxima na ordem do `PLAN.md`), em thread nova: usa os campos da E11 (prazo, requisitos de empresa).
-Antes, o humano roda `make extract` (P22) e confere P13–P21: sem dados reais o M2/M3 não fecham.
+➡️ **E14 — Triagem humana e métricas** (próxima na ordem do `PLAN.md`), em thread nova: usa `Score` e `Triage`.
+Antes, o humano roda `make rescore` (P23) e confere P22: sem dados reais o M2/M3 não fecham.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co). Ela também
@@ -25,24 +25,20 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 
 | Etapa | Data | Resumo | Registro |
 |---|---|---|---|
-| E00/E00b | 2026-09-30 | Planejamento, pesquisa, arquitetura, plano; Supabase/GitHub Actions, Gemini, memória comercial, MEI; ADR-001–013 | `docs/history/sessions/2026-09-30-E00.md`, `…-E00b.md` |
-| E01b (parcial) | 2026-09-30 | Seeds (portfólio, perfil MEI, template de interações), `.env.example`, checklist de contas, ADR-014/015 | `…-E01b.md` |
+| E00–E01b | 2026-09-30 | Planejamento, pesquisa, arquitetura, plano; Supabase/GitHub Actions, Gemini, memória comercial, MEI; seeds (portfólio, perfil MEI, interações), `.env.example`; ADR-001–015. **E01b parcial** | `docs/history/sessions/2026-09-30-E00.md`, `…-E00b.md`, `…-E01b.md` |
 | E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks`, ADR-016. CI verde | `…-10-01-E02.md` |
 | E03 | 2026-10-01 | 9 entidades, `record_evidence` (ADR-004), opt-out (`usable()`), admin com selos observado × inferido, catálogo de 12 serviços (`make seed`); 202 testes; ADR-017/018/019. CI verde. Aplicado no Supabase pelo titular (P4) | `…-10-01-E03.md` |
 | E03b | 2026-10-01 | `Interaction`, `PortfolioItem`, `CompanyProfile`, derivados por signals, admin (histórico na organização, "próximas ações"), `load_company_profile`/`import_portfolio`/`import_interactions`, dedupe de organização; 271 testes; ADR-020. **M1 funcional; datas das propostas aguardam P1/P2** | `…-10-01-E03b.md` |
 | E04 | 2026-10-01 | `collection/`: fetcher educado (robots, rate limit, 304, retry, limites), `CollectionRun`/`RawDocument`/`Evidence.raw_document`, runner + `collect` (`--all/--dry-run/--limit`), `seed_csv`, retenção; 337 testes; ADR-021 | `…-10-01-E04.md` |
 | E12 | 2026-10-01 | `Municipality` (5.571 linhas, `load_municipalities`), FK `municipality` com resolução ao salvar (`resolve_municipalities`), `scoring/geo.py` (R0–R5, 5 perfis, gate, dado ausente); 395 testes; ADR-022. **Bauru está a ≈ 111 km, não ~100** | `…-10-01-E12.md` |
-| E17/E17b | 2026-10-01 | `sesc-sp-unidades` (42 curadas, mãe «SESC-SP»), `inep-escolas` (privadas ≤ 150 km + polos, arquivo local) e `similar_orgs.csv` (redes, prefeituras, universidades dos 4 polos), tags de vocabulário fechado; 431 testes; ADR-023/024. **Listas e layout do INEP não conferidos (P11, P12)** | `…-10-01-E17.md`, `…-E17b.md` |
-| E18 | 2026-10-01 | `collection/search/` (Serper/Brave, cache `SearchQuery`, teto por execução), `extraction/website.py` (bloqueio, nome+município na página), `find_websites`; evidência inferida; 31 testes novos; ADR-025. **Busca real e amostra de 20 não testadas (P13)** | `…-10-01-E18.md` |
-| E19 | 2026-10-01 | `extraction/contacts.py` (e-mail, telefone E.164, WhatsApp, JSON-LD, redes, formulário), `collection/contact_finder.py`, `extract_contacts`, `contacts_checked_at`; evidência observada, opt-out antes e depois, idempotente; 40 testes novos; ADR-026. **Sites reais e amostra de 20 não testados (P14)** | `…-10-01-E19.md` |
+| E17/E17b | 2026-10-01 | `sesc-sp-unidades` (42 curadas), `inep-escolas` (privadas ≤ 150 km + polos) e `similar_orgs.csv`, tags de vocabulário fechado; ADR-023/024. **Listas e layout do INEP não conferidos (P11, P12)** | `…-10-01-E17.md`, `…-E17b.md` |
+| E18 | 2026-10-01 | `collection/search/` (Serper/Brave, cache `SearchQuery`, teto), `extraction/website.py`, `find_websites`; evidência inferida; ADR-025. **Busca real não testada (P13)** | `…-10-01-E18.md` |
+| E19 | 2026-10-01 | `extraction/contacts.py`, `contact_finder.py`, `extract_contacts`; evidência observada, opt-out antes e depois; ADR-026. **Sites reais não testados (P14)** | `…-10-01-E19.md` |
 | E20 | 2026-10-01 | `scoring/match_rules.py` + `matching.py` (regras em dados), `match_services`; razões com evidência, prova só de portfólio público e confirmado (sem prova: força ×0,7), máx. 3 por organização; 19 testes; ADR-027. **Regras e forças são hipóteses; nada rodado em dados reais (P15)** | `…-10-01-E20.md` |
-| E05 | 2026-10-01 | `collection/connectors/devpost.py` (JSON público, filtro tema + online/Brasil, datas só se inequívocas, dedupe por URL), `Source` `devpost` desabilitada; 33 testes (fixture **sintética**); ADR-028. **Rodou de verdade: formato confere (P16)** | `…-10-01-E05.md` |
-| E06 | 2026-10-01 | `collection/connectors/itch_jams.py` (listagem HTML, filtro 48 h + inscritos/palavras em `Source.config`, datas só se inequívocas), `Source` `itch-jams` desabilitada; fetcher com prazo por requisição (90 s) e `stats`; 584 testes (fixture **sintética**); ADR-029. **HTML real e termos não conferidos (P17)** | `…-10-01-E06.md` |
-| E07 | 2026-10-01 | `collection/connectors/html_watch.py` (por `kind`): links da listagem (seletor CSS simples, padrões, palavras, exclusões) → `Opportunity` candidata `unknown`; «novo» = o que o upsert cria; página só-JS = erro; 9 `Source` desabilitadas; 20 testes; ADR-030. **URLs de memória, nada rodado (P18)** | `…-10-01-E07.md` |
-| E08 | 2026-10-01 | `collection/connectors/querido_diario.py`: 1 requisição por consulta para 6 municípios, trecho = candidata `unknown` sem datas, dedupe `município+data+hash`, janela pela última execução `ok`, sondagem de cobertura; `Source` desabilitada; 29 testes (fixture **sintética**); ADR-031. **API real não alcançada (P19)** | `…-10-01-E08.md` |
-| E09 | 2026-10-01 | `collection/connectors/mapas_culturais.py`: uma `Source`, várias instâncias em `config` (nacional + SP, endereços de memória), `/api/opportunity/find` com `registrationTo=GTE(hoje)`; prazo/abertura só se a instância informa (status derivado); filtro por palavras-chave; falha de uma instância não derruba as outras; `Source` `mapas-culturais` desabilitada; 24 testes (fixture **sintética**); ADR-032. **API real não alcançada (P20)** | `…-10-01-E09.md` |
-| E10 | 2026-10-01 | `llm/`: `AIService.run(tarefa, entrada)` com estratégias por tarefa (`rules`, Gemini free/pago, Claude, Ollama, fake), cache por hash, retry de schema, classe `public`/`internal`, teto mensal/por execução, `LLMCall`, citações verificadas, `llm_smoke`/`llm_usage`; HTTP direto, sem SDK; 32 testes; ADR-033. **Fumaça real do Gemini free OK (P21)** | `…-10-01-E10.md` |
-| E11 | 2026-10-01 | `extraction/` (`rules.py`, `text.py`, `opportunity.py`, prompt versionado), tarefa `extract_opportunity` (Gemini free → Haiku → regras), conferência de valor por regex, campo crítico só na coluna se a citação é verificada (senão evidência `inferred`), `extract_opportunities`/`make extract`; 709 testes; ADR-034. **Sem PDF; acurácia não medida (P22)** | `…-10-01-E11.md` |
+| E05–E09 | 2026-10-01 | Conectores de oportunidades em `collection/connectors/`: `devpost` (**rodou de verdade**, P16), `itch_jams` (+ prazo e `stats` no fetcher), `html_watch` (genérico, 9 `Source`), `querido_diario`, `mapas_culturais`; todos desabilitados até conferir termos, datas só se inequívocas, fixtures **sintéticas**; ADR-028–032. **Formatos reais não conferidos (P17–P20)** | `…-10-01-E05.md` a `…-E09.md` |
+| E10 | 2026-10-01 | `llm/`: `AIService.run(tarefa, entrada)`, estratégias por tarefa, cache, teto de custo, `LLMCall`; HTTP direto; ADR-033. **Fumaça real do Gemini free OK (P21)** | `…-10-01-E10.md` |
+| E11 | 2026-10-01 | `extraction/` (regras + Gemini free → Haiku), campo crítico só na coluna se a citação é verificada, `make extract`; 709 testes; ADR-034. **Sem PDF; acurácia não medida (P22)** | `…-10-01-E11.md` |
+| E13 | 2026-10-01 | `scoring/`: `Score` (migration `scoring.0001`), gates (prazo, território, requisito da empresa), 6 fatores, elegibilidade MEI, confiança K, perfis em dados, `make rescore`, breakdown no admin; 784 testes; ADR-035. **Pesos são hipótese; nada rodado em dados reais (P23)** | `…-10-01-E13.md` |
 
 ## Pendências do humano
 
@@ -63,12 +59,13 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P14 | **E19:** depois do P13, rodar `make migrate` e `make contacts DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os contatos contra os sites (meta: todos conferem) e a linha «Cobertura»; depois `make contacts`. Revisar `is_personal` no admin | `docs/decisions/ADR-026-contatos-publicos-institucionais.md` |
 | P15 | **E20:** depois de `make seed`/`make memory`/`make collect`, rodar `make match DRY=1` e depois `make match` na sua máquina (não no SQL Editor; sem migration); conferir no admin (Matches) 10 sugestões: razão faz sentido, prova correta; ajustar `scoring/match_rules.py` se preciso. Marcar itens de portfólio como `public` só quando puderem ser citados | `docs/decisions/ADR-027-matching-por-regras.md` |
 | P16 | **E05:** já coletou (45 vistos, 21 novos; formato confere). Falta revisar 10 hackathons no admin e salvar uma resposta real como fixture. **Demora (2–3 min/página, processo não saía):** rode de novo e mande a linha `tempo —` da saída (ADR-029) | `docs/decisions/ADR-028-conector-devpost.md` |
-| P17 | **E06:** conferir termos/robots.txt do itch.io; `make seed`, marcar «coleta permitida» e habilitar `itch-jams` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); revisar 10 jams (meta ≥ 10). Layout suposto: se mudou, o erro diz; salvar a página real como fixture | `docs/decisions/ADR-029-conector-itch-jams-e-medicao-do-fetcher.md` |
-| P18 | **E07:** conferir as 9 URLs de `html_watch` (de memória) e os termos/robots.txt; `make seed`, marcar «coleta permitida» e habilitar **uma** página por vez no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); ajustar `selector`/`link_patterns` em `Source.config` se vier ruído; revisar 10 itens e salvar uma página real como fixture | `docs/decisions/ADR-030-conector-html-watch-generico.md` |
-| P19 | **E08:** conferir termos da API do Querido Diário; `git pull`, `make seed`, marcar «coleta permitida» e habilitar `querido-diario` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); veja a linha «Cobertura» (município sem diário vira erro) e revise 10 ocorrências, anotando a taxa de relevância aqui; ajuste `queries`/`exclude_patterns` em `Source.config`; salve uma resposta real como fixture | `docs/decisions/ADR-031-conector-querido-diario.md` |
-| P20 | **E09:** conferir as instâncias de `config.instances` (URLs de memória; achar as de SP/Araraquara/São Carlos) e os termos; `git pull`, `make seed`, marcar «coleta permitida» e habilitar `mapas-culturais` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); revise 10 oportunidades (prazo certo? relevantes?), ajuste `keywords` e salve uma resposta real como fixture | `docs/decisions/ADR-032-conector-mapas-culturais.md` |
+| P17 | **E06:** conferir termos/robots.txt do itch.io; `make seed`, marcar «coleta permitida» e habilitar `itch-jams` no admin; `make collect DRY=1` e `make collect` na sua máquina (não no SQL Editor); revisar 10 jams e salvar uma página real como fixture | `docs/decisions/ADR-029-conector-itch-jams-e-medicao-do-fetcher.md` |
+| P18 | **E07:** conferir as 9 URLs de `html_watch` (de memória) e os termos; `make seed`, habilitar **uma** página por vez no admin; `make collect DRY=1` e `make collect`; ajustar `selector`/`link_patterns` em `Source.config` se vier ruído; revisar 10 itens e salvar uma página real como fixture | `docs/decisions/ADR-030-conector-html-watch-generico.md` |
+| P19 | **E08:** conferir termos da API do Querido Diário; `git pull`, `make seed`, habilitar `querido-diario` no admin; `make collect DRY=1` e `make collect` (município sem diário vira erro); revisar 10 ocorrências, ajustar `queries`/`exclude_patterns` e salvar uma resposta real como fixture | `docs/decisions/ADR-031-conector-querido-diario.md` |
+| P20 | **E09:** conferir as instâncias de `config.instances` (URLs de memória) e os termos; `git pull`, `make seed`, habilitar `mapas-culturais` no admin; `make collect DRY=1` e `make collect`; revisar 10 oportunidades, ajustar `keywords` e salvar uma resposta real como fixture | `docs/decisions/ADR-032-conector-mapas-culturais.md` |
 | P21 | **E10:** `git pull`, `make migrate` (cria `llm_llmcall`), chaves só no `.env` (`GEMINI_API_KEY_FREE`, opcional `GEMINI_API_KEY_PAID`/`ANTHROPIC_API_KEY`; nunca no chat); `make llm-smoke` (**feito pelo titular: Gemini free `gemini-3.1-flash-lite` respondeu `OK`**; o `2.5-flash-lite` dá 404) e `make llm-usage`; confira preços em `llm/pricing.py` | `docs/decisions/ADR-033-camada-de-ia.md` |
 | P22 | **E11:** `git pull` (sem migration); `make extract DRY=1 N=20` e depois `make extract N=20` na sua máquina (não no SQL Editor; usa a chave Gemini free já no `.env`); revise 20 no admin e preencha `docs/research/extraction-eval.md` (meta: prazo e requisitos ≥ 90% certos ou `unknown`, zero errado confiante); anote páginas PDF/`sem-texto` | `docs/decisions/ADR-034-extracao-de-oportunidades.md` |
+| P23 | **E13:** `git pull`, `make migrate` (cria `scoring_score`), `make rescore DRY=1` e depois `make rescore` na sua máquina (não no SQL Editor); no admin (Oportunidades, coluna «pontuação») leia o breakdown de 10: nota faz sentido? Anote os erros e ajuste pesos em `scoring/profiles.py` (suba `SCORING_VERSION`) | `docs/decisions/ADR-035-score-de-oportunidades.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -90,7 +87,8 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 031 Querido Diário: consultas combinadas, janela incremental, cobertura ·
 032 Mapas Culturais: uma `Source`, várias instâncias, datas só se informadas ·
 033 camada de IA: tarefas × estratégias, HTTP sem SDK, dado interno só em pago/local ·
-**034 extração: citação obrigatória, conferência por regras, campo crítico só se verificado**.
+034 extração: citação obrigatória, conferência por regras, campo crítico só se verificado ·
+**035 score de oportunidades: gates, fatores, confiança, pesos como dado versionado**.
 
 ## Problemas abertos
 
@@ -98,7 +96,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Lista SESC-SP, layout do INEP, organizações parecidas e URLs oficiais são de memória, nada conferido na fonte (P11, P12, ADR-023/024); chamamentos do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
 - E18: Serper/Brave só da documentação, sites só em JS caem em ambíguo (ADR-025). E19: nenhum site real testado; e-mail ofuscado/JS não é lido (ADR-026). E20: regras e forças não calibradas (ADR-027).
 - Endpoints das fontes **não testados** (E01); E08: formato da API do Querido Diário só da documentação (ADR-031); E09: instâncias e JSON do Mapas Culturais só de memória (ADR-032); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
-- Demora do Devpost (2–3 min/página): causa não reproduzida (rede bloqueada aqui); ver P16 e ADR-029. E10: nenhum provedor testado de verdade; preços de Gemini pago conferir (P21, ADR-033). E11: PDF não é lido (`sem-texto`), prompt e regras só testados com texto sintético (P22, ADR-034).
+- Devpost lento (2–3 min/página, P16, ADR-029). E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). E13: pesos, faixas e valores dos fatores são hipótese (P23, ADR-035); `Score` só para oportunidades (leads na E21).
 - Supabase (projeto **Prospection**): migrations aplicadas pelo titular até a E03b. **Não conferido por nós:** a Data API sem as tabelas expostas; migrations seguintes só no PostgreSQL local, então `make migrate` após cada merge (P21 para `llm`).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
