@@ -23,9 +23,12 @@ alto de hackathons irrelevantes → filtro por temas/palavras-chave (games, educ
 social good, open) + modalidade online ou Brasil.
 **Testes:** `normalize` com fixture; datas em timezone correto; dedupe por URL.
 **Critério de conclusão:**
-- [ ] Coleta real traz ≥ 10 hackathons; 10 revisados manualmente estão corretos.
-- [ ] Evidências `observed` com URL e data.
-- [ ] Segunda execução não duplica.
+- [ ] Coleta real traz ≥ 10 hackathons; 10 revisados manualmente estão corretos. *(pendente do humano: P16)*
+- [x] Evidências `observed` com URL e data. *(fixture sintética)*
+- [x] Segunda execução não duplica.
+
+**Feito (2026-10-01, ADR-028):** `collection/connectors/devpost.py`, `Source` `devpost` em `load_sources`
+(desabilitada), fixture sintética em `tests/fixtures/devpost/` (o ambiente não alcança devpost.com).
 
 ---
 

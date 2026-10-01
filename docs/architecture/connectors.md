@@ -104,5 +104,7 @@ Evidence); o histórico não é apagado.
 - **Contatos públicos (E19, ADR-026):** `extraction/contacts.py` (puro) lê `mailto:`, `tel:`, `wa.me`, texto, JSON-LD,
   redes e formulário em até 5 páginas do site (`PoliteFetcher`); `manage.py extract_contacts` / `make contacts`
   grava `ContactPoint` com `Evidence` observada (`regex:contacts`), respeitando `Suppression`.
+- **Devpost (E05, ADR-028):** `devpost` (`api`) lê `/api/hackathons` (open + upcoming) por `PoliteFetcher`; filtra por
+  tema/título e online/Brasil; datas só quando o texto do período é inequívoco; fonte nasce desabilitada.
 - **Fontes iniciais:** `make seed` roda `load_sources` (cria `Source` que faltam, sem sobrescrever edições).
 - **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.
