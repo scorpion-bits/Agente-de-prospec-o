@@ -39,3 +39,8 @@ dos fornecedores e estão cobertos só por respostas simuladas (`httpx.MockTrans
 − Formatos HTTP não verificados contra os serviços reais até o P21; preços do Gemini pago são de referência (conferir).
 − `response_text` fica no banco (dado possivelmente interno): fora do git e dos logs; política de retenção pode vir
   quando houver tarefas com dado interno.
+
+## Atualização (2026-10-01, após a fumaça real)
+O titular rodou `make llm-smoke`: `gemini-2.5-flash-lite` devolveu 404 para a chave nova e `gemini-3.1-flash-lite` funcionou
+(formato do adapter Gemini confirmado; Anthropic e Ollama seguem sem chamada real). O padrão da tarefa de fumaça passou a ser
+`gemini-free:gemini-3.1-flash-lite`. Preço do 3.1 no pago não consta em `llm/pricing.py` (não inventado): sem preço, não é chamado.

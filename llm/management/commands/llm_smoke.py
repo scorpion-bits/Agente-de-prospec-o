@@ -16,7 +16,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--strategy",
-            help="provedor:modelo (padrão: o da tarefa, gemini-free:gemini-2.5-flash-lite).",
+            help="provedor:modelo (padrão: o da tarefa, gemini-free:gemini-3.1-flash-lite).",
         )
 
     def handle(self, *args, strategy, **options):
