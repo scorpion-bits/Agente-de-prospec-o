@@ -98,5 +98,8 @@ Evidence); o histórico não é apagado.
   (`seed_csv`) e `inep-escolas` (`dataset`, arquivo local em `config.path`; sem `url` não usa rede).
 - **Parecidas com o SESC (E17b, ADR-024):** `orgs-parecidas-sesc` (`seed_csv`, `data/seeds/similar_orgs.csv`):
   `fields["similarity_tags"]` (vocabulário fechado) soma às tags da organização; site da rede na mãe.
+- **Busca de site oficial (E18, ADR-025):** `collection/search/` (`SearchProvider`: Serper e Brave) com cache
+  permanente em `SearchQuery` e teto de buscas pagas por execução; `extraction/website.py` valida
+  (domínio bloqueado, nome no começo da página, município); `manage.py find_websites` / `make websites`.
 - **Fontes iniciais:** `make seed` roda `load_sources` (cria `Source` que faltam, sem sobrescrever edições).
 - **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.

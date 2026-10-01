@@ -123,6 +123,12 @@ USER_AGENT = f"RadarScorpionBits/0.1 (+https://scorpionbits.com; {CONTACT_EMAIL}
     "; )", ")"
 )
 
+# Busca web (E18): provedor, chaves e teto de buscas pagas por execução.
+SEARCH_PROVIDER = env.str("SEARCH_PROVIDER", default="serper")
+SERPER_API_KEY = env.str("SERPER_API_KEY", default="")
+BRAVE_API_KEY = env.str("BRAVE_API_KEY", default="")
+SEARCH_MAX_CALLS_PER_RUN = env.int("SEARCH_MAX_CALLS_PER_RUN", default=100)
+
 # Logs: o GitHub Actions é público — nunca registrar dados pessoais (ADR-014).
 LOG_PII = env.bool("LOG_PII", default=False)
 LOGGING = {

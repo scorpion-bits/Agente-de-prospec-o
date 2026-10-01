@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from collection.models import CollectionRun, RawDocument
+from collection.models import CollectionRun, RawDocument, SearchQuery
 
 
 class ReadOnlyAdmin(admin.ModelAdmin):
@@ -35,3 +35,10 @@ class RawDocumentAdmin(ReadOnlyAdmin):
     list_filter = ("source", "status_code")
     search_fields = ("url",)
     exclude = ("text_gz",)
+
+
+@admin.register(SearchQuery)
+class SearchQueryAdmin(ReadOnlyAdmin):
+    list_display = ("query", "provider", "searched_at")
+    list_filter = ("provider",)
+    search_fields = ("query",)
