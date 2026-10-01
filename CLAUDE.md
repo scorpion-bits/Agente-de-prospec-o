@@ -48,8 +48,8 @@ Visão completa: `docs/product/vision.md` · MVP: `docs/product/mvp.md`
 
 ## Stack (decidida — ADR-001, ADR-010, ADR-011)
 
-- Python 3.12 · gerenciador `uv` · Django 5 (ORM, migrations, **admin como UI do MVP**, auth)
-- PostgreSQL no **Supabase** (projetos `radar-dev`/`radar-prod`, via pooler); só o Django acessa
+- Python 3.12 · gerenciador `uv` · Django 5.2 (ORM, migrations, **admin como UI do MVP**, auth)
+- PostgreSQL no **Supabase** (`radar-dev`/`radar-prod`, pooler em modo sessão); tabelas no schema `radar` (ADR-016)
 - Jobs: comandos `manage.py`, agendados no **GitHub Actions** (sem fila, sem servidor)
 - UI do MVP: Django admin **local**; online depois em `app.scorpionbits.com` (Cloud Run). Sem Vercel no MVP
 - HTTP: `httpx`; HTML: `selectolax`/`trafilatura`; PDF: `pypdf`/`pdfplumber`
@@ -57,10 +57,11 @@ Visão completa: `docs/product/vision.md` · MVP: `docs/product/mvp.md`
 - IA: camada `llm/` por **tarefa**, estratégias trocáveis (regras | Gemini | Claude | local);
   Gemini é o principal na extração; dados internos só em provedor pago (ADR-003, ADR-011)
 
-## Estrutura (alvo; criada a partir da E02)
+## Estrutura (criada na E02)
 
 ```
 radar/            projeto Django (settings, urls)
+tests/            testes (pytest); scripts/ verificações do repositório; Makefile; compose.yaml
 core/             modelos núcleo: Organization, Opportunity, Evidence, ServiceOffering
 collection/       fetcher educado, cache, RawDocument, conectores (fontes)
 extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
@@ -69,6 +70,11 @@ llm/              abstração de provedores, cache, log de custo, orçamento
 reports/          digest semanal
 docs/             memória do projeto (ver docs/README.md)
 ```
+
+## Comandos
+
+`make setup` · `make migrate` · `make run` (admin) · `make test` · `make lint`/`make fmt` ·
+`make check` (tudo que o CI roda). Testes precisam de `DATABASE_URL` (PostgreSQL, ex. `docker compose up -d`).
 
 ## Convenções
 

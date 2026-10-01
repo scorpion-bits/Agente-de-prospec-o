@@ -67,7 +67,7 @@ Por quê: 1–3 usuários, volume pequeno, equipe mínima, custo ≈ zero, sem l
 |---|---|---|
 | Frontend | Django admin local | Django no Cloud Run (`app.scorpionbits.com`); Next.js/Vercel Pro + Supabase Auth só se houver usuários não técnicos |
 | Banco | Supabase Postgres Free (projetos dev e prod), via pooler | Supabase Pro (US$ 25) quando backups gerenciados/sem pausa forem necessários |
-| Exposição do Supabase | Data API desativada / schema dedicado; só o Django acessa | RLS explícito se um frontend usar o cliente Supabase |
+| Exposição do Supabase | Schema dedicado `radar` (fora da Data API), criado por `pre_migrate`; pooler em modo sessão (ADR-016); só o Django acessa | RLS explícito se um frontend usar o cliente Supabase |
 | Jobs | `run_pipeline` no GitHub Actions (cron) ou local | Worker separado só se jobs > 1 h |
 | Scheduler | GitHub Actions `schedule` + `workflow_dispatch` (fallback: cron externo/local) | — |
 | Documentos brutos | Não guardados; URL + hash + ETag + texto extraído comprimido, com retenção | Supabase Storage/S3 se necessário |

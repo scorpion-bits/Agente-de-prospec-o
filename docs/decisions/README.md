@@ -26,3 +26,4 @@ Regras:
 | 013 | MEI: elegibilidade pelo perfil da empresa | aceito |
 | 014 | Repositório público: higiene de dados, logs e backups | aceito |
 | 015 | Cobertura de atividades do MEI (CNAE) como fator de elegibilidade | aceito |
+| 016 | Schema dedicado `radar` e conexão pelo pooler em modo sessão | aceito |
