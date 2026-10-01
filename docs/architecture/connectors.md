@@ -96,5 +96,7 @@ Evidence); o histórico não é apagado.
 - **Redes e hierarquia (E17, ADR-023):** `fields["parent_name"]` liga a unidade à organização-mãe da rede
   (criada se faltar; mãe já definida não é trocada). Conectores específicos: `sesc-sp-unidades`
   (`seed_csv`) e `inep-escolas` (`dataset`, arquivo local em `config.path`; sem `url` não usa rede).
+- **Parecidas com o SESC (E17b, ADR-024):** `orgs-parecidas-sesc` (`seed_csv`, `data/seeds/similar_orgs.csv`):
+  `fields["similarity_tags"]` (vocabulário fechado) soma às tags da organização; site da rede na mãe.
 - **Fontes iniciais:** `make seed` roda `load_sources` (cria `Source` que faltam, sem sobrescrever edições).
 - **Logs públicos:** `collect` imprime só contagens; mensagens de erro ficam em `CollectionRun.error_log`.

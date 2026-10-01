@@ -31,6 +31,7 @@ from core.models import (
     Suppression,
     Triage,
 )
+from core.services.similarity import SIMILARITY_TAGS
 from core.services.suppression import is_suppressed
 
 # tipo da evidência -> (rótulo, cor do texto e da borda, fundo, estilo da borda)
@@ -189,6 +190,24 @@ class SourceAdmin(SlugLockedMixin, admin.ModelAdmin):
     search_fields = ("slug", "name", "base_url")
 
 
+class SimilarityFilter(admin.SimpleListFilter):
+    """Filtro «parecida com o SESC»: qualquer tag de similaridade, ou uma tag específica (E17b)."""
+
+    title = "parecida com o SESC"
+    parameter_name = "similar"
+
+    def lookups(self, request, model_admin):
+        return [("any", "Qualquer parecida"), *SIMILARITY_TAGS.items()]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "any":
+            return queryset.filter(similarity_tags__len__gt=0)
+        if value in SIMILARITY_TAGS:
+            return queryset.filter(similarity_tags__contains=[value])
+        return queryset
+
+
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = (
@@ -202,7 +221,15 @@ class OrganizationAdmin(admin.ModelAdmin):
         "next_action_at",
         "website_status",
     )
-    list_filter = ("kind", "relationship_status", "uf", "network", "website_status", "size_hint")
+    list_filter = (
+        "kind",
+        SimilarityFilter,
+        "relationship_status",
+        "uf",
+        "network",
+        "website_status",
+        "size_hint",
+    )
     search_fields = ("name", "legal_name", "cnpj", "inep_code", "municipality_name", "website")
     autocomplete_fields = ("parent", "first_seen_source", "municipality")
     # Derivados das interações (E03b): ninguém digita à mão.
