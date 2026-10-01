@@ -38,3 +38,4 @@ Regras:
 | 025 | Descoberta de site oficial: busca com cache + validação determinística | aceito |
 | 026 | Contatos públicos institucionais: extração por regra, só do domínio da organização | aceito |
 | 027 | Matching por regras em dados: razões com evidência, prova de portfólio, máx. 3 por organização | aceito |
+| 028 | Conector Devpost: API pública, filtro de relevância e datas sem chute | aceito |

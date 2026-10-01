@@ -1,0 +1,27 @@
+{
+  "_comment": "FIXTURE SINTETICA (ver pagina 1). Repete um item da pagina 1 para testar dedupe.",
+  "hackathons": [
+    {
+      "id": 1001,
+      "title": "Exemplo Game Jam Global",
+      "displayed_location": {"icon": "globe", "location": "Online"},
+      "open_state": "open",
+      "url": "https://exemplo-game-jam.devpost.com/",
+      "submission_period_dates": "Sep 01 - Oct 30, 2026",
+      "themes": [{"id": 1, "name": "Gaming"}],
+      "organization_name": "Organizacao Exemplo A"
+    },
+    {
+      "id": 1006,
+      "title": "Open Source Education Sprint",
+      "displayed_location": {"icon": "globe", "location": "Online"},
+      "open_state": "open",
+      "url": "https://oss-edu.devpost.com/",
+      "submission_period_dates": "Dec 15, 2026 - Jan 10, 2027",
+      "themes": [{"id": 2, "name": "Education"}, {"id": 7, "name": "Open Ended"}],
+      "prize_amount": "$<span data-currency-value>2,500</span>",
+      "organization_name": "Organizacao Exemplo E"
+    }
+  ],
+  "meta": {"total_count": 6, "per_page": 5}
+}

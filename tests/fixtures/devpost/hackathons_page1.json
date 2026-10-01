@@ -1,0 +1,61 @@
+{
+  "_comment": "FIXTURE SINTETICA no formato descrito pela documentacao de terceiros (apify) e de memoria; NAO e uma resposta gravada do Devpost. Substituir por resposta real na E01. Nomes e URLs sao ficticios.",
+  "hackathons": [
+    {
+      "id": 1001,
+      "title": "Exemplo Game Jam Global",
+      "displayed_location": {"icon": "globe", "location": "Online"},
+      "open_state": "open",
+      "url": "https://exemplo-game-jam.devpost.com/?ref_feature=challenge&ref_medium=discover",
+      "submission_period_dates": "Sep 01 - Oct 30, 2026",
+      "themes": [{"id": 1, "name": "Gaming"}, {"id": 2, "name": "Education"}],
+      "prize_amount": "$<span data-currency-value>10,000</span>",
+      "registrations_count": 412,
+      "organization_name": "Organizacao Exemplo A",
+      "invite_only": false
+    },
+    {
+      "id": 1002,
+      "title": "Hackathon Social Futuro",
+      "displayed_location": {"icon": "location-pin", "location": "Sao Paulo, Brazil"},
+      "open_state": "upcoming",
+      "url": "https://social-futuro.devpost.com/",
+      "submission_period_dates": "Nov 20 - Dec 15, 2026",
+      "themes": [{"id": 3, "name": "Social Good"}],
+      "prize_amount": "$0",
+      "organization_name": "Organizacao Exemplo B",
+      "invite_only": false
+    },
+    {
+      "id": 1003,
+      "title": "Fintech Challenge Berlin",
+      "displayed_location": {"icon": "location-pin", "location": "Berlin, Germany"},
+      "open_state": "open",
+      "url": "https://fintech-berlin.devpost.com/",
+      "submission_period_dates": "Oct 10 - Oct 12, 2026",
+      "themes": [{"id": 4, "name": "Open Ended"}],
+      "organization_name": "Organizacao Exemplo C"
+    },
+    {
+      "id": 1004,
+      "title": "Blockchain Online Cup",
+      "displayed_location": {"icon": "globe", "location": "Online"},
+      "open_state": "open",
+      "url": "https://blockchain-cup.devpost.com/",
+      "submission_period_dates": "Oct 01 - Oct 31, 2026",
+      "themes": [{"id": 5, "name": "Blockchain"}, {"id": 6, "name": "Fintech"}],
+      "organization_name": "Organizacao Exemplo D"
+    },
+    {
+      "id": 1005,
+      "title": "Hackathon Fechado Education",
+      "displayed_location": {"icon": "globe", "location": "Online"},
+      "open_state": "open",
+      "url": "https://fechado.devpost.com/",
+      "submission_period_dates": "Oct 01 - Oct 31, 2026",
+      "themes": [{"id": 2, "name": "Education"}],
+      "invite_only": true
+    }
+  ],
+  "meta": {"total_count": 6, "per_page": 5}
+}

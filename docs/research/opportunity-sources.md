@@ -10,7 +10,7 @@ Confiabilidade: 5 = oficial/estruturado · 3 = agregador confiável · 1 = não 
 
 | # | Fonte | Tipo de oportunidade | Método de acesso | Custo | Confiab. | Validado |
 |---|---|---|---|---|---|---|
-| 1 | **Devpost** (`devpost.com/api/hackathons`) | Hackathons (online/presenciais, globais) | JSON público usado pelo próprio site (sem auth); filtros `status`, busca | Grátis | 4 | ⏳ E01 — confirmar termos de uso para uso automatizado |
+| 1 | **Devpost** (`devpost.com/api/hackathons`) | Hackathons (online/presenciais, globais) | JSON público usado pelo próprio site (sem auth); filtros `status`, busca | Grátis | 4 | ⏳ E01 — termos para uso automatizado não confirmados; conector pronto (E05, ADR-028), fonte desabilitada até conferir (P16) |
 | 2 | **itch.io jams** (`itch.io/jams`) | Game jams | Sem API oficial de jams; páginas de listagem aceitam sufixo `.xml` (RSS) para browse pages; `itch.io/jam/<id>/entries.json` para entradas | Grátis | 4 | ⏳ E01 — verificar se `/jams/upcoming.xml` existe |
 | 3 | **Querido Diário** (API pública, Open Knowledge Brasil) | Editais, chamamentos, credenciamentos municipais em diários oficiais | API REST: busca textual por termo + município (`territory_ids`) + período; retorna trecho + PDF | Grátis | 4 | ⏳ E01 — confirmar cobertura de Araraquara e vizinhas |
 | 4 | **Mapas Culturais** (mapa.cultura.gov.br e instâncias estaduais/municipais) | Oportunidades/editais culturais (inclui PNAB) | API JSON (`/api/opportunity/find`, mesmo padrão de `/api/event/find`) | Grátis | 4 | ⏳ E01 — listar instâncias relevantes (SP? Araraquara?) |
