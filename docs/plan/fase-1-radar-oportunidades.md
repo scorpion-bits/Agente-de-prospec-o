@@ -191,8 +191,10 @@ datas ambíguas → regex confere; free tier sai do ar → fallback; custo de PD
 **Testes:** FakeProvider com respostas gravadas; verificação de citação rejeita citação
 inexistente; regex de datas/valores; documento idêntico não chama LLM 2×.
 **Critério de conclusão:**
-- [ ] 20 extrações revisadas: acurácia por campo registrada em `extraction-eval.md`;
+- [ ] *(pendente do humano: P22)* 20 extrações revisadas: acurácia por campo registrada em `extraction-eval.md`;
       prazo e requisitos de empresa ≥ 90% corretos ou `unknown` (nunca errados com confiança).
-- [ ] Pelo menos 1 edital real com requisito de empresa (ex. idade mínima de CNPJ) extraído com citação.
-- [ ] Custo total da etapa registrado em `LLMCall`.
-- [ ] Campos sem citação verificada aparecem como inferência no admin.
+- [ ] *(P22)* Pelo menos 1 edital real com requisito de empresa (ex. idade mínima de CNPJ) extraído com citação.
+- [ ] *(P22)* Custo total da etapa registrado em `LLMCall` (`make llm-usage`).
+- [x] Campos sem citação verificada aparecem como inferência no admin (`Evidence.kind=inferred`).
+
+> Feita (ADR-034), **sem PDF** (o fetcher só baixa texto; página PDF fica `sem-texto`) e sem `pypdf`/`trafilatura`: HTML pelo extrator da E18 + janelas por palavra-chave. Acurácia ainda não medida (P22).
