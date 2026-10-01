@@ -101,9 +101,11 @@ IBGE) e consultas; fixtures; testes.
 termos combinados + lista de exclusão; município sem cobertura → registrar e usar `html_watch`.
 **Testes:** normalização; janela de datas incremental (só desde a última execução); dedupe por (município, data, trecho-hash).
 **Critério de conclusão:**
-- [ ] Consultas configuradas para ≥ 4 municípios cobertos.
-- [ ] Coleta incremental funciona.
-- [ ] Revisão de 10 ocorrências: taxa de relevância anotada em STATUS (para ajustar termos).
+- [x] Consultas configuradas para ≥ 4 municípios (6 configurados; cobertura real confirmada só na 1ª coleta: P19).
+- [x] Coleta incremental funciona (janela = última execução `ok` − 1 dia; testado).
+- [ ] Revisão de 10 ocorrências: taxa de relevância anotada em STATUS (para ajustar termos) — pendente: P19.
+
+> Feita (ADR-031): consultas combinadas + exclusões, janela por `CollectionRun`, sondagem de cobertura; fonte desabilitada.
 
 ---
 
