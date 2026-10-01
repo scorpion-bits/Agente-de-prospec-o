@@ -112,3 +112,26 @@ class RawDocument(models.Model):
         self.text_gz = b""
         self.size_bytes = 0
         self.etag = self.last_modified = ""  # sem texto, não há como responder a um 304
+
+
+class SearchQuery(models.Model):
+    """Resultado de uma busca web, guardado **para sempre**: nenhuma consulta é paga duas vezes."""
+
+    provider = models.CharField("provedor", max_length=20)
+    query_key = models.CharField(
+        "consulta normalizada", max_length=300, help_text="Sem acentos, caixa e pontuação."
+    )
+    query = models.CharField("consulta", max_length=300)
+    results = models.JSONField("resultados", default=list)
+    searched_at = models.DateTimeField("feita em", default=timezone.now)
+
+    class Meta:
+        ordering = ["-searched_at"]
+        verbose_name = "busca web"
+        verbose_name_plural = "buscas web"
+        constraints = [
+            models.UniqueConstraint(fields=["provider", "query_key"], name="uniq_search_query")
+        ]
+
+    def __str__(self):
+        return f"{self.provider}: {self.query}"

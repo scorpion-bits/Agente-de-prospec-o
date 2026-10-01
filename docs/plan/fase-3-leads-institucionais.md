@@ -76,8 +76,9 @@ armazenamento de resultados; comparar acurácia com a API de busca em 20 casos.
 **Riscos:** site errado (franquia, diretório) → validação + `ambiguous`; cota estourada → teto por execução.
 **Testes:** resultados gravados (site certo, diretório, rede social, homônimo em outra cidade).
 **Critério de conclusão:**
-- [ ] Amostra de 20: ≥ 85% corretos entre `found`; erros viram `ambiguous`, não `found`.
-- [ ] Nenhuma query repetida.
+- [ ] Amostra de 20: ≥ 85% corretos entre `found`; erros viram `ambiguous`, não `found`
+  (**não medido**: sem chave de busca nem rede no ambiente; P13).
+- [x] Nenhuma query repetida (`SearchQuery` com chave normalizada; testado, ADR-025).
 
 ---
 
