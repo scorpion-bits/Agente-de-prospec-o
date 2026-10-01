@@ -76,9 +76,11 @@ casam padrão"; ruído (notícias, não editais) → padrões de URL/palavras-ch
 páginas via JS → marcar e deixar fora.
 **Testes:** fixture "antes/depois" detecta exatamente os links novos; página inalterada = 0 novos.
 **Critério de conclusão:**
-- [ ] ≥ 5 páginas configuradas sem código específico por página.
-- [ ] Execução repetida sem mudança = 0 itens novos.
-- [ ] Itens novos aparecem no admin como candidatos com link e trecho.
+- [x] ≥ 5 páginas configuradas sem código específico por página (9, desabilitadas até conferir URL/termos: P18).
+- [x] Execução repetida sem mudança = 0 itens novos (testado com fixture antes/depois).
+- [x] Itens novos aparecem no admin como candidatos com link e trecho (coleta real pendente: P18).
+
+> Feita (ADR-030): conector por `kind`, seletor CSS simples, sem flag `needs_extraction` (candidata = `status=unknown`).
 
 ---
 

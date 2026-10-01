@@ -11,7 +11,7 @@ sem mexer no resto do sistema.
 |---|---|---|
 | `api` | Devpost, Querido Diário, Mapas Culturais, PNCP | Chama endpoint JSON público, pagina, normaliza |
 | `feed` | itch.io (listagem `.xml`, não confirmado; o conector E06 lê a listagem HTML como `html_watch`) | Lê RSS/Atom |
-| `html_watch` | FAPESP/PIPE, Sebrae-SP, InovAtiva, ProAC, prefeituras | Baixa página de listagem, extrai links/itens, detecta novidades por diff |
+| `html_watch` | FAPESP/PIPE, Sebrae-SP, InovAtiva, ProAC, prefeituras | Baixa a página, extrai os links da listagem (config em `Source.config`, sem código por página; ADR-030); novidade = o que o upsert cria |
 | `dataset` | INEP (Catálogo de Escolas / microdados), IBGE municípios, CNPJ aberto | Download de arquivo, filtro local, import |
 | `seed_csv` | Unidades SESC-SP, fontes curadas à mão | CSV versionado em `data/seeds/` |
 | `search` | Brave/Serper | Consulta de busca com cache (usado para achar sites, não como fonte primária) |

@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E06)
+> Última atualização: **2026-10-01** (E07)
 
 ## Onde estamos
 
@@ -10,11 +10,12 @@ E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem 
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 **E05 (Devpost)**: conector `devpost`; rodou de verdade (formato bateu, 45 vistos, 21 novos). **E06 (itch.io)**: conector
 `itch-jams` (game jams, ADR-029) + fetcher com prazo e medição de tempo; fonte desabilitada até conferir termos; sem migration.
+**E07 (`html_watch`)**: conector genérico (uma página = uma `Source`, ADR-030) e 9 páginas iniciais desabilitadas; sem migration.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E07 — Conector genérico `html_watch` + primeiras páginas** (próximo na ordem do `PLAN.md`).
+➡️ **E08 — Conector Querido Diário** (próximo na ordem do `PLAN.md`).
 Antes, o humano roda `make websites` (P13), `make contacts` (P14) e `make match` (P15) e confere P16/P17: sem dados reais o M2 não fecha.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
@@ -40,6 +41,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | E20 | 2026-10-01 | `scoring/match_rules.py` + `matching.py` (regras em dados), `match_services`; razões com evidência, prova só de portfólio público e confirmado (sem prova: força ×0,7), máx. 3 por organização; 19 testes; ADR-027. **Regras e forças são hipóteses; nada rodado em dados reais (P15)** | `…-10-01-E20.md` |
 | E05 | 2026-10-01 | `collection/connectors/devpost.py` (JSON público, filtro tema + online/Brasil, datas só se inequívocas, dedupe por URL), `Source` `devpost` desabilitada; 33 testes (fixture **sintética**); ADR-028. **Rodou de verdade: formato confere (P16)** | `…-10-01-E05.md` |
 | E06 | 2026-10-01 | `collection/connectors/itch_jams.py` (listagem HTML `upcoming`/`in-progress`, filtro 48 h + inscritos/palavra-chave em `Source.config`, datas só se inequívocas), `Source` `itch-jams` desabilitada; fetcher com prazo por requisição (90 s) e `stats`; `collect` imprime tempo de busca × gravação; 584 testes (fixture **sintética**); ADR-029. **HTML real e termos não conferidos (P17)** | `…-10-01-E06.md` |
+| E07 | 2026-10-01 | `collection/connectors/html_watch.py` (registrado por `kind`): links da listagem (seletor CSS simples, padrões, palavras, exclusões) → `Opportunity` candidata `unknown` com trecho; «novo» = o que o upsert cria (re-rodar = 0); página só-JS = erro; 9 `Source` desabilitadas (FAPESP, ProAC, Oficinas, Sebrae-SP, InovAtiva, 4 prefeituras); 20 testes; ADR-030. **URLs de memória, nada rodado (P18)** | `…-10-01-E07.md` |
 
 ## Pendências do humano
 
@@ -62,6 +64,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P15 | **E20:** depois de `make seed`/`make memory`/`make collect`, rodar `make match DRY=1` e depois `make match` na sua máquina (não no SQL Editor; sem migration); conferir no admin (Matches) 10 sugestões: razão faz sentido, prova correta; ajustar `scoring/match_rules.py` se preciso. Marcar itens de portfólio como `public` só quando puderem ser citados | `docs/decisions/ADR-027-matching-por-regras.md` |
 | P16 | **E05:** já coletou (45 vistos, 21 novos; formato confere). Falta revisar 10 hackathons no admin e salvar uma resposta real como fixture. **Demora (2–3 min/página, processo não saía):** rode de novo e mande a linha `tempo —` da saída (ADR-029) | `docs/decisions/ADR-028-conector-devpost.md` |
 | P17 | **E06:** conferir termos/robots.txt do itch.io; `make seed`, marcar «coleta permitida» e habilitar `itch-jams` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); revisar 10 jams (meta ≥ 10). Layout suposto: se mudou, o erro diz; salvar a página real como fixture | `docs/decisions/ADR-029-conector-itch-jams-e-medicao-do-fetcher.md` |
+| P18 | **E07:** conferir as 9 URLs de `html_watch` (de memória) e os termos/robots.txt; `make seed`, marcar «coleta permitida» e habilitar **uma** página por vez no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); ajustar `selector`/`link_patterns` em `Source.config` se vier ruído; revisar 10 itens e salvar uma página real como fixture | `docs/decisions/ADR-030-conector-html-watch-generico.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -75,23 +78,22 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
 021 regras da coleta (robots, bloqueio, dry-run, retenção) ·
 022 municípios do IBGE: texto × FK e perfis geográficos como dado ·
-023 SESC-SP (CSV curado) e escolas do INEP (arquivo local) ·
-024 parecidas com o SESC ·
+023 SESC-SP e escolas INEP · 024 parecidas com o SESC ·
 025 site oficial: busca com cache + validação que erra para «ambíguo» ·
-026 contatos públicos: por regra, só do domínio da organização, opt-out antes e depois ·
-027 matching por regras em dados ·
+026 contatos públicos institucionais · 027 matching por regras em dados ·
 028 conector Devpost: filtro de relevância, datas sem chute, fonte desabilitada até conferir ·
-**029 conector itch.io (listagem HTML, filtro em `Source.config`) e prazo/medição de tempo no fetcher**.
+029 conector itch.io (listagem HTML, filtro em `Source.config`) e prazo/medição de tempo no fetcher ·
+**030 `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert**.
 
 ## Problemas abertos
 
 - Coordenadas dos municípios vêm de conjunto derivado do IBGE (sedes), não do IBGE direto (rede bloqueada): conferir quando possível (ADR-022).
 - Lista SESC-SP escrita de memória e layout do INEP supostos: nada conferido na fonte (P11, ADR-023).
-- Lista de organizações parecidas e URLs oficiais também de memória (P12, ADR-024); `html_watch` das páginas de chamamento só na E07.
+- Lista de organizações parecidas e URLs oficiais também de memória (P12, ADR-024); páginas de chamamento do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
 - E18: formatos de Serper/Brave só da documentação (nada testado com chave real); sites só em JavaScript caem em ambíguo (ADR-025).
 - E20: regras e forças são hipóteses não calibradas; palavras-chave só enxergam o que virou evidência (ADR-027).
 - E19: nenhum site real testado; heurística pessoal × institucional pode errar; e-mail ofuscado/JS não é lido (ADR-026).
-- Endpoints das fontes **não testados** (E01); E06: HTML da listagem do itch.io só de memória (ADR-029). Devpost conferido pelo uso real.
+- Endpoints das fontes **não testados** (E01); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
 - Demora do Devpost (2–3 min/página): causa não reproduzida (rede bloqueada aqui); ver P16 e ADR-029.
 - Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
