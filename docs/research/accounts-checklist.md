@@ -17,7 +17,7 @@
 
 | # | Ação | Por quê / observação |
 |---|---|---|
-| A1 | Criar projetos **Supabase** `radar-dev` e `radar-prod` (região mais próxima, ex. São Paulo); anotar a string do **pooler** (não a direta); guardar a senha em gerenciador | Banco do MVP (ADR-010). Ninguém além do Django deve acessar; a E02 desativa a Data API |
+| A1 | Criar projetos **Supabase** `radar-dev` e `radar-prod` (região mais próxima, ex. São Paulo); anotar a string do **pooler** (não a direta); guardar a senha em gerenciador | Banco do MVP (ADR-010). Ninguém além do Django deve acessar; as tabelas ficam no schema `radar`, fora da Data API (ADR-016). Passo a passo: `docs/operations/supabase-setup.md` |
 | A2 | Ativar os **benefícios de desenvolvedor do Google AI Pro** em google.dev ("Activate Developer Benefits") | ~US$ 10/mês em créditos de Cloud; 🔎 conferir em Billing que valem para a Gemini API |
 | A3 | Criar **chave do Google AI Studio** (free tier) e, separadamente, projeto Cloud com faturamento para a chave paga | Free tier só para documentos públicos; dados internos só na chave paga (ADR-011) |
 | A4 | Escolher busca: **Serper** (2.500 buscas grátis) ou **Brave** (US$ 5 de crédito/mês) | 🔎 conferir se pedem cartão; 1 busca por organização, com cache |

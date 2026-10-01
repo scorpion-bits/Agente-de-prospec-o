@@ -27,11 +27,17 @@ DJANGO_SETTINGS_MODULE = "radar.settings"
 python_files = ["test_*.py"]
 pythonpath = ["."]
 testpaths = ["tests"]
+filterwarnings = [
+    # Django 5.2 avisa que URLField passará a assumir https (6.0). Só afeta quem digita URL sem
+    # esquema; a setting de transição já é depreciada. Remover ao migrar para o Django 6.
+    "ignore:The default scheme will be changed:django.utils.deprecation.RemovedInDjango60Warning",
+]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["staticfiles", "docs", "spikes"]
+# Migrations são geradas pelo Django (rótulos e help_text viram linhas longas): não se formatam.
+extend-exclude = ["staticfiles", "docs", "spikes", "*/migrations"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "DJ"]

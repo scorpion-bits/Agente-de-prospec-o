@@ -1,0 +1,194 @@
+[
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "course_gamedev",
+      "name": "Curso de desenvolvimento de jogos",
+      "category": "education",
+      "description": "Curso presencial de criação de jogos (lógica de programação, arte e game design) para jovens e adultos, em escolas, SESCs e instituições de ensino.",
+      "keywords": ["curso de jogos", "curso de desenvolvimento de jogos", "curso de game design", "curso de programação de jogos", "curso de games", "formação em games"],
+      "target_org_kinds": ["sesc", "school", "university", "ngo", "public_body"],
+      "target_cnaes": [],
+      "geo_profile": "onsite_recurring",
+      "active": true,
+      "mei_coverage": "covered",
+      "required_cnae_prefixes": ["85.99-6/03"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "workshop_gamedev",
+      "name": "Oficina de desenvolvimento de jogos",
+      "category": "education",
+      "description": "Oficina curta (algumas horas ou poucos encontros) de criação de jogos para eventos, escolas e equipamentos culturais.",
+      "keywords": ["oficina de jogos", "oficina de game design", "oficina de criação de jogos", "oficina de programação", "workshop de jogos", "workshop de games"],
+      "target_org_kinds": ["sesc", "school", "university", "ngo", "public_body", "event_organizer"],
+      "target_cnaes": [],
+      "geo_profile": "onsite_recurring",
+      "active": true,
+      "mei_coverage": "covered",
+      "required_cnae_prefixes": ["85.99-6/03"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "game_jam_org",
+      "name": "Organização de game jam",
+      "category": "education",
+      "description": "Planejamento e condução de game jams (maratonas de criação de jogos) para escolas, universidades, empresas e eventos.",
+      "keywords": ["game jam", "maratona de jogos", "maratona de criação de jogos", "hackathon de jogos", "jam de jogos"],
+      "target_org_kinds": ["sesc", "school", "university", "ngo", "public_body", "company", "event_organizer"],
+      "target_cnaes": [],
+      "geo_profile": "onsite_event",
+      "active": true,
+      "mei_coverage": "verify",
+      "required_cnae_prefixes": []
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "extracurricular_school",
+      "name": "Atividade extracurricular em escolas",
+      "category": "education",
+      "description": "Oficina ou clube recorrente de jogos e programação no contraturno ou como atividade extracurricular de escolas particulares.",
+      "keywords": ["atividade extracurricular", "atividades extracurriculares", "contraturno", "clube de jogos", "clube de programação", "cultura digital", "pensamento computacional"],
+      "target_org_kinds": ["school"],
+      "target_cnaes": ["85.1", "85.2"],
+      "geo_profile": "onsite_recurring",
+      "active": true,
+      "mei_coverage": "covered",
+      "required_cnae_prefixes": ["85.99-6/03"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "indie_game",
+      "name": "Jogo próprio (indie)",
+      "category": "games",
+      "description": "Jogos autorais publicados pelo estúdio (ex.: itch.io). Gera portfólio, prêmios e acesso a editais de fomento; não é venda a um cliente.",
+      "keywords": ["jogo independente", "jogo indie", "fomento a jogos", "edital de jogos", "publicação de jogos"],
+      "target_org_kinds": [],
+      "target_cnaes": [],
+      "geo_profile": "online",
+      "active": true,
+      "mei_coverage": "verify",
+      "required_cnae_prefixes": ["58.21-2"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "educational_game",
+      "name": "Jogo educativo sob encomenda",
+      "category": "games",
+      "description": "Jogo digital com objetivo pedagógico, sob encomenda de escolas, universidades, editoras e organizações.",
+      "keywords": ["jogo educativo", "jogo educacional", "game educacional", "aprendizagem baseada em jogos", "material didático digital"],
+      "target_org_kinds": ["school", "university", "public_body", "ngo", "sesc", "company"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "verify",
+      "required_cnae_prefixes": ["58.21-2", "62.01-5"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "institutional_game",
+      "name": "Jogo institucional ou de campanha",
+      "category": "games",
+      "description": "Jogo para divulgar a marca, a campanha, o evento ou a causa de uma organização.",
+      "keywords": ["jogo institucional", "advergame", "jogo para campanha", "jogo para evento", "jogo promocional"],
+      "target_org_kinds": ["company", "public_body", "ngo", "sesc", "university"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "verify",
+      "required_cnae_prefixes": ["62.01-5", "58.21-2"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "gamification",
+      "name": "Gamificação",
+      "category": "games",
+      "description": "Mecânicas de jogo aplicadas a treinamentos, programas de engajamento e plataformas.",
+      "keywords": ["gamificação", "gamificar", "treinamento gamificado", "engajamento", "ranking e recompensas"],
+      "target_org_kinds": ["company", "school", "university", "public_body", "ngo", "sesc"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "verify",
+      "required_cnae_prefixes": ["62.01-5"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "custom_software",
+      "name": "Software sob demanda",
+      "category": "software",
+      "description": "Sistemas e automações sob medida para organizações.",
+      "keywords": ["desenvolvimento de software", "software sob encomenda", "sistema sob medida", "sistema personalizado", "automação de processos", "aplicativo sob demanda"],
+      "target_org_kinds": ["company", "public_body", "ngo", "university", "school"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "not_covered",
+      "required_cnae_prefixes": ["62.01-5"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "web_app",
+      "name": "Aplicação web",
+      "category": "web",
+      "description": "Sistemas e plataformas acessados pelo navegador (painéis, portais, áreas do cliente).",
+      "keywords": ["aplicação web", "sistema web", "web app", "portal", "plataforma online", "painel de gestão", "área do cliente"],
+      "target_org_kinds": ["company", "public_body", "ngo", "university", "school", "sesc"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "not_covered",
+      "required_cnae_prefixes": ["62.01-5"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "landing_page",
+      "name": "Landing page",
+      "category": "web",
+      "description": "Página única de campanha, evento ou captação de contatos.",
+      "keywords": ["landing page", "página de captura", "página de vendas", "página de campanha", "página de evento"],
+      "target_org_kinds": ["company", "ngo", "event_organizer", "school", "other"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "not_covered",
+      "required_cnae_prefixes": ["62.01-5"]
+    }
+  },
+  {
+    "model": "core.serviceoffering",
+    "fields": {
+      "slug": "institutional_site",
+      "name": "Site institucional",
+      "category": "web",
+      "description": "Site completo de apresentação de empresa, escola ou instituição.",
+      "keywords": ["site institucional", "criação de site", "novo site", "site para empresa", "site para escola", "redesign de site"],
+      "target_org_kinds": ["company", "school", "ngo", "public_body", "university"],
+      "target_cnaes": [],
+      "geo_profile": "remote_service",
+      "active": true,
+      "mei_coverage": "not_covered",
+      "required_cnae_prefixes": ["62.01-5"]
+    }
+  }
+]

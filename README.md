@@ -4,7 +4,7 @@ Plataforma interna da **Scorpion Bits** para descobrir, qualificar e priorizar
 oportunidades comerciais (escolas, SESCs, empresas, instituições) e institucionais
 (editais, hackathons, game jams, programas de aceleração).
 
-> Estado: esqueleto do projeto pronto (E02); veja `docs/plan/STATUS.md` para a próxima etapa.
+> Estado: modelo de dados núcleo e admin prontos (E03); veja `docs/plan/STATUS.md` para a próxima etapa.
 
 ## Por onde começar
 
@@ -27,6 +27,7 @@ Requisitos: [uv](https://docs.astral.sh/uv/) (instala o Python 3.12 sozinho) e u
 make setup            # instala dependências e cria o .env a partir do .env.example
 docker compose up -d  # PostgreSQL local (ou use o projeto Supabase radar-dev: ver .env.example)
 make migrate          # cria o schema "radar" e as tabelas
+make seed             # catálogo inicial de serviços (não sobrescreve o que você editar no admin)
 make superuser        # usuário do admin
 make run              # http://127.0.0.1:8000/admin/
 make check            # lint + testes + verificações (o mesmo que o CI roda)
@@ -34,6 +35,8 @@ make check            # lint + testes + verificações (o mesmo que o CI roda)
 
 `make help` lista todos os comandos. Os testes precisam de `DATABASE_URL` apontando para um
 PostgreSQL (nunca para o banco de produção: o pytest cria e apaga um banco `test_*`).
+
+Aplicar no **Supabase** (e rodar no Windows sem `make`): `docs/operations/supabase-setup.md`.
 
 ## Regras do repositório público
 

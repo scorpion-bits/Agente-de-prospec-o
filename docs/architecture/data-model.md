@@ -1,7 +1,7 @@
 # Modelo de dados
 
 > Modelo **alvo**. Cada etapa cria só o que precisa. Nomes de código em inglês.
-> Status: proposto (nenhuma migration criada ainda).
+> Status: núcleo implementado na E03 (ver "Estado de implementação"); o resto entra nas etapas indicadas.
 
 ## Visão geral
 
@@ -27,6 +27,36 @@ LLMCall (log de custo/cache)   SearchQuery (cache de busca)   Suppression (opt-o
 ```
 
 Banco: PostgreSQL (Supabase) — ADR-010. Limite do Free: 500 MB → nada de binários no banco.
+
+## Estado de implementação
+
+| Etapa | Entidades |
+|---|---|
+| **E03 (feita)** | `Source`, `Organization`, `ContactPoint`, `Opportunity`, `Evidence`, `ServiceOffering`, `Match`, `Triage`, `Suppression` |
+| E03b | `Interaction`, `PortfolioItem`, `CompanyProfile`, `Match.portfolio_refs`; cálculo de `relationship_status`, `last_interaction_at`, `next_action_at` |
+| E04 | `CollectionRun`, `RawDocument`, `Evidence.raw_document` |
+| E10 · E12 · E13 · E18 | `LLMCall` · `Municipality` · `Score` · `SearchQuery` |
+
+**Desvios do modelo alvo feitos na E03** (as seções abaixo continuam descrevendo o alvo):
+- Município provisório: `municipality_name` + `uf` em `Organization` e `Opportunity` (a FK vem na E12).
+- `ServiceOffering.typical_ticket_brl` (faixa) virou `typical_ticket_min_brl` e `typical_ticket_max_brl`,
+  nulos: valores comerciais ficam no banco, não no repositório público (ADR-014).
+- `Evidence`/`Triage` apontam para a entidade por `GenericForeignKey` (ADR-017), validando que o ID existe.
+- Listas de strings são `ArrayField` (ADR-018). CNAE é sempre comparado **só pelos dígitos**.
+- Identificadores externos únicos (`cnpj`, `inep_code`, `osm_id`) ficam **NULL** quando ausentes. O
+  `cnpj` é guardado sem máscara, aceita o formato alfanumérico (vigente desde jul/2026) e tem os
+  dígitos verificadores validados.
+- `Opportunity.canonical_key`: gerada quando em branco (URL canônica; senão organizador + título + prazo,
+  conforme `connectors.md`) e **somente leitura** no admin depois de criada.
+- `ContactPoint`: `(organization, kind, value)` único, com o valor normalizado (e-mail em minúsculas,
+  telefone em E.164). `evidence` obrigatória (`RESTRICT`) e **sobre a mesma organização**.
+  `ContactPoint.objects.usable()` é a **única** porta para exibir ou usar contatos: exclui opt-out,
+  organizações `do_not_contact` e contatos inativos.
+- `Suppression`: valor normalizado por tipo; domínio vale para subdomínios; `organization` vale por CNPJ ou nome.
+- `Match`: um por `(organization, service, method)`. `Triage`: uma por entidade; descartar exige motivo.
+- `Source` nasce desabilitada e sem `robots_ok`: só liga depois de conferir termos e robots.txt.
+- Catálogo de serviços: `core/fixtures/services.json`. `make seed` (`load_services`) só cria o que falta e
+  **não sobrescreve** edições do admin (ex.: cobertura do MEI ajustada pelo contador); `loaddata` sobrescreve.
 
 ## Entidades
 
