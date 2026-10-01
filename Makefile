@@ -9,7 +9,7 @@ help:  ## Lista os comandos
 
 setup:  ## Instala dependências (uv) e cria o .env a partir do exemplo
 	$(UV) sync
-	@test -f .env || (cp .env.example .env && echo ".env criado: preencha DATABASE_URL e DJANGO_DEBUG=true para uso local")
+	@test -f .env || (cp .env.example .env && echo ".env criado a partir do .env.example (PostgreSQL local em 127.0.0.1:5432; ajuste DATABASE_URL se usar o Supabase)")
 
 migrate:  ## Aplica migrations (cria o schema dedicado se preciso)
 	$(UV) run python manage.py migrate

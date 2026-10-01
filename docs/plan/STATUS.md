@@ -26,7 +26,7 @@ Depois (ordem em `PLAN.md`): **E03b (M1: memória comercial)** → E04 → E12 �
 | E00 | 2026-09-30 | Planejamento, pesquisa, arquitetura, plano, ADR-001–009 | `docs/history/sessions/2026-09-30-E00.md` |
 | E00b | 2026-09-30 | Complemento: Supabase/GitHub Actions, Gemini, memória comercial, MEI; ADR-010–013 | `…-E00b.md` |
 | E01b (parcial) | 2026-09-30 | Seeds (portfólio, perfil MEI, template de interações), `.env.example`, checklist de contas, ADR-014/015 | `…-E01b.md` |
-| E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks` (limites + dados sensíveis), ADR-016. Falta só validar no Supabase (P4) | `…-10-01-E02.md` |
+| E02 | 2026-10-01 | Django 5.2 + psycopg3, schema `radar`, admin, Makefile, CI com Postgres, `repo_checks` (limites + dados sensíveis), ADR-016. CI do GitHub verde (run 1). Falta só validar no Supabase (P4) | `…-10-01-E02.md` |
 
 ## Pendências do humano (fecham a E01b)
 
@@ -53,6 +53,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 
 - Endpoints das fontes **não testados** (E01).
 - Conexão ao **Supabase real** e Data API sem as tabelas: não verificado (P4); validado só em PostgreSQL 16 local.
+- CI usa `actions/checkout@v4` e `setup-uv@v5`, que o GitHub avisa serem Node 20 (hoje forçados para Node 24 e funcionando): subir as versões quando conveniente.
 - `CLAUDE.md` com 125 linhas (alerta a partir de 120; limite 150): na próxima etapa, enxugar antes de crescer.
 - Limites de free tier (Supabase, Gemini, Serper/Brave) por fontes secundárias — confirmar ao criar as contas.
 - Créditos do AI Pro na Gemini API: 🔎 conferir em Billing após ativar.

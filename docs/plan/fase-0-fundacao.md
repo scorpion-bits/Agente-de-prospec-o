@@ -120,7 +120,7 @@ automatizada desde o início.
 transação do pooler (prepared statements/cursors) → preferir modo sessão ou ajustar opções.
 **Testes:** fumaça (`manage.py check`, `/admin/` responde); migrations aplicam no Postgres do CI.
 **Critério de conclusão:**
-- [x] `make check` passa em PostgreSQL 16 (8 testes) e o admin responde (login verificado). CI: ver STATUS.
+- [x] `make check` passa em PostgreSQL 16 (8 testes) e o admin responde (login verificado). CI do GitHub verde (run 1).
 - [ ] `make run` conectado ao `radar-dev` do Supabase — **pendente de P4**.
 - [ ] Supabase não expõe as tabelas pela Data API — **pendente de P4** (schema `radar` testado localmente).
 - [x] CLAUDE.md "Estrutura" confere com o que existe.
