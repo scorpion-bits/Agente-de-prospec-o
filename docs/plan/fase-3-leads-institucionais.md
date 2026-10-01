@@ -126,8 +126,11 @@ e `portfolio_refs`. Regras v1 (como dados):
 **Riscos:** regras genéricas demais → força diferenciada e máximo de 3 matches por organização.
 **Testes:** cada regra com caso positivo/negativo; razões e portfólio apontam para registros existentes.
 **Critério de conclusão:**
-- [ ] Toda unidade SESC/escola tem ≥ 1 match com razão legível, evidência e (quando existir) item de portfólio.
-- [ ] Novo serviço ou item de portfólio no admin + regra em dados não exige mudar o motor.
+- [x] Toda unidade SESC/escola tem ≥ 1 match com razão legível, evidência e (quando existir) item de portfólio
+  (testado: SESC pela regra principal; escola sempre cai ao menos no fallback fraco; número real depois de `make match`).
+- [x] Novo serviço ou item de portfólio no admin + regra em dados não exige mudar o motor.
+
+**Feita (2026-10-01, ADR-027):** `scoring/match_rules.py` (regras v1), `scoring/matching.py`, `match_services`, `make match`.
 
 ---
 

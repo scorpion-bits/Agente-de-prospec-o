@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E19)
+> Última atualização: **2026-10-01** (E20)
 
 ## Onde estamos
 
@@ -19,13 +19,15 @@ runner e `collect`, conector `seed_csv`, `purge_raw_documents`. **E12 (geografia
 e `find_websites` / `make websites` (ADR-025).
 **E19 (contatos públicos)**: `extract_contacts` / `make contacts` lê até 5 páginas do site oficial e grava
 `ContactPoint` com evidência e opt-out (ADR-026); migration `core.0005`.
+**E20 (matching)**: `match_services` / `make match` gera `Match` por regras em dados, com razões, prova de
+portfólio e no máx. 3 por organização (ADR-027); sem migration.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase pelo titular; faltam outras ações do humano, abaixo).
 **Repositório público** → regras de dados em ADR-014. Comandos: `make help`.
 
 ## Próxima etapa
 
-➡️ **E20 — Matching serviço ↔ organização ↔ portfólio** (`fase-3-leads-institucionais.md`; ordem do `PLAN.md`).
-Antes, o humano roda `make websites` (P13) e `make contacts` (P14): sem sites e contatos reais o M2 não fecha.
+➡️ **E05 — Conector Devpost** (próximo na ordem do `PLAN.md`; E21 vem depois de E13, na posição 20–21).
+Antes, o humano roda `make websites` (P13), `make contacts` (P14) e `make match` (P15): sem dados reais o M2 não fecha.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co). Ela também
@@ -47,6 +49,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | E17b | 2026-10-01 | `similar_orgs.csv` (redes, prefeituras e universidades dos 4 polos), conector `orgs-parecidas-sesc`, tags de vocabulário fechado que somam no upsert, filtro no admin; 431 testes; ADR-024. **Lista e URLs de memória, não conferidas (P12)** | `…-10-01-E17b.md` |
 | E18 | 2026-10-01 | `collection/search/` (Serper/Brave, cache `SearchQuery`, teto por execução), `extraction/website.py` (bloqueio, nome+município na página), `find_websites`; evidência inferida; 31 testes novos; ADR-025. **Busca real e amostra de 20 não testadas (P13)** | `…-10-01-E18.md` |
 | E19 | 2026-10-01 | `extraction/contacts.py` (e-mail, telefone E.164, WhatsApp, JSON-LD, redes, formulário), `collection/contact_finder.py`, `extract_contacts`, `contacts_checked_at`; evidência observada, opt-out antes e depois, idempotente; 40 testes novos; ADR-026. **Sites reais e amostra de 20 não testados (P14)** | `…-10-01-E19.md` |
+| E20 | 2026-10-01 | `scoring/match_rules.py` + `matching.py` (regras em dados), `match_services`; razões com evidência, prova só de portfólio público e confirmado (sem prova: força ×0,7), máx. 3 por organização; 19 testes; ADR-027. **Regras e forças são hipóteses; nada rodado em dados reais (P15)** | `…-10-01-E20.md` |
 
 ## Pendências do humano
 
@@ -66,6 +69,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P12 | **E17b:** conferir `data/seeds/similar_orgs.csv` (unidades faltando/sobrando, URLs oficiais) e rodar `make seed` seguido de `make collect` no terminal da sua máquina (não no SQL Editor); sem migration nova | `docs/decisions/ADR-024-organizacoes-parecidas-com-o-sesc.md` |
 | P13 | **E18:** criar a chave Serper (ou Brave) em `.env` (`SEARCH_PROVIDER`, `SERPER_API_KEY`); rodar `make migrate` e `make websites DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os `found` (meta ≥ 85%) e anotar erros; depois `make websites` | `docs/decisions/ADR-025-descoberta-de-site-oficial.md` |
 | P14 | **E19:** depois do P13, rodar `make migrate` e `make contacts DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os contatos contra os sites (meta: todos conferem) e a linha «Cobertura»; depois `make contacts`. Revisar `is_personal` no admin | `docs/decisions/ADR-026-contatos-publicos-institucionais.md` |
+| P15 | **E20:** depois de `make seed`/`make memory`/`make collect`, rodar `make match DRY=1` e depois `make match` na sua máquina (não no SQL Editor; sem migration); conferir no admin (Matches) 10 sugestões: razão faz sentido, prova correta; ajustar `scoring/match_rules.py` se preciso. Marcar itens de portfólio como `public` só quando puderem ser citados | `docs/decisions/ADR-027-matching-por-regras.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -82,7 +86,8 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 023 SESC-SP (CSV curado) e escolas do INEP (arquivo local) ·
 024 parecidas com o SESC ·
 025 site oficial: busca com cache + validação que erra para «ambíguo» ·
-**026 contatos públicos: por regra, só do domínio da organização, opt-out antes e depois**.
+026 contatos públicos: por regra, só do domínio da organização, opt-out antes e depois ·
+**027 matching por regras em dados: razões com evidência, prova de portfólio, máx. 3 por organização**.
 
 ## Problemas abertos
 
@@ -90,18 +95,16 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Lista SESC-SP escrita de memória e layout do INEP supostos: nada conferido na fonte (P11, ADR-023).
 - Lista de organizações parecidas e URLs oficiais também de memória (P12, ADR-024); `html_watch` das páginas de chamamento só na E07.
 - E18: formatos de Serper/Brave só da documentação (nada testado com chave real); sites só em JavaScript caem em ambíguo (ADR-025).
+- E20: regras e forças são hipóteses não calibradas; palavras-chave só enxergam o que virou evidência (ADR-027).
 - E19: nenhum site real testado; heurística pessoal × institucional pode errar; e-mail ofuscado/JS não é lido (ADR-026).
 - Endpoints das fontes **não testados** (E01). Nenhum conector real existe ainda; só o genérico `seed_csv`.
 - Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
-- `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env` do titular: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.
+- `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env`: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.
 - Dedupe de organização por nome varre a tabela em Python (ADR-020): indexar chave normalizada quando a base crescer (E04+).
-- Sair de `do_not_contact` exige editar no banco/shell (derivado não é editável; tela de `Suppression` na Fase 4).
-- Aviso do Django 6 sobre `URLField` (http→https) filtrado nos testes (`pyproject.toml`); remover ao migrar para o Django 6.
-- CI usa `actions/checkout@v4` e `setup-uv@v5`, que o GitHub avisa serem Node 20 (hoje forçados para Node 24 e funcionando): subir as versões quando conveniente.
-- Limites de free tier (Supabase, Gemini, Serper/Brave) por fontes secundárias — confirmar ao criar as contas.
-- Créditos do AI Pro na Gemini API: 🔎 conferir em Billing após ativar.
+- Aviso do Django 6 sobre `URLField` filtrado nos testes (`pyproject.toml`); remover ao migrar. CI usa `checkout@v4`/`setup-uv@v5` (Node 20, forçado para 24): subir quando conveniente.
+- Limites de free tier (Supabase, Gemini, Serper/Brave) e créditos do AI Pro: confirmar ao criar as contas/Billing.
 - `schedule` do GitHub Actions desliga após 60 dias sem commits (repositório público) — mitigação em ADR-014.
 
 ## Riscos de negócio a acompanhar
