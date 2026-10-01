@@ -105,8 +105,9 @@ def scan_organization(
 def apply_scan(organization: Organization, scan: Scan) -> dict[str, int]:
     """Grava os contatos (com evidência observada) e marca a organização como verificada.
 
-    Contato já existente (inclusive editado ou invalidado à mão) não é alterado: só renova a
-    evidência e, se estiver ativo, `last_verified_at`. Devolve `{kind: criados}`.
+    Achar não é verificar: `last_verified_at` fica vazio (o «visto no site» está na evidência) e só
+    uma checagem posterior, humana, o preenche. Contato já existente (inclusive editado ou
+    invalidado à mão) não é alterado: só renova a evidência. Devolve `{kind: criados}`.
     """
     now = timezone.now()
     created: dict[str, int] = {}
@@ -133,14 +134,10 @@ def apply_scan(organization: Organization, scan: Scan) -> dict[str, int]:
                 "label": contact.label,
                 "is_personal": contact.is_personal,
                 "evidence": evidence,
-                "last_verified_at": now,
             },
         )
         if was_created:
             created[contact.kind] = created.get(contact.kind, 0) + 1
-        elif point.status == ContactPoint.Status.ACTIVE:
-            point.last_verified_at = now
-            point.save(update_fields=["last_verified_at"])
     mark_checked(organization, now)
     return created
 

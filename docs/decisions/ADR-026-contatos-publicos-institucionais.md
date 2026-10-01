@@ -29,7 +29,7 @@ no LinkedIn. O ambiente do Claude não alcança sites reais: **nada foi testado 
    literal verificado contra o texto). Organização em `Suppression` (ou `do_not_contact`) nem é visitada; e-mail,
    telefone e domínio suprimidos não viram contato. Uso/exibição continua por `ContactPoint.objects.usable()`.
 8. **Idempotência:** contato existente (mesmo `organização+tipo+valor`) não é alterado (preserva edição e
-   `bounced`/`invalid`); só renova a evidência e `last_verified_at`. `Organization.contacts_checked_at` (migration
+   `bounced`/`invalid`); só renova a evidência. **Achar ≠ verificar:** `last_verified_at` fica vazio na extração; sem verificação por SMTP nem serviços de terceiros (ADR-005). `Organization.contacts_checked_at` (migration
    `core.0005`) evita reler o mesmo site toda execução; `--refresh` relê.
 9. **Logs públicos:** o comando imprime só contagens e a cobertura (% de organizações com site e ≥ 1 contato
    institucional utilizável). Nenhum valor de contato sai nos logs (ADR-014).

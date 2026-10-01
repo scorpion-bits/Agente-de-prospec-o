@@ -308,7 +308,7 @@ def test_reexecutar_nao_duplica_nem_mexe_no_que_o_humano_editou(escola):
     assert ContactPoint.objects.count() == total and Evidence.objects.count() == evidences
     mail = ContactPoint.objects.get(value="secretaria@colegioaurora.test")
     assert mail.status == "bounced" and mail.label == "editado"
-    assert mail.last_verified_at is not None
+    assert mail.last_verified_at is None  # achar no site não é verificar
 
 
 def test_opt_out_de_email_e_dominio_nao_vira_contato(escola):
