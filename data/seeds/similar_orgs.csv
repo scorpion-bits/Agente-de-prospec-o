@@ -1,0 +1,47 @@
+name,kind,network,parent,municipality,uf,website,tags,source_url,curated_at
+SENAC-SP,other,SENAC-SP,,,SP,https://www.sp.senac.br/,sistema_s|educacao_nao_formal,,2026-10-01
+SESI-SP,other,SESI-SP,,,SP,https://www.sesisp.org.br/,sistema_s|educacao_nao_formal,,2026-10-01
+SENAI-SP,other,SENAI-SP,,,SP,https://sp.senai.br/,sistema_s|educacao_tecnica,,2026-10-01
+Centro Paula Souza,public_body,Centro Paula Souza,,,SP,https://www.cps.sp.gov.br/,educacao_tecnica|baixa_prioridade,,2026-10-01
+IFSP,university,IFSP,,,SP,https://www.ifsp.edu.br/,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+Oficinas Culturais do Estado de SP,public_body,Oficinas Culturais,,,SP,https://oficinasculturais.org.br/,cultural_publico|educacao_nao_formal,,2026-10-01
+Prefeitura de Araraquara,public_body,Prefeitura de Araraquara,,,SP,https://www.araraquara.sp.gov.br/,poder_publico_municipal,,2026-10-01
+Prefeitura de São Carlos,public_body,Prefeitura de São Carlos,,,SP,https://www.saocarlos.sp.gov.br/,poder_publico_municipal,,2026-10-01
+Prefeitura de Ribeirão Preto,public_body,Prefeitura de Ribeirão Preto,,,SP,https://www.ribeiraopreto.sp.gov.br/,poder_publico_municipal,,2026-10-01
+Prefeitura de Bauru,public_body,Prefeitura de Bauru,,,SP,https://www.bauru.sp.gov.br/,poder_publico_municipal,,2026-10-01
+UNESP,university,UNESP,,,SP,https://www.unesp.br/,ensino_superior|baixa_prioridade,,2026-10-01
+UFSCar,university,UFSCar,,,SP,https://www.ufscar.br/,ensino_superior|baixa_prioridade,,2026-10-01
+USP,university,USP,,,SP,https://www.usp.br/,ensino_superior|baixa_prioridade,,2026-10-01
+SENAC Araraquara,other,SENAC-SP,SENAC-SP,Araraquara,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SENAC São Carlos,other,SENAC-SP,SENAC-SP,São Carlos,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SENAC Ribeirão Preto,other,SENAC-SP,SENAC-SP,Ribeirão Preto,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SENAC Bauru,other,SENAC-SP,SENAC-SP,Bauru,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SESI Araraquara,other,SESI-SP,SESI-SP,Araraquara,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SESI São Carlos,other,SESI-SP,SESI-SP,São Carlos,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SESI Ribeirão Preto,other,SESI-SP,SESI-SP,Ribeirão Preto,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SESI Bauru,other,SESI-SP,SESI-SP,Bauru,SP,,sistema_s|educacao_nao_formal,,2026-10-01
+SENAI Araraquara,other,SENAI-SP,SENAI-SP,Araraquara,SP,,sistema_s|educacao_tecnica,,2026-10-01
+SENAI São Carlos,other,SENAI-SP,SENAI-SP,São Carlos,SP,,sistema_s|educacao_tecnica,,2026-10-01
+SENAI Ribeirão Preto,other,SENAI-SP,SENAI-SP,Ribeirão Preto,SP,,sistema_s|educacao_tecnica,,2026-10-01
+SENAI Bauru,other,SENAI-SP,SENAI-SP,Bauru,SP,,sistema_s|educacao_tecnica,,2026-10-01
+Fatec São Carlos,university,Centro Paula Souza,Centro Paula Souza,São Carlos,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+Fatec Ribeirão Preto,university,Centro Paula Souza,Centro Paula Souza,Ribeirão Preto,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+Fatec Bauru,university,Centro Paula Souza,Centro Paula Souza,Bauru,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+IFSP Araraquara,university,IFSP,IFSP,Araraquara,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+IFSP São Carlos,university,IFSP,IFSP,São Carlos,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+IFSP Matão,university,IFSP,IFSP,Matão,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+IFSP Bauru,university,IFSP,IFSP,Bauru,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+IFSP Ribeirão Preto,university,IFSP,IFSP,Ribeirão Preto,SP,,educacao_tecnica|ensino_superior|baixa_prioridade,,2026-10-01
+Prefeitura de Araraquara - Secretaria de Cultura,public_body,Prefeitura de Araraquara,Prefeitura de Araraquara,Araraquara,SP,,poder_publico_municipal|cultural_publico|educacao_nao_formal,,2026-10-01
+Prefeitura de São Carlos - Secretaria de Cultura,public_body,Prefeitura de São Carlos,Prefeitura de São Carlos,São Carlos,SP,,poder_publico_municipal|cultural_publico|educacao_nao_formal,,2026-10-01
+Prefeitura de Ribeirão Preto - Secretaria de Cultura,public_body,Prefeitura de Ribeirão Preto,Prefeitura de Ribeirão Preto,Ribeirão Preto,SP,,poder_publico_municipal|cultural_publico|educacao_nao_formal,,2026-10-01
+Prefeitura de Bauru - Secretaria de Cultura,public_body,Prefeitura de Bauru,Prefeitura de Bauru,Bauru,SP,,poder_publico_municipal|cultural_publico|educacao_nao_formal,,2026-10-01
+Prefeitura de Araraquara - Secretaria de Educação,public_body,Prefeitura de Araraquara,Prefeitura de Araraquara,Araraquara,SP,,poder_publico_municipal|baixa_prioridade,,2026-10-01
+Prefeitura de São Carlos - Secretaria de Educação,public_body,Prefeitura de São Carlos,Prefeitura de São Carlos,São Carlos,SP,,poder_publico_municipal|baixa_prioridade,,2026-10-01
+Prefeitura de Ribeirão Preto - Secretaria de Educação,public_body,Prefeitura de Ribeirão Preto,Prefeitura de Ribeirão Preto,Ribeirão Preto,SP,,poder_publico_municipal|baixa_prioridade,,2026-10-01
+Prefeitura de Bauru - Secretaria de Educação,public_body,Prefeitura de Bauru,Prefeitura de Bauru,Bauru,SP,,poder_publico_municipal|baixa_prioridade,,2026-10-01
+UNESP Araraquara,university,UNESP,UNESP,Araraquara,SP,,ensino_superior|baixa_prioridade,,2026-10-01
+UFSCar São Carlos,university,UFSCar,UFSCar,São Carlos,SP,,ensino_superior|baixa_prioridade,,2026-10-01
+USP São Carlos,university,USP,USP,São Carlos,SP,,ensino_superior|baixa_prioridade,,2026-10-01
+USP Ribeirão Preto,university,USP,USP,Ribeirão Preto,SP,,ensino_superior|baixa_prioridade,,2026-10-01
+CDCC-USP (Centro de Divulgação Científica e Cultural),public_body,USP,USP,São Carlos,SP,,ciencia_cultura|educacao_nao_formal|cultural_publico,,2026-10-01

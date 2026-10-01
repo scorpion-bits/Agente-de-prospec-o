@@ -82,14 +82,26 @@ def _link_parent(organization: Organization, parent_name: str, source) -> bool:
     return True
 
 
+def _add_tags(organization: Organization, tags: list[str]) -> bool:
+    """Acrescenta tags de similaridade (união: nunca remove as que o humano pôs no admin)."""
+    missing = [tag for tag in tags if tag not in organization.similarity_tags]
+    if not missing:
+        return False
+    organization.similarity_tags = [*organization.similarity_tags, *missing]
+    organization.save(update_fields=["similarity_tags", "updated_at"])
+    return True
+
+
 @transaction.atomic
 def upsert_organization(candidate: OrganizationCandidate, *, source, raw_document=None):
     """`(organização, CREATED|UPDATED|UNCHANGED)`.
 
     `fields["parent_name"]` (opcional) é o nome da organização-mãe da rede (ex.: "SESC-SP").
+    `fields["similarity_tags"]` (opcional) é somada às tags da organização, existente ou nova.
     """
     fields = dict(candidate.fields)
     parent_name = fields.pop("parent_name", "")
+    tags = fields.pop("similarity_tags", [])
     lookup = {k: fields.pop(k) for k in ORGANIZATION_LOOKUP_FIELDS if k in fields}
     existing = find_existing_organization(candidate.name, **lookup)
     before = _columns(existing.pk) if existing is not None else None
@@ -97,10 +109,11 @@ def upsert_organization(candidate: OrganizationCandidate, *, source, raw_documen
         candidate.name, defaults={**fields, "first_seen_source": source}, **lookup
     )
     linked = _link_parent(organization, parent_name, source)
+    tagged = _add_tags(organization, tags)
     new_evidence = _record(organization, candidate.evidence, source, raw_document)
     if created:
         return organization, CREATED
-    filled = linked or before != _columns(organization.pk)
+    filled = linked or tagged or before != _columns(organization.pk)
     return organization, UPDATED if filled or new_evidence else UNCHANGED
 
 

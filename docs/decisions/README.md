@@ -34,3 +34,4 @@ Regras:
 | 021 | Regras da infra de coleta (robots, bloqueio, dry-run, retenção, evidência de CSV) | aceito |
 | 022 | Municípios do IBGE: texto × FK, polos e perfis geográficos como dado | aceito |
 | 023 | Rede SESC-SP (CSV curado) e escolas do INEP (dataset local) | aceito |
+| 024 | Organizações parecidas com o SESC (CSV curado + vocabulário fechado de tags) | aceito |

@@ -49,8 +49,9 @@ apoiada por pesquisa manual — Gemini Deep Research/Claude Code interativo, cus
 **Custo:** US$ 0. **Complexidade:** baixa.
 **Riscos:** lista crescer sem foco → começar pelos polos; organizações sem contratação externa → tag de baixa prioridade.
 **Critério de conclusão:**
-- [ ] ≥ 20 organizações similares nos polos, cada uma com URL oficial e evidência.
-- [ ] Tags permitem filtrar "parecidas com o SESC" no admin.
+- [x] ≥ 20 organizações similares nos polos, cada uma com URL oficial (própria ou da rede-mãe) e evidência
+  manual (lista de memória: **conferir na fonte**, P12).
+- [x] Tags permitem filtrar "parecidas com o SESC" no admin (filtro e vocabulário fechado, ADR-024).
 
 ---
 

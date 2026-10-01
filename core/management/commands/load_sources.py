@@ -1,6 +1,7 @@
 """Cria as fontes de coleta iniciais (`Source`) sem sobrescrever o que foi editado no admin.
 
-`sesc-sp-unidades` (CSV curado, sem rede) já nasce habilitada. `inep-escolas` nasce
+`sesc-sp-unidades` e `orgs-parecidas-sesc` (CSVs curados, sem rede) já nascem
+habilitadas. `inep-escolas` nasce
 **desabilitada**: baixe o Catálogo de Escolas do INEP para `data/inep/catalogo_escolas.csv`
 (ignorado pelo git), confira os termos e habilite no admin (docs/research/organization-sources.md).
 """
@@ -21,6 +22,16 @@ INITIAL_SOURCES = [
         "config": {"path": "data/seeds/sesc_sp.csv", "entity": "organization"},
     },
     {
+        "slug": "orgs-parecidas-sesc",
+        "name": "Organizações parecidas com o SESC (lista curada)",
+        "kind": Source.Kind.SEED_CSV,
+        "base_url": "https://www.sescsp.org.br/",
+        "robots_ok": True,  # arquivo local: nada é baixado
+        "reliability": 3,
+        "enabled": True,
+        "config": {"path": "data/seeds/similar_orgs.csv", "entity": "organization"},
+    },
+    {
         "slug": "inep-escolas",
         "name": "INEP — Catálogo de Escolas (privadas ativas da região)",
         "kind": Source.Kind.DATASET,
@@ -37,7 +48,7 @@ INITIAL_SOURCES = [
 
 
 class Command(BaseCommand):
-    help = "Cria as fontes iniciais (SESC-SP e INEP) que ainda não existem."
+    help = "Cria as fontes iniciais (SESC-SP, parecidas e INEP) que ainda não existem."
 
     def handle(self, *args, **options):
         created = 0
