@@ -6,6 +6,7 @@ habilitadas. `inep-escolas` nasce
 (ignorado pelo git), confira os termos e habilite no admin (docs/research/organization-sources.md).
 `devpost` (API pública, E05) também nasce **desabilitada** e sem `robots_ok`: confira os termos
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
+`itch-jams` (listagem pública de game jams, E06) segue a mesma regra.
 """
 
 from django.core.management.base import BaseCommand
@@ -57,11 +58,22 @@ INITIAL_SOURCES = [
         "enabled": False,  # habilite só depois de conferir termos e robots.txt (E01)
         "config": {"max_api_pages": 5, "min_interval_seconds": 5},
     },
+    {
+        "slug": "itch-jams",
+        "name": "itch.io — game jams futuras e em andamento",
+        "kind": Source.Kind.HTML_WATCH,
+        "base_url": "https://itch.io/jams",
+        "terms_url": "https://itch.io/docs/legal/terms",
+        "license": "Termos do itch.io (uso automatizado não confirmado)",
+        "reliability": 4,
+        "enabled": False,  # habilite só depois de conferir termos e robots.txt (E01)
+        "config": {"max_listing_pages": 3, "min_interval_seconds": 5},
+    },
 ]
 
 
 class Command(BaseCommand):
-    help = "Cria as fontes iniciais (SESC-SP, parecidas, INEP e Devpost) que ainda não existem."
+    help = "Cria as fontes iniciais (SESC-SP, parecidas, INEP, Devpost e itch.io) que faltam."
 
     def handle(self, *args, **options):
         created = 0

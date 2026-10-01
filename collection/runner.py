@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import time
 from contextlib import nullcontext
 
 from django.db import transaction
@@ -48,6 +49,24 @@ def build_fetcher(source: Source, **overrides) -> PoliteFetcher:
     return PoliteFetcher(**{**kwargs, **overrides})
 
 
+def _timed(items, clock: dict):
+    """Repassa os itens medindo o tempo gasto *dentro* do conector (rede + espera do fetcher).
+
+    O conector é um gerador: o tempo de gravar cada item no banco cai fora dessa medida. Assim
+    «demora» se separa em busca × gravação (ex.: banco remoto lento) — ADR-029.
+    """
+    iterator = iter(items)
+    while True:
+        started = time.monotonic()
+        try:
+            item = next(iterator)
+        except StopIteration:
+            clock["fetch"] += time.monotonic() - started
+            return
+        clock["fetch"] += time.monotonic() - started
+        yield item
+
+
 def _short(exc: Exception) -> str:
     return f"{type(exc).__name__}: {exc}"[:MAX_ERROR_CHARS]
 
@@ -56,6 +75,8 @@ def run_source(
     source: Source, *, fetcher=None, limit=None, dry_run=False, connector=None
 ) -> CollectionRun:
     run = CollectionRun.objects.create(source=source, dry_run=dry_run, item_limit=limit)
+    clock = {"fetch": 0.0}
+    started_at = time.monotonic()
     errors: list[str] = []
     blocked = False
     seen = new = updated = failed = 0
@@ -68,7 +89,7 @@ def run_source(
             try:
                 connector = connector or registry.for_source(source)
                 ctx = RunContext(source=source, fetcher=fetcher, limit=limit, dry_run=dry_run)
-                for item in connector.fetch(ctx):
+                for item in _timed(connector.fetch(ctx), clock):
                     if limit is not None and seen >= limit:
                         break
                     seen += 1
@@ -96,6 +117,12 @@ def run_source(
     finally:
         if own_fetcher:
             fetcher.close()
+        total = time.monotonic() - started_at
+        run.timing = (  # só em memória (sem migration); a linha vai para a saída do `collect`
+            f"{total:.1f} s no total: busca {clock['fetch']:.1f} s, "
+            f"gravação {max(total - clock['fetch'], 0):.1f} s"
+            + (f"; {stats.summary()}" if (stats := getattr(fetcher, "stats", None)) else "")
+        )
 
     if blocked and not dry_run:
         Source.objects.filter(pk=source.pk).update(enabled=False)

@@ -5,6 +5,7 @@ A saída traz só contagens (logs do GitHub Actions são públicos — ADR-014);
 """
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connections
 
 from collection import registry, runner
 from collection.models import CollectionRun
@@ -55,6 +56,10 @@ class Command(BaseCommand):
                 f"vistos, {run.items_new} novos, {run.items_updated} atualizados, "
                 f"{run.items_failed} com falha"
             )
+            if timing := getattr(run, "timing", ""):
+                self.stdout.write(f"{prefix}{source.slug}: tempo — {timing}")
             failures += run.status == CollectionRun.Status.ERROR
+        if not connections["default"].in_atomic_block:  # (testes rodam dentro de transação)
+            connections.close_all()  # fecha o banco antes de sair: não deixa o processo preso
         if failures:
             raise CommandError(f"{failures} fonte(s) falharam; veja Admin → Execuções de coleta.")

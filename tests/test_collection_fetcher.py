@@ -301,6 +301,34 @@ class TestRetries:
             fetcher.fetch(URL)
         assert len(calls) == 3
 
+    def test_total_deadline_stops_slow_retry_chains(self):
+        """429 com Retry-After longo em sequência não prende a coleta por minutos (ADR-029)."""
+        site = Site(
+            {
+                "/robots.txt": httpx.Response(404),
+                "/editais": httpx.Response(429, headers={"retry-after": "60"}),
+            }
+        )
+        fetcher, clock = make_fetcher(site, min_interval=0, max_seconds=90)
+        with pytest.raises(FetchError, match="Prazo de 90 s"):
+            fetcher.fetch(URL)
+        assert sum(clock.sleeps) <= 90
+        assert site.paths().count("/editais") == 2
+
+    def test_stats_separate_network_from_waiting(self):
+        site = Site(
+            {
+                "/robots.txt": httpx.Response(404),
+                "/editais": [httpx.Response(503), page("ok")],
+            }
+        )
+        fetcher, _ = make_fetcher(site, min_interval=0)
+        fetcher.fetch(URL)
+        stats = fetcher.stats
+        assert (stats.requests, stats.attempts, stats.retries) == (1, 3, 1)  # robots + 503 + 200
+        assert stats.wait_seconds == 2.0
+        assert "1 retry" in stats.summary()
+
 
 class TestBlocked:
     @pytest.mark.parametrize("status", [401, 403])

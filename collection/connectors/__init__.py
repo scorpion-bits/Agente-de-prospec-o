@@ -3,6 +3,7 @@
 from collection.connectors import (  # noqa: F401
     devpost,
     inep_schools,
+    itch_jams,
     seed_csv,
     sesc_sp,
     similar_orgs,
