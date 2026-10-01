@@ -103,7 +103,6 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
 - `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env`: sem eles `make memory` deixa CNPJ/e-mail do perfil em branco.
 - Dedupe de organização por nome varre a tabela em Python (ADR-020): indexar chave normalizada quando a base crescer (E04+).
-- Sair de `do_not_contact` exige editar no banco/shell (derivado não é editável; tela de `Suppression` na Fase 4).
 - Aviso do Django 6 sobre `URLField` filtrado nos testes (`pyproject.toml`); remover ao migrar. CI usa `checkout@v4`/`setup-uv@v5` (Node 20, forçado para 24): subir quando conveniente.
 - Limites de free tier (Supabase, Gemini, Serper/Brave) e créditos do AI Pro: confirmar ao criar as contas/Billing.
 - `schedule` do GitHub Actions desliga após 60 dias sem commits (repositório público) — mitigação em ADR-014.
