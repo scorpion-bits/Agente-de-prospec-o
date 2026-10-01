@@ -25,7 +25,7 @@ radar de oportunidades (análise de impacto: `docs/history/sessions/2026-09-30-E
 | 9 | E17b Organizações parecidas com o SESC | |
 | 10 | E18 Site oficial · 11. E19 Contatos institucionais | **M2: lista de instituições com contatos para a janela out–dez** |
 | 12 | E20 Matching serviço ↔ organização ↔ portfólio | feita (ADR-027) |
-| 13 | E05 Devpost (feita, ADR-028) · 14. E06 itch.io · 15. E07 páginas monitoradas (feita, ADR-030) · 16. E08 Querido Diário (feita, ADR-031) · 17. E09 Mapas Culturais | |
+| 13 | E05 Devpost (feita, ADR-028) · 14. E06 itch.io · 15. E07 páginas monitoradas (feita, ADR-030) · 16. E08 Querido Diário (feita, ADR-031) · 17. E09 Mapas Culturais (feita, ADR-032) | |
 | 18 | E10 Camada de IA · 19. E11 Extração de oportunidades (inclui requisitos MEI) | **M3: radar de oportunidades** |
 | 20 | E13 Score de oportunidades · 21. E21 Score de leads | |
 | 22 | E14 Triagem e métricas · 23. E15 Digest (oportunidades, leads, follow-ups) · 24. E16 Agendamento (GitHub Actions) e backups | **M4: radar semanal automático** |

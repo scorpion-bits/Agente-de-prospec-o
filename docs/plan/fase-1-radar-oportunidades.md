@@ -123,8 +123,10 @@ não relacionadas → filtro por palavras-chave (jogos, games, audiovisual, tecn
 cultura digital, educação, oficina).
 **Testes:** fixture de 2 instâncias; filtro; datas de inscrição.
 **Critério de conclusão:**
-- [ ] ≥ 2 instâncias configuradas; oportunidades com prazo de inscrição corretamente mapeado.
-- [ ] 10 revisadas.
+- [x] ≥ 2 instâncias configuradas; prazo de inscrição mapeado só quando informado. *(fixture sintética)*
+- [ ] 10 revisadas. *(pendente do humano: P20)*
+
+> Feita (ADR-032): uma `Source` com várias instâncias em `config`, datas e status só do que a instância informa, falha isolada por instância; fonte desabilitada.
 
 ---
 

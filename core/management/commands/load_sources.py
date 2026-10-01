@@ -6,10 +6,11 @@ habilitadas. `inep-escolas` nasce
 (ignorado pelo git), confira os termos e habilite no admin (docs/research/organization-sources.md).
 `devpost` (API pública, E05) também nasce **desabilitada** e sem `robots_ok`: confira os termos
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
-`itch-jams` (listagem pública de game jams, E06) e `querido-diario` (API de diários oficiais, E08,
-ADR-031) seguem a mesma regra. As páginas monitoradas pelo
-`html_watch` genérico (E07, ADR-030) também nascem **desabilitadas**, e as URLs são de memória/da
-pesquisa: confirme cada uma (e o `selector`, se a listagem tiver área própria) antes de habilitar.
+`itch-jams` (listagem pública de game jams, E06), `querido-diario` (API de diários oficiais, E08,
+ADR-031) e `mapas-culturais` (editais culturais, E09, ADR-032) seguem a mesma regra. As páginas
+monitoradas pelo `html_watch` genérico (E07, ADR-030) também nascem **desabilitadas**, e as URLs são
+de memória/da pesquisa: confirme cada uma (e o `selector`, se a listagem tiver área própria) antes
+de habilitar.
 """
 
 from django.core.management.base import BaseCommand
@@ -82,6 +83,17 @@ INITIAL_SOURCES = [
         "reliability": 4,
         "enabled": False,  # habilite só depois de conferir termos e robots.txt (E01)
         "config": {"max_pages": 120, "min_interval_seconds": 2},
+    },
+    {
+        "slug": "mapas-culturais",
+        "name": "Mapas Culturais — editais (nacional e SP)",
+        "kind": Source.Kind.API,
+        "base_url": "https://mapa.cultura.gov.br/",
+        "terms_url": "https://docs.mapasculturais.org/",
+        "license": "Dados abertos; termos de cada instância não conferidos",
+        "reliability": 4,
+        "enabled": False,  # habilite só depois de conferir instâncias, termos e robots.txt (P20)
+        "config": {"max_pages_per_instance": 4, "min_interval_seconds": 3},
     },
 ]
 
