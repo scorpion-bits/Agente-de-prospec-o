@@ -59,20 +59,48 @@ def _columns(organization_id):
     return row
 
 
+def _link_parent(organization: Organization, parent_name: str, source) -> bool:
+    """Liga a unidade à mãe da rede (cria se faltar). Nunca troca uma mãe já definida."""
+    if organization.parent_id or not parent_name:
+        return False
+    network = organization.network
+    parent = find_existing_organization(parent_name, network=network)
+    if parent is None:
+        parent = Organization(
+            name=parent_name,
+            kind=organization.kind,
+            network=network,
+            uf=organization.uf,
+            first_seen_source=source,
+        )
+        parent.full_clean()
+        parent.save()
+    if parent.pk == organization.pk:
+        return False
+    organization.parent = parent
+    organization.save(update_fields=["parent", "updated_at"])
+    return True
+
+
 @transaction.atomic
 def upsert_organization(candidate: OrganizationCandidate, *, source, raw_document=None):
-    """`(organização, CREATED|UPDATED|UNCHANGED)`."""
+    """`(organização, CREATED|UPDATED|UNCHANGED)`.
+
+    `fields["parent_name"]` (opcional) é o nome da organização-mãe da rede (ex.: "SESC-SP").
+    """
     fields = dict(candidate.fields)
+    parent_name = fields.pop("parent_name", "")
     lookup = {k: fields.pop(k) for k in ORGANIZATION_LOOKUP_FIELDS if k in fields}
     existing = find_existing_organization(candidate.name, **lookup)
     before = _columns(existing.pk) if existing is not None else None
     organization, created = get_or_create_organization(
         candidate.name, defaults={**fields, "first_seen_source": source}, **lookup
     )
+    linked = _link_parent(organization, parent_name, source)
     new_evidence = _record(organization, candidate.evidence, source, raw_document)
     if created:
         return organization, CREATED
-    filled = before != _columns(organization.pk)
+    filled = linked or before != _columns(organization.pk)
     return organization, UPDATED if filled or new_evidence else UNCHANGED
 
 

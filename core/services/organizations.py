@@ -27,6 +27,7 @@ FILLABLE_FIELDS = (
     "network",
     "municipality_name",
     "uf",
+    "inep_code",
 )
 
 

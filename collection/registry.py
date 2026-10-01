@@ -45,4 +45,8 @@ def for_source(source):
 
 
 def needs_network(source) -> bool:
-    return source.kind not in OFFLINE_KINDS
+    """`dataset` lido de arquivo local (`config.path` sem `config.url`) também não usa a rede."""
+    if source.kind in OFFLINE_KINDS:
+        return False
+    config = source.config or {}
+    return not (source.kind == "dataset" and config.get("path") and not config.get("url"))
