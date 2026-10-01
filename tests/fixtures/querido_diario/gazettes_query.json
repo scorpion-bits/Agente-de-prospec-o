@@ -1,0 +1,59 @@
+{
+ "_nota": "Fixture SINTÉTICA (E08): formato suposto da API, nenhum dado real.",
+ "total_gazettes": 4,
+ "gazettes": [
+  {
+   "territory_id": "3503208",
+   "territory_name": "Araraquara",
+   "state_code": "SP",
+   "date": "2099-03-10",
+   "edition": "1234",
+   "is_extra_edition": false,
+   "url": "https://exemplo.invalid/araraquara/2099-03-10.pdf",
+   "txt_url": "https://exemplo.invalid/araraquara/2099-03-10.txt",
+   "excerpts": [
+    "A Prefeitura abre <em>chamamento</em> público para credenciamento de <em>oficineiros</em> de <em>jogos</em> digitais ..."
+   ]
+  },
+  {
+   "territory_id": "3548906",
+   "territory_name": "São Carlos",
+   "state_code": "SP",
+   "date": "2099-03-11",
+   "edition": "99",
+   "is_extra_edition": false,
+   "url": "https://exemplo.invalid/sao-carlos/2099-03-11.pdf",
+   "txt_url": "https://exemplo.invalid/sao-carlos/2099-03-11.txt",
+   "excerpts": [
+    "Edital de licitação para curso de <em>programação</em> para jovens, pregão eletrônico 12/2099 ...",
+    "Abertura dos <em>Jogos</em> Abertos da cidade com campeonato de futebol ..."
+   ]
+  },
+  {
+   "territory_id": "3543402",
+   "territory_name": "Ribeirão Preto",
+   "state_code": "SP",
+   "date": "2099-03-12",
+   "edition": "7",
+   "is_extra_edition": false,
+   "url": "https://exemplo.invalid/ribeirao/2099-03-12.pdf",
+   "txt_url": "https://exemplo.invalid/ribeirao/2099-03-12.txt",
+   "excerpts": [
+    "Prêmio <em>Aldir Blanc</em>: edital de fomento cultural 3/2099 ..."
+   ]
+  },
+  {
+   "territory_id": "3999999",
+   "territory_name": "Fora da lista",
+   "state_code": "SP",
+   "date": "2099-03-12",
+   "edition": "1",
+   "is_extra_edition": false,
+   "url": "https://exemplo.invalid/fora/2099-03-12.pdf",
+   "txt_url": "https://exemplo.invalid/fora/2099-03-12.txt",
+   "excerpts": [
+    "oficina de jogos em município fora da configuração"
+   ]
+  }
+ ]
+}

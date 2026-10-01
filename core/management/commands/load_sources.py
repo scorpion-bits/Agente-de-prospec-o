@@ -6,7 +6,8 @@ habilitadas. `inep-escolas` nasce
 (ignorado pelo git), confira os termos e habilite no admin (docs/research/organization-sources.md).
 `devpost` (API pública, E05) também nasce **desabilitada** e sem `robots_ok`: confira os termos
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
-`itch-jams` (listagem pública de game jams, E06) segue a mesma regra. As páginas monitoradas pelo
+`itch-jams` (listagem pública de game jams, E06) e `querido-diario` (API de diários oficiais, E08,
+ADR-031) seguem a mesma regra. As páginas monitoradas pelo
 `html_watch` genérico (E07, ADR-030) também nascem **desabilitadas**, e as URLs são de memória/da
 pesquisa: confirme cada uma (e o `selector`, se a listagem tiver área própria) antes de habilitar.
 """
@@ -70,6 +71,17 @@ INITIAL_SOURCES = [
         "reliability": 4,
         "enabled": False,  # habilite só depois de conferir termos e robots.txt (E01)
         "config": {"max_listing_pages": 3, "min_interval_seconds": 5},
+    },
+    {
+        "slug": "querido-diario",
+        "name": "Querido Diário — diários oficiais dos polos",
+        "kind": Source.Kind.API,
+        "base_url": "https://queridodiario.ok.org.br/",
+        "terms_url": "https://docs.queridodiario.ok.org.br/pt-br/latest/utilizando/api-publica/",
+        "license": "Dados abertos (OKBR); termos da API não conferidos",
+        "reliability": 4,
+        "enabled": False,  # habilite só depois de conferir termos e robots.txt (E01)
+        "config": {"max_pages": 120, "min_interval_seconds": 2},
     },
 ]
 
@@ -171,7 +183,8 @@ INITIAL_SOURCES += [
 
 class Command(BaseCommand):
     help = (
-        "Cria as fontes iniciais (SESC-SP, parecidas, INEP, Devpost, itch.io e páginas) que faltam."
+        "Cria as fontes iniciais (SESC-SP, parecidas, INEP, Devpost, itch.io, Querido Diário e "
+        "páginas) que faltam."
     )
 
     def handle(self, *args, **options):

@@ -41,3 +41,4 @@ Regras:
 | 028 | Conector Devpost: API pública, filtro de relevância e datas sem chute | aceito |
 | 029 | Conector itch.io (listagem HTML) e medição de tempo/prazo no fetcher | aceito |
 | 030 | Conector `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert | aceito |
+| 031 | Conector Querido Diário: consultas por termos, janela incremental e sondagem de cobertura | aceito |

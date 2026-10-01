@@ -1,22 +1,21 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-01** (E07)
+> Última atualização: **2026-10-01** (E08)
 
 ## Onde estamos
 
 **Fase 0 — Fundação.** Prontos E00–E04, E12 (geografia), E17/E17b (SESC-SP, escolas e parecidas), E18 (site oficial),
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
-**E05 (Devpost)**: conector `devpost`; rodou de verdade (formato bateu, 45 vistos, 21 novos). **E06 (itch.io)**: conector
-`itch-jams` (game jams, ADR-029) + fetcher com prazo e medição de tempo; fonte desabilitada até conferir termos; sem migration.
-**E07 (`html_watch`)**: conector genérico (uma página = uma `Source`, ADR-030) e 9 páginas iniciais desabilitadas; sem migration.
+**E05 Devpost** (rodou de verdade: formato bateu, 45 vistos, 21 novos), **E06 itch.io** (ADR-029), **E07 `html_watch`** (ADR-030)
+e **E08 Querido Diário** (ADR-031) são conectores de oportunidades, com fontes desabilitadas até conferir termos; sem migration.
 **E01b parcial**; **P4 concluído** (migrations aplicadas no Supabase). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E08 — Conector Querido Diário** (próximo na ordem do `PLAN.md`).
-Antes, o humano roda `make websites` (P13), `make contacts` (P14) e `make match` (P15) e confere P16/P17: sem dados reais o M2 não fecha.
+➡️ **E09 — Conector Mapas Culturais** (próximo na ordem do `PLAN.md`), em thread nova.
+Antes, o humano roda `make websites` (P13), `make contacts` (P14), `make match` (P15) e confere P16–P19: sem dados reais o M2 não fecha.
 
 ➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet
 normal (o ambiente do Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co). Ela também
@@ -42,6 +41,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | E05 | 2026-10-01 | `collection/connectors/devpost.py` (JSON público, filtro tema + online/Brasil, datas só se inequívocas, dedupe por URL), `Source` `devpost` desabilitada; 33 testes (fixture **sintética**); ADR-028. **Rodou de verdade: formato confere (P16)** | `…-10-01-E05.md` |
 | E06 | 2026-10-01 | `collection/connectors/itch_jams.py` (listagem HTML `upcoming`/`in-progress`, filtro 48 h + inscritos/palavra-chave em `Source.config`, datas só se inequívocas), `Source` `itch-jams` desabilitada; fetcher com prazo por requisição (90 s) e `stats`; `collect` imprime tempo de busca × gravação; 584 testes (fixture **sintética**); ADR-029. **HTML real e termos não conferidos (P17)** | `…-10-01-E06.md` |
 | E07 | 2026-10-01 | `collection/connectors/html_watch.py` (registrado por `kind`): links da listagem (seletor CSS simples, padrões, palavras, exclusões) → `Opportunity` candidata `unknown` com trecho; «novo» = o que o upsert cria (re-rodar = 0); página só-JS = erro; 9 `Source` desabilitadas (FAPESP, ProAC, Oficinas, Sebrae-SP, InovAtiva, 4 prefeituras); 20 testes; ADR-030. **URLs de memória, nada rodado (P18)** | `…-10-01-E07.md` |
+| E08 | 2026-10-01 | `collection/connectors/querido_diario.py`: 1 requisição por consulta para 6 municípios (4 polos + Matão, Américo Brasiliense), trecho = candidata `unknown` sem datas, dedupe `município+data+hash`, exclusão de falsos positivos, janela pela última execução `ok`, sondagem de cobertura; `Source` `querido-diario` desabilitada; 29 testes (fixture **sintética**); ADR-031. **API real não alcançada (P19)** | `…-10-01-E08.md` |
 
 ## Pendências do humano
 
@@ -65,6 +65,7 @@ confere as listas SESC e de parecidas e o layout real do INEP (P11, P12).
 | P16 | **E05:** já coletou (45 vistos, 21 novos; formato confere). Falta revisar 10 hackathons no admin e salvar uma resposta real como fixture. **Demora (2–3 min/página, processo não saía):** rode de novo e mande a linha `tempo —` da saída (ADR-029) | `docs/decisions/ADR-028-conector-devpost.md` |
 | P17 | **E06:** conferir termos/robots.txt do itch.io; `make seed`, marcar «coleta permitida» e habilitar `itch-jams` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); revisar 10 jams (meta ≥ 10). Layout suposto: se mudou, o erro diz; salvar a página real como fixture | `docs/decisions/ADR-029-conector-itch-jams-e-medicao-do-fetcher.md` |
 | P18 | **E07:** conferir as 9 URLs de `html_watch` (de memória) e os termos/robots.txt; `make seed`, marcar «coleta permitida» e habilitar **uma** página por vez no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); ajustar `selector`/`link_patterns` em `Source.config` se vier ruído; revisar 10 itens e salvar uma página real como fixture | `docs/decisions/ADR-030-conector-html-watch-generico.md` |
+| P19 | **E08:** conferir termos da API do Querido Diário; `git pull`, `make seed`, marcar «coleta permitida» e habilitar `querido-diario` no admin; `make collect DRY=1` e depois `make collect` na sua máquina (não no SQL Editor; sem migration); veja a linha «Cobertura» (município sem diário vira erro) e revise 10 ocorrências, anotando a taxa de relevância aqui; ajuste `queries`/`exclude_patterns` em `Source.config`; salve uma resposta real como fixture | `docs/decisions/ADR-031-conector-querido-diario.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -83,7 +84,8 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 026 contatos públicos institucionais · 027 matching por regras em dados ·
 028 conector Devpost: filtro de relevância, datas sem chute, fonte desabilitada até conferir ·
 029 conector itch.io (listagem HTML, filtro em `Source.config`) e prazo/medição de tempo no fetcher ·
-**030 `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert**.
+030 `html_watch` genérico: uma página = uma `Source`, candidatas sem datas, diff pelo upsert ·
+**031 Querido Diário: consultas combinadas + exclusões, janela incremental, sondagem de cobertura**.
 
 ## Problemas abertos
 
@@ -93,7 +95,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - E18: formatos de Serper/Brave só da documentação (nada testado com chave real); sites só em JavaScript caem em ambíguo (ADR-025).
 - E20: regras e forças são hipóteses não calibradas; palavras-chave só enxergam o que virou evidência (ADR-027).
 - E19: nenhum site real testado; heurística pessoal × institucional pode errar; e-mail ofuscado/JS não é lido (ADR-026).
-- Endpoints das fontes **não testados** (E01); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
+- Endpoints das fontes **não testados** (E01); E08: formato da API e operadores de busca do Querido Diário só da documentação (ADR-031); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
 - Demora do Devpost (2–3 min/página): causa não reproduzida (rede bloqueada aqui); ver P16 e ADR-029.
 - Migrations aplicadas no Supabase (projeto **Prospection**) pelo titular, que confirmou que funcionou. **Não conferido por nós:** a Data API sem as tabelas expostas e as migrations `collection.0001`/`core.0003` (E04), aplicadas só no PostgreSQL local; rodar `make migrate` de novo após o merge do PR da E04. A E17 **não** tem migration (só `make seed` para criar as fontes).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
