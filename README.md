@@ -28,6 +28,7 @@ make setup            # instala dependências e cria o .env a partir do .env.exa
 docker compose up -d  # PostgreSQL local (ou use o projeto Supabase radar-dev: ver .env.example)
 make migrate          # cria o schema "radar" e as tabelas
 make seed             # catálogo inicial de serviços (não sobrescreve o que você editar no admin)
+make memory           # perfil da empresa, portfólio e histórico comercial (CNPJ via COMPANY_CNPJ no .env)
 make superuser        # usuário do admin
 make run              # http://127.0.0.1:8000/admin/
 make check            # lint + testes + verificações (o mesmo que o CI roda)

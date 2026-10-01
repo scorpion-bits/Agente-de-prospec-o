@@ -105,6 +105,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Identificação do robô de coleta (usada a partir da E04). O e-mail vem do .env, não do git.
 CONTACT_EMAIL = env.str("CONTACT_EMAIL", default="")
+# CNPJ da empresa: dado sensível (ADR-014), só no .env; carregado por `load_company_profile`.
+COMPANY_CNPJ = env.str("COMPANY_CNPJ", default="")
 USER_AGENT = f"RadarScorpionBits/0.1 (+https://scorpionbits.com; {CONTACT_EMAIL})".replace(
     "; )", ")"
 )

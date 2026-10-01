@@ -464,7 +464,7 @@ class TestEvidenceConstraints:
 class TestSchema:
     def test_every_core_table_lives_in_the_dedicated_schema_not_public(self, settings):
         tables = {model._meta.db_table for model in apps.get_app_config("core").get_models()}
-        assert len(tables) == 9
+        assert len(tables) == 12  # 9 da E03 + Interaction, PortfolioItem, CompanyProfile (E03b)
         with connection.cursor() as cursor:
             cursor.execute(
                 "select table_schema, table_name from information_schema.tables "

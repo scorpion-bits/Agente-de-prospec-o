@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -16,6 +16,12 @@ migrate:  ## Aplica migrations (cria o schema dedicado se preciso)
 
 seed:  ## Carrega o catálogo inicial de serviços (não sobrescreve edições do admin)
 	$(UV) run python manage.py load_services
+
+memory:  ## Carrega perfil da empresa, portfólio e (se existir) o histórico privado de interações
+	$(UV) run python manage.py load_company_profile
+	$(UV) run python manage.py import_portfolio
+	@test -f data/private/interactions.csv && $(UV) run python manage.py import_interactions \
+		|| echo "data/private/interactions.csv não existe: copie data/seeds/interactions.template.csv e preencha (P1/P2)"
 
 superuser:  ## Cria um usuário administrador
 	$(UV) run python manage.py createsuperuser
