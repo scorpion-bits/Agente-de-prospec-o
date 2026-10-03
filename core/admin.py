@@ -9,8 +9,9 @@ from django.contrib import admin
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Q, Subquery
 from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -33,6 +34,7 @@ from core.models import (
 )
 from core.services.similarity import SIMILARITY_TAGS
 from core.services.suppression import is_suppressed
+from core.services.triage import triage_entities
 from scoring.display import annotate_scores, breakdown_html, label_badge
 from scoring.models import Score
 
@@ -177,6 +179,95 @@ class EntityLabelMixin:
         return f"{obj.content_type.name}: {obj.entity}"
 
 
+class DiscardForm(forms.Form):
+    reason = forms.ChoiceField(label="Motivo", choices=Triage.DiscardReason.choices)
+    note = forms.CharField(
+        label="Nota (opcional)", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+
+class TriageStatusFilter(admin.SimpleListFilter):
+    """Triagem da lista: «não triadas» = sem decisão ou ainda `Nova` (E14)."""
+
+    title = "triagem"
+    parameter_name = "triage"
+
+    def lookups(self, request, model_admin):
+        return [("untriaged", "Não triadas"), *Triage.Status.choices[1:]]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "untriaged":
+            return queryset.filter(Q(_triage_status__isnull=True) | Q(_triage_status="new"))
+        if value:
+            return queryset.filter(_triage_status=value)
+        return queryset
+
+
+class TriageActionsMixin:
+    """Ações em massa de triagem + coluna da situação. O modelo precisa de `triage_items`."""
+
+    def annotate_triage(self, queryset):
+        triage = Triage.objects.filter(
+            content_type=ContentType.objects.get_for_model(queryset.model),
+            object_id=OuterRef("pk"),
+        )
+        return queryset.annotate(_triage_status=Subquery(triage.values("status")[:1]))
+
+    @admin.display(description="triagem", ordering="_triage_status")
+    def triage(self, obj):
+        status = getattr(obj, "_triage_status", None) or Triage.Status.NEW
+        return Triage.Status(status).label
+
+    def _apply(self, request, queryset, status, **extra):
+        count = triage_entities(queryset, status, request.user, **extra)
+        self.message_user(request, f"{count} item(ns) → {Triage.Status(status).label}.")
+
+    @admin.action(description="Triagem: marcar como interessante")
+    def mark_interesting(self, request, queryset):
+        self._apply(request, queryset, Triage.Status.INTERESTING)
+
+    @admin.action(description="Triagem: marcar como em andamento")
+    def mark_acting(self, request, queryset):
+        self._apply(request, queryset, Triage.Status.ACTING)
+
+    @admin.action(description="Triagem: marcar como concluído")
+    def mark_done(self, request, queryset):
+        self._apply(request, queryset, Triage.Status.DONE)
+
+    @admin.action(description="Triagem: voltar para não triado")
+    def mark_new(self, request, queryset):
+        self._apply(request, queryset, Triage.Status.NEW)
+
+    @admin.action(description="Triagem: descartar (pede o motivo)")
+    def discard(self, request, queryset):
+        if request.POST.get("apply"):
+            form = DiscardForm(request.POST)
+            if form.is_valid():
+                self._apply(
+                    request,
+                    queryset,
+                    Triage.Status.DISCARDED,
+                    reason=form.cleaned_data["reason"],
+                    note=form.cleaned_data["note"],
+                )
+                return None
+        else:
+            form = DiscardForm()
+        return TemplateResponse(
+            request,
+            "admin/core/discard_reason.html",
+            {
+                **self.admin_site.each_context(request),
+                "title": "Descartar",
+                "form": form,
+                "count": queryset.count(),
+                "selected": list(queryset.values_list("pk", flat=True)),
+                "back": request.get_full_path(),
+            },
+        )
+
+
 class SlugLockedMixin:
     """O `slug` é chave estável (importações, regras): depois de criado não se renomeia."""
 
@@ -276,7 +367,8 @@ class ContactPointAdmin(admin.ModelAdmin):
 
 
 @admin.register(Opportunity)
-class OpportunityAdmin(admin.ModelAdmin):
+class OpportunityAdmin(TriageActionsMixin, admin.ModelAdmin):
+    actions = ("mark_interesting", "mark_acting", "mark_done", "discard", "mark_new")
     list_display = (
         "title",
         "kind",
@@ -286,8 +378,10 @@ class OpportunityAdmin(admin.ModelAdmin):
         "modality",
         "location",
         "score",
+        "triage",
     )
     list_filter = (
+        TriageStatusFilter,
         "kind",
         "status",
         "modality",
@@ -376,7 +470,7 @@ class OpportunityAdmin(admin.ModelAdmin):
         return (*fields, "canonical_key") if obj else fields
 
     def get_queryset(self, request):
-        return annotate_scores(super().get_queryset(request), Opportunity)
+        return self.annotate_triage(annotate_scores(super().get_queryset(request), Opportunity))
 
     @admin.display(description="pontuação", ordering="_score_total")
     def score(self, obj):

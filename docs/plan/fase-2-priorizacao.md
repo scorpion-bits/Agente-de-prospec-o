@@ -68,8 +68,8 @@ em ação / concluído), filtro "não triados", e `manage.py metrics` exibindo M
 **Riscos:** triagem lenta no admin → medir; se > 30 min/semana, considerar view HTMX dedicada (registrar).
 **Testes:** ações alteram status e registram autor/data; métricas calculadas com dados de teste.
 **Critério de conclusão:**
-- [ ] Triar 20 itens leva < 5 min.
-- [ ] `metrics` mostra M1–M8 (os que já têm dados).
+- [ ] Triar 20 itens leva < 5 min (conferir com dados reais, P24).
+- [x] `make metrics` mostra M1–M9 (os que já têm dados). ADR-036.
 
 ---
 
