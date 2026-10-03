@@ -115,6 +115,6 @@ fallback de agendamento: cron externo chamando `workflow_dispatch` ou cron local
 ilimitados), mas `schedule` desliga após 60 dias sem commits → alerta no digest e no runbook; falha silenciosa → digest mostra "última coleta há X dias".
 **Testes:** `run_pipeline --dry-run`; backup restaura no projeto `radar-dev`.
 **Critério de conclusão:**
-- [ ] Pipeline agendado rodou sozinho ao menos 1×.
-- [ ] Restauração de backup testada.
-- [ ] Runbook permite a outra pessoa operar sem ajuda.
+- [ ] Pipeline agendado rodou sozinho ao menos 1× (P26: configurar Secrets e conferir no Actions).
+- [x] Restauração de backup testada localmente (PostgreSQL 16); falta testar no `radar-dev` do Supabase (P26).
+- [x] Runbook em `docs/operations/runbook.md` (ADR-038); «outra pessoa operar sem ajuda» a validar no P26.
