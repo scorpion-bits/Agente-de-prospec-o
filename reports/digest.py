@@ -2,7 +2,8 @@
 
 Só leitura do banco, sem IA e sem rede. Reaproveita `Score` (E13) e `Triage` (E14).
 Oportunidades bloqueadas por gate ou já descartadas/concluídas nunca entram nas listas de ação;
-as bloqueadas por requisito da empresa têm seção própria.
+as bloqueadas por requisito da empresa têm seção própria. Leads (E21): «Leads da semana» só traz
+quem nunca foi contatado; quem já foi vai para «Em andamento» (memória comercial, ADR-012).
 Cada lista tem limite rígido para o digest caber em minutos.
 O arquivo traz dados pessoais (resumo de interações): fica em `data/digests/` (ignorado pelo git,
 ADR-014) e o e-mail opcional só vai para endereços da própria empresa (ADR-005, ADR-037).
@@ -23,7 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from collection.models import CollectionRun
-from core.models import Opportunity, Organization, Source, Triage
+from core.models import ContactPoint, Match, Opportunity, Organization, Source, Triage
 from llm.models import LLMCall
 from scoring.models import Score
 
@@ -37,7 +38,7 @@ STALE_SOURCE_DAYS = 7
 SUMMARY_CHARS = 160
 EXCLUDED = (Triage.Status.DISCARDED, Triage.Status.DONE)
 STATE_FILE = ".state.json"
-LEADS_NOTE = "Seções de leads entram com a E21 (leads institucionais)."
+CONTACT_PREFERENCE = ("email", "phone", "whatsapp", "contact_form")
 
 
 @dataclass
@@ -53,7 +54,7 @@ class Digest:
     blocked: dict = field(default_factory=dict)
     sources: dict = field(default_factory=dict)
     costs: dict = field(default_factory=dict)
-    leads_note: str = LEADS_NOTE
+    leads: dict = field(default_factory=dict)
 
 
 def week_label(moment):
@@ -61,8 +62,8 @@ def week_label(moment):
     return f"{year}-W{week:02d}"
 
 
-def _excluded_ids():
-    ct = ContentType.objects.get_for_model(Opportunity)
+def _excluded_ids(model=Opportunity):
+    ct = ContentType.objects.get_for_model(model)
     return set(
         Triage.objects.filter(content_type=ct, status__in=EXCLUDED).values_list(
             "object_id", flat=True
@@ -191,6 +192,82 @@ def blocked_by_requirement(excluded, base_url):
     return {"rows": rows, "total": len(live), "amount": total, "with_value": with_value}
 
 
+def _org_link(base_url, org):
+    return base_url.rstrip("/") + reverse("admin:core_organization_change", args=[org.pk])
+
+
+def _suggested_contacts(org_ids):
+    """Melhor contato `usable()` (opt-out respeitado) de cada organização: e-mail, telefone…"""
+    best = {}
+    contacts = ContactPoint.objects.usable().filter(organization_id__in=org_ids)
+    for c in contacts.exclude(kind__in=["website", "instagram", "facebook", "youtube", "other"]):
+        rank = CONTACT_PREFERENCE.index(c.kind) if c.kind in CONTACT_PREFERENCE else 99
+        if c.organization_id not in best or rank < best[c.organization_id][0]:
+            best[c.organization_id] = (rank, c)
+    return {org_id: f"{c.get_kind_display()}: {c.value}" for org_id, (_, c) in best.items()}
+
+
+def leads_section(base_url):
+    """«Leads da semana» (nunca contatados, por nota) e «Em andamento» (memória comercial)."""
+    ct = ContentType.objects.get_for_model(Organization)
+    scores = Score.objects.filter(content_type=ct, gated=False, total__isnull=False).exclude(
+        object_id__in=_excluded_ids(Organization)
+    )
+    orgs = Organization.objects.in_bulk(list(scores.values_list("object_id", flat=True)))
+    fresh = scores.exclude(label__in=[Score.Label.ONGOING, Score.Label.IGNORE])
+    fresh = [s for s in fresh.order_by("-total", "object_id") if s.object_id in orgs]
+    ongoing = [s for s in scores.filter(label=Score.Label.ONGOING) if s.object_id in orgs]
+    ongoing.sort(
+        key=lambda s: (
+            orgs[s.object_id].next_action_at is None,
+            orgs[s.object_id].next_action_at or timezone.localdate(),
+            -s.total,
+        )
+    )
+    shown = fresh[:TOP_N]
+    contacts = _suggested_contacts([s.object_id for s in shown])
+    rows = []
+    for s in shown:
+        org = orgs[s.object_id]
+        match = (
+            Match.objects.filter(organization=org, service__active=True)
+            .select_related("service")
+            .prefetch_related("portfolio_refs")
+            .order_by("-strength")
+            .first()
+        )
+        rows.append(
+            {
+                "name": org.name,
+                "total": s.total,
+                "label": s.get_label_display(),
+                "service": match.service.name if match else "",
+                "proof": [p.title for p in match.portfolio_refs.all()] if match else [],
+                "contact": contacts.get(org.pk, "sem contato institucional conhecido"),
+                "why": _reasons(s),
+                "admin_url": _org_link(base_url, org),
+            }
+        )
+    progress = []
+    for s in ongoing[:LIST_LIMIT]:
+        org = orgs[s.object_id]
+        progress.append(
+            {
+                "name": org.name,
+                "status": org.get_relationship_status_display(),
+                "last": org.last_interaction_at,
+                "next": org.next_action_at,
+                "admin_url": _org_link(base_url, org),
+            }
+        )
+    return {
+        "new": rows,
+        "new_total": len(fresh),
+        "ongoing": progress,
+        "ongoing_total": len(ongoing),
+    }
+
+
 def source_status(now):
     """Fontes habilitadas: execuções com erro e há quanto tempo foi a última coleta."""
     problems, stale = [], []
@@ -253,6 +330,7 @@ def build(now=None, since=None, base_url=None):
         blocked=blocked_by_requirement(excluded, base_url),
         sources=source_status(now),
         costs=month_costs(now),
+        leads=leads_section(base_url),
     )
 
 
@@ -323,6 +401,25 @@ def render_markdown(d):
     if not b["rows"]:
         out.append("Nenhuma.")
 
+    ld = d.leads
+    out += ["", f"## Leads da semana ({ld['new_total']})", ""]
+    for i, r in enumerate(ld["new"], 1):
+        proof = f" Portfólio: {', '.join(r['proof'])}." if r["proof"] else ""
+        service = f" Serviço: {r['service']}." if r["service"] else ""
+        out.append(
+            f"{i}. **{r['name']}** — {r['total']}/100 ({r['label']}).{service}{proof} "
+            f"Contato: {r['contact']}. {r['why']} [admin]({r['admin_url']})"
+        )
+    if not ld["new"]:
+        out.append("Nenhum lead novo pontuado (rode `make match` e `make rescore`).")
+    out += ["", f"## Em andamento ({ld['ongoing_total']})", ""]
+    for r in ld["ongoing"]:
+        last = f"última interação {_day(r['last'])}" if r["last"] else "sem data confirmada"
+        nxt = f"; próxima ação {_day(r['next'])}" if r["next"] else ""
+        out.append(f"- **{r['name']}**: {r['status']} ({last}{nxt}) [admin]({r['admin_url']})")
+    if not ld["ongoing"]:
+        out.append("Nenhum lead em andamento.")
+
     out += ["", "## Fontes", ""]
     for slug, status, when in d.sources["problems"]:
         out.append(
@@ -341,8 +438,6 @@ def render_markdown(d):
         f"- Dinheiro novo: US$ {c['money']:.2f} de US$ {c['money_budget']:.2f}",
         f"- Créditos: US$ {c['credits']:.2f} de US$ {c['credits_budget']:.2f}",
         f"- Chamadas: {c['calls']} (a busca web ainda não registra custo)",
-        "",
-        f"_{d.leads_note}_",
         "",
     ]
     return "\n".join(out)

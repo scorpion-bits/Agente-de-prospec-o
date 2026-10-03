@@ -28,14 +28,19 @@ def geo_for(opp: Opportunity, ctx: ScoringContext) -> GeoResult:
     return geo_relevance(opp, geo_profile_for(opp), home=ctx.home)
 
 
+def contact_kinds(organization_id: int | None) -> set[str]:
+    """Tipos dos contatos `usable()` (opt-out respeitado) da organização."""
+    if not organization_id:
+        return set()
+    return set(
+        ContactPoint.objects.usable()
+        .filter(organization_id=organization_id)
+        .values_list("kind", flat=True)
+    )
+
+
 def contactability(opp: Opportunity) -> tuple[float, str]:
-    kinds = set()
-    if opp.organizer_id:
-        kinds = set(
-            ContactPoint.objects.usable()
-            .filter(organization_id=opp.organizer_id)
-            .values_list("kind", flat=True)
-        )
+    kinds = contact_kinds(opp.organizer_id)
     if kinds & {ContactPoint.Kind.EMAIL, ContactPoint.Kind.PHONE, ContactPoint.Kind.WHATSAPP}:
         return CONTACT_DIRECT, "organizador com e-mail/telefone institucional"
     if opp.official_url:

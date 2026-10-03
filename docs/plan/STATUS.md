@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-03** (E16)
+> Última atualização: **2026-10-03** (E21)
 
 ## Onde estamos
 
@@ -9,13 +9,13 @@
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 **E05–E09** (Devpost, itch.io, `html_watch`, Querido Diário, Mapas Culturais; ADR-028–032) são conectores de oportunidades, com
-fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)**, **E15 (digest, ADR-037)** e **E16 (agendamento e backups, ADR-038)** prontas, sem migration (P24–P26).
+fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)**, **E15 (digest, ADR-037)**, **E16 (agendamento e backups, ADR-038)** e **E21 (score de leads, ADR-039; migration `scoring.0002`)** prontas (P24–P27).
 **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4 concluído). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E21 — Score de leads** (ficou para trás na ordem do `PLAN.md`; as seções de leads do digest dependem dela) e depois **E22 — Avaliação do MVP**, em thread nova.
-Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, teste de restauração).
+➡️ **E22 — Avaliação do MVP** (go/no-go), em thread nova; exige ≥ 4 semanas de uso real. Antes, o humano faz o P26 (Secrets, 1ª execução
+do pipeline, teste de restauração) e o P27 (`make match`, `make rescore`, ler 5 leads).
 ➡️ **E01 (validação de fontes)** segue pendente: precisa de internet normal (o ambiente do Claude bloqueia as fontes e o supabase.co) (P11, P12).
 
 ## Concluído
@@ -39,6 +39,7 @@ Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, teste de restaur
 | E14 | 2026-10-03 | `core/services/triage.py` + ações em massa no admin de oportunidades (interessante, em andamento, concluído, descartar com motivo, voltar), coluna e filtro «Não triadas»; `reports/metrics.py` + `make metrics` (M1–M9, «sem dados» quando vazio); sem migration; 799 testes; ADR-036. **Nada medido com dados reais (P24)** | `…-10-03-E14.md` |
 | E15 | 2026-10-03 | `reports/digest.py` + `make digest`: `data/digests/AAAA-Www.html/.md` (follow-ups, top-10 com «por quê», prazos ≤ 14 dias, novidades, bloqueadas por requisito com valor somado, fontes, custo do mês); nada gated/descartado nas listas; e-mail opcional só para a lista `DIGEST_EMAIL_TO`; sem migration; 817 testes; ADR-037. **Nada lido com dados reais (P25)** | `…-10-03-E15.md` |
 | E16 | 2026-10-03 | `manage.py run_pipeline` (`make pipeline`: collect→extract→match→rescore→digest, falha isolada por etapa, log só com contagens); `pipeline.yml` (diário + `workflow_dispatch`, migrate antes, digest só por e-mail às segundas, renova o agendamento); `backup.yml` + `scripts/backup.sh`/`restore_backup.sh` (`pg_dump` → age, artefato 30 dias); `docs/operations/runbook.md`; sem migration; ADR-038. **Restauração testada só em PostgreSQL local; Actions nunca rodou com Secrets (P26)** | `…-10-03-E16.md` |
+| E21 | 2026-10-03 | `scoring/leads.py` + `factors/lead.py`: `lead.sesc` (SESC e parecidas) e `lead.school_course`; V (ticket do catálogo), F (match + prova), C (rede com case, relacionamento, resposta, MEI), T (sazonalidade escolar, follow-up), A (geo × contato); gate de opt-out; contatados saem como «em andamento», nunca como novos; `make rescore` cobre leads; admin de organizações com nota e breakdown; digest com «Leads da semana» e «Em andamento»; migration `scoring.0002`; 837 testes; ADR-039. **Pesos e faixas são hipótese (P27)** | `…-10-03-E21.md` |
 
 ## Pendências do humano
 
@@ -69,6 +70,7 @@ Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, teste de restaur
 | P24 | **E14:** `git pull`; `make rescore`; no admin (Oportunidades) filtre «Não triadas», cronometre a triagem de 20 itens (meta < 5 min) e rode `make metrics`; anote o tempo semanal (M6) aqui (M6 é autodeclarado) | `docs/decisions/ADR-036-triagem-e-metricas.md` |
 | P25 | **E15:** `git pull`, `make rescore` e `make digest` na sua máquina (não no SQL Editor; sem migration); abra `data/digests/AAAA-Www.html`: leu em < 5 min? links do admin abrem (ajuste `DIGEST_BASE_URL`)? algo faltando ou sobrando? E-mail só se quiser (`DIGEST_EMAIL_TO` com os e-mails da equipe, SMTP no `.env`; `make digest MAIL=1`) | `docs/decisions/ADR-037-digest-semanal.md` |
 | P26 | **E16:** seguir `docs/operations/runbook.md` §2: `age-keygen` (guardar a privada em 2 lugares), Secrets `DATABASE_URL`, `DJANGO_SECRET_KEY`, `BACKUP_AGE_PUBLIC_KEY` (+ chaves de IA/busca/SMTP que quiser); *Run workflow* `Pipeline` com `dry_run`, depois sem; *Run workflow* `Backup`, baixar o artefato e **restaurar no radar-dev** (`scripts/restore_backup.sh`) | `docs/decisions/ADR-038-agendamento-e-backups.md` |
+| P27 | **E21:** `git pull`, `make migrate` (`scoring.0002`), `make match` e `make rescore` na sua máquina (não no SQL Editor); no admin (Organizações, coluna «pontuação») leia o breakdown de 5 leads; confira que SESC Bauru, Ribeirão Preto e São Carlos aparecem «Em andamento» (registre as propostas: P2) e que o digest traz «Leads da semana». Ajuste pesos/sazonalidade em `scoring/profiles.py` | `docs/decisions/ADR-039-score-de-leads.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -79,22 +81,15 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 015 cobertura de atividades do MEI (CNAE) · 016 schema `radar` + pooler em modo sessão ·
 017 Evidence/Triage por GenericForeignKey · 018 listas como ArrayField ·
 019 UI web + API do Django (sem executável, sem acesso direto ao Supabase) ·
-020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) ·
-021 regras da coleta (robots, bloqueio, dry-run, retenção) ·
-022 municípios do IBGE: texto × FK e perfis geográficos como dado ·
-023 SESC-SP e escolas INEP · 024 parecidas com o SESC ·
-025 site oficial: busca com cache + validação que erra para «ambíguo» ·
-026 contatos públicos institucionais · 027 matching por regras em dados ·
-028 conector Devpost: filtro de relevância, datas sem chute, fonte desabilitada até conferir ·
-029 itch.io e prazo/medição no fetcher · 030 `html_watch` genérico (uma página = uma `Source`) ·
-031 Querido Diário: consultas combinadas, janela incremental, cobertura ·
-032 Mapas Culturais: uma `Source`, várias instâncias, datas só se informadas ·
-033 camada de IA: tarefas × estratégias, HTTP sem SDK, dado interno só em pago/local ·
-034 extração: citação obrigatória, conferência por regras, campo crítico só se verificado ·
-035 score de oportunidades: gates, fatores, confiança, pesos como dado versionado ·
-036 triagem em massa no admin e métricas M1–M9 calculadas do banco ·
+020 regras do relacionamento derivado (datas, pendentes sem data inventada, dedupe) · 021 regras da coleta (robots, bloqueio, dry-run, retenção) ·
+022 municípios do IBGE e perfis geográficos como dado · 023 SESC-SP e escolas INEP · 024 parecidas com o SESC ·
+025 site oficial: busca com cache + validação que erra para «ambíguo» · 026 contatos públicos institucionais · 027 matching por regras ·
+028–032 conectores (Devpost, itch.io + medição, `html_watch`, Querido Diário, Mapas Culturais: datas sem chute, fonte desabilitada até conferir) ·
+033 camada de IA: tarefas × estratégias, HTTP sem SDK · 034 extração: citação obrigatória, campo crítico só se verificado ·
+035 score de oportunidades: gates, fatores, confiança, pesos como dado versionado · 036 triagem em massa e métricas M1–M9 ·
 037 digest semanal: arquivo local, listas com limite, e-mail só para a equipe ·
-**038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público**.
+038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público ·
+**039 score de leads: mesmo motor, gate de opt-out, contatado = «em andamento»**.
 
 ## Problemas abertos
 
@@ -102,7 +97,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Lista SESC-SP, layout do INEP, organizações parecidas e URLs oficiais são de memória, nada conferido na fonte (P11, P12, ADR-023/024); chamamentos do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
 - E18: Serper/Brave só da documentação, sites só em JS caem em ambíguo (ADR-025). E19: nenhum site real testado; e-mail ofuscado/JS não é lido (ADR-026). E20: regras e forças não calibradas (ADR-027).
 - Endpoints das fontes **não testados** (E01); E08: formato da API do Querido Diário só da documentação (ADR-031); E09: instâncias e JSON do Mapas Culturais só de memória (ADR-032); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
-- Devpost lento (2–3 min/página, P16, ADR-029). E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). E13: pesos, faixas e valores dos fatores são hipótese (P23, ADR-035); `Score` só para oportunidades (leads na E21).
+- Devpost lento (2–3 min/página, P16, ADR-029). E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). E13: pesos, faixas e valores dos fatores são hipótese (P23, ADR-035); pesos de leads (E21) também são hipótese (P27).
 - Supabase (projeto **Prospection**): migrations aplicadas pelo titular até a E03b. **Não conferido por nós:** a Data API sem as tabelas expostas; migrations seguintes só no PostgreSQL local, então `make migrate` após cada merge (P21 para `llm`).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).

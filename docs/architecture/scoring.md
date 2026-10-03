@@ -113,7 +113,7 @@ Edital "PIPE Fase 1 — Soberania Digital" (FAPESP)          Perfil: opp.edital 
 ```
 (Números ilustrativos: mostram o formato, não um dado real.)
 
-## Implementação (E13 feita para oportunidades; E21 fará os leads — ADR-035)
+## Implementação (E13 oportunidades — ADR-035; E21 leads — ADR-039)
 
 - `scoring/factors/{value,fit,chance,timing,access,lightness}.py`: uma função por fator, pura, testável.
 - `scoring/eligibility.py` (requisitos × `CompanyProfile`), `scoring/gates.py`, `scoring/engine.py` (`score_opportunity`, `combine`).
@@ -125,9 +125,9 @@ Edital "PIPE Fase 1 — Soberania Digital" (FAPESP)          Perfil: opp.edital 
   categoria, 0,2 sem relação, +0,1 com portfólio público; C base 0,5 ± elegibilidade, abrangência e relacionamento; T por dias até
   o prazo (≤ 4: 0,1 · 5–6: 0,5 · 7–14: 0,85 · 15–45: 0,95 · 46–90: 0,7 · > 90: 0,5); A = `G` × contatabilidade (e-mail/telefone
   1,0 · página oficial 0,8 · formulário 0,7 · nada 0,3); L pelo esforço.
-- **Fora desta etapa:** sazonalidade de escolas, `follow-up vencendo` e fatores de leads (E21); frescor de evidência (E22/E30).
-- Gates de leads (opt-out, contato recente, duplicata) não se aplicam a oportunidades e ficam para a E21; a duplicata de
-  oportunidade já é barrada pela `canonical_key` única.
+- **Leads (E21):** `scoring/leads.py` e `scoring/factors/lead.py`; mesmo `combine`, perfis `lead.sesc`/`lead.school_course`. Opt-out
+  → `gated`; já contatado ou contato < 21 dias → rótulo «em andamento» (tem nota, nunca é lead novo). Detalhes e valores em ADR-039.
+- **Fora do MVP:** frescor de evidência (E22/E30); perfil `lead.company_service`; duplicata de oportunidade já é barrada pela `canonical_key`.
 
 ## Calibração (E30)
 

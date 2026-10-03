@@ -65,7 +65,7 @@ core/             modelos núcleo em pacote `models/` (Organization, Opportunity
                   services/ (evidência, opt-out, normalização), fixtures/ (catálogo de serviços)
 collection/       fetcher educado, RawDocument, runner (`collect`), conectores em `connectors/`
 extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
-scoring/          geo (E12), matching (E20), `Score` e motor da E13: gates, fatores, elegibilidade, perfis
+scoring/          geo (E12), matching (E20), `Score` e motor da E13 (leads: `leads.py`, E21): gates, fatores, perfis
 llm/              abstração de provedores, cache, log de custo, orçamento
 reports/          métricas M1–M9 (E14); digest semanal (E15)
 docs/             memória do projeto (ver docs/README.md)

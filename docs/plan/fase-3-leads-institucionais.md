@@ -150,8 +150,10 @@ memória (recontato < 21 dias, `do_not_contact`); admin ordena leads por score c
 aberto reaparecerem como "novas" → gate de memória testado.
 **Testes:** fatores; gates de memória; sazonalidade.
 **Critério de conclusão:**
-- [ ] SESC Bauru/Ribeirão Preto/São Carlos classificados "em andamento", nunca como novos leads.
-- [ ] Breakdown de 5 leads compreensível sem ler código.
+- [x] SESC Bauru/Ribeirão Preto/São Carlos classificados "em andamento", nunca como novos leads (testado com proposta de data pendente; conferir com dados reais: P27).
+- [ ] Breakdown de 5 leads compreensível sem ler código (P27).
+
+**Feita (2026-10-03, ADR-039):** `scoring/leads.py`, `scoring/factors/lead.py`, `make rescore` cobre leads, admin de organizações, seções de leads do digest.
 
 ---
 

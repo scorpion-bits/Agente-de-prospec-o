@@ -147,20 +147,21 @@ def _evidence_of(opp: Opportunity):
     return Evidence.objects.filter(content_type=content_type, object_id=opp.pk)
 
 
-def is_discarded(opp: Opportunity) -> bool:
+def is_discarded(entity) -> bool:
     """Já descartada pelo humano: fora do digest, não recalcula (docs/architecture/scoring.md)."""
-    content_type = ContentType.objects.get_for_model(Opportunity)
+    content_type = ContentType.objects.get_for_model(type(entity))
     return Triage.objects.filter(
-        content_type=content_type, object_id=opp.pk, status=Triage.Status.DISCARDED
+        content_type=content_type, object_id=entity.pk, status=Triage.Status.DISCARDED
     ).exists()
 
 
 @transaction.atomic
-def save_score(opp: Opportunity, result: ScoreResult, ctx: ScoringContext) -> Score:
-    content_type = ContentType.objects.get_for_model(Opportunity)
+def save_score(entity, result: ScoreResult, ctx: ScoringContext) -> Score:
+    """Grava (ou substitui) o `Score` de uma oportunidade ou organização."""
+    content_type = ContentType.objects.get_for_model(type(entity))
     score, _ = Score.objects.update_or_create(
         content_type=content_type,
-        object_id=opp.pk,
+        object_id=entity.pk,
         defaults={
             "profile": result.profile,
             "scoring_version": SCORING_VERSION,
