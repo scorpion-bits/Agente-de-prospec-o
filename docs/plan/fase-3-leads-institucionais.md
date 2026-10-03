@@ -172,3 +172,5 @@ sucesso/fracasso e decisão: **continuar (quais etapas da Fase 4)**, **ajustar**
 **Critério de conclusão:**
 - [ ] Relatório com números, não impressões.
 - [ ] Decisão em ADR e próxima etapa definida em STATUS.
+
+**Preparada (2026-10-03, ADR-040):** `reports/evaluation.py` + `make evaluate` (prontidão ≥ 28 dias e ≥ 20 triagens, sugestão por regras) e o modelo `docs/history/mvp-evaluation.md`. **A decisão em si fica aberta** até haver 4 semanas de uso real (P28).
