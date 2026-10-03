@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "llm",
     "scoring",
     "reports",
+    "radar",  # só comandos de orquestração (run_pipeline), sem modelos
 ]
 
 MIDDLEWARE = [
