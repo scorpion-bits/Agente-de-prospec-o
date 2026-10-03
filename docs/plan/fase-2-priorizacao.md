@@ -81,7 +81,7 @@ com: **follow-ups vencendo/vencidos** (resumo da última interação), top-10 op
 score (com 1 linha de "por quê"), prazos que vencem em ≤ 14 dias, novidades desde o último
 digest, **oportunidades bloqueadas por requisito da empresa** (e valor somado), fontes com
 erro, custo do mês (dinheiro novo e créditos). E-mail opcional **apenas para a equipe**
-(remetente/destinatário `@scorpionbits.com`). Seções de leads (se E21 concluída): "Leads da
+(lista `DIGEST_EMAIL_TO` no `.env`; a equipe ainda não tem domínio próprio, ADR-037). Seções de leads (se E21 concluída): "Leads da
 semana" (top-10 com contato sugerido, razão e portfólio a citar) e "Em andamento".
 **Ler antes:** `docs/product/mvp.md`, `scoring.md` (faixas).
 **Alterações:** `reports/digest.py`, templates, comando `digest`, settings SMTP opcionais.
@@ -91,8 +91,8 @@ semana" (top-10 com contato sugerido, razão e portfólio a citar) e "Em andamen
 **Riscos:** digest longo demais → limite rígido de itens; e-mail cair no spam → é só para a equipe; alternativa: abrir o HTML.
 **Testes:** geração com dados de teste; itens gated/descartados não aparecem; seção de prazos correta.
 **Critério de conclusão:**
-- [ ] Digest legível em < 5 min; links funcionam.
-- [ ] Nada descartado/gated aparece.
+- [ ] Digest legível em < 5 min com dados reais (P25); links do admin dependem de `DIGEST_BASE_URL`.
+- [x] Nada descartado/gated aparece nas listas de ação (testado). ADR-037; seções de leads aguardam a E21.
 
 ---
 

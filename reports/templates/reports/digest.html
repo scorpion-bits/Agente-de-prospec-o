@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Digest {{ d.week }}</title>
+<style>body{font:15px/1.5 system-ui,sans-serif;max-width:820px;margin:2rem auto;padding:0 1rem;color:#1f2328}
+h2{border-bottom:1px solid #d0d7de;padding-bottom:.2rem;margin-top:2rem}.late{color:#cf222e;font-weight:600}
+.muted{color:#57606a}li{margin:.4rem 0}</style></head><body>
+<h1>Digest semanal {{ d.week }}</h1>
+<p class="muted">Gerado em {{ d.generated_at|date:"d/m/Y H:i" }}. Novidades desde {{ d.since|date:"d/m/Y H:i" }}.</p>
+
+<h2>Follow-ups ({{ d.follow_ups.total }})</h2>
+<ul>{% for r in d.follow_ups.rows %}<li><b>{{ r.name }}</b>: ação em {{ r.due|date:"d/m/Y" }}{% if r.overdue_days %} <span class="late">vencido há {{ r.overdue_days }} dias</span>{% endif %}.
+ Última: {{ r.last }}{% if r.outcome %} ({{ r.outcome }}){% endif %}. {{ r.summary }}</li>
+{% empty %}<li>Nenhum follow-up vencido ou próximo.</li>{% endfor %}</ul>
+
+<h2>Top {{ d.top|length }} por pontuação</h2>
+<ol>{% for t in d.top %}<li><b>{{ t.title }}</b> — {{ t.total }}/100 ({{ t.label }}){% if t.deadline %}; prazo {{ t.deadline|date:"d/m/Y" }}{% endif %}.
+ <span class="muted">{{ t.why }}</span> <a href="{{ t.admin_url }}">admin</a>{% if t.url %} · <a href="{{ t.url }}">oficial</a>{% endif %}</li>
+{% empty %}<li>Nenhuma oportunidade pontuada (rode <code>make rescore</code>).</li>{% endfor %}</ol>
+
+<h2>Prazos em até 14 dias</h2>
+<ul>{% for t in d.deadlines %}<li>{{ t.deadline|date:"d/m/Y" }}: <b>{{ t.title }}</b> ({{ t.total }}/100) <a href="{{ t.admin_url }}">admin</a></li>
+{% empty %}<li>Nenhum prazo próximo.</li>{% endfor %}</ul>
+
+<h2>Novidades ({{ d.new.total }})</h2>
+<ul>{% for t in d.new.rows %}<li><b>{{ t.title }}</b> ({{ t.total }}/100, {{ t.label }}) <a href="{{ t.admin_url }}">admin</a></li>
+{% empty %}<li>Nada novo e elegível desde o último digest.</li>{% endfor %}</ul>
+
+<h2>Bloqueadas por requisito da empresa ({{ d.blocked.total }})</h2>
+{% if d.blocked.total %}<p>Valor somado (de {{ d.blocked.with_value }} com valor informado): <b>{{ d.blocked.amount|floatformat:2 }}</b> R$.</p>{% endif %}
+<ul>{% for r in d.blocked.rows %}<li><b>{{ r.title }}</b>{% if r.amount %} (R$ {{ r.amount|floatformat:2 }}){% endif %}: {{ r.reason }} <a href="{{ r.admin_url }}">admin</a></li>
+{% empty %}<li>Nenhuma.</li>{% endfor %}</ul>
+
+<h2>Fontes</h2>
+<ul>{% for slug, status, when in d.sources.problems %}<li>{{ slug }}: última execução {{ status|lower }} ({{ when|date:"d/m/Y" }})</li>{% endfor %}
+{% for slug, what in d.sources.stale %}<li>{{ slug }}: {{ what }}</li>{% endfor %}
+{% if not d.sources.problems and not d.sources.stale %}<li>Todas as fontes habilitadas coletaram sem erro.</li>{% endif %}</ul>
+
+<h2>Custo do mês (IA)</h2>
+<ul><li>Dinheiro novo: US$ {{ d.costs.money|floatformat:2 }} de US$ {{ d.costs.money_budget|floatformat:2 }}</li>
+<li>Créditos: US$ {{ d.costs.credits|floatformat:2 }} de US$ {{ d.costs.credits_budget|floatformat:2 }}</li>
+<li>Chamadas: {{ d.costs.calls }} (a busca web ainda não registra custo)</li></ul>
+<p class="muted">{{ d.leads_note }}</p>
+</body></html>
