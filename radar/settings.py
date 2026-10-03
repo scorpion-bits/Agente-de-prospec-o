@@ -154,12 +154,11 @@ LOGGING = {
 }
 
 # Digest semanal (E15, ADR-037). Arquivos em data/digests/ (ignorado pelo git). E-mail opcional e só
-# para a equipe: remetente e destinatários precisam ser do domínio abaixo (ADR-005).
+# para a equipe: destinatários só da lista DIGEST_EMAIL_TO (sem domínio próprio ainda; ADR-005).
 DIGEST_DIR = BASE_DIR / "data" / "digests"
 DIGEST_BASE_URL = env.str(
     "DIGEST_BASE_URL", default="http://127.0.0.1:8000"
 )  # base dos links do admin
-DIGEST_EMAIL_DOMAIN = env.str("DIGEST_EMAIL_DOMAIN", default="scorpionbits.com")
 DIGEST_EMAIL_FROM = env.str("DIGEST_EMAIL_FROM", default="")
 DIGEST_EMAIL_TO = env.list("DIGEST_EMAIL_TO", default=[])
 EMAIL_HOST = env.str("SMTP_HOST", default="")

@@ -363,23 +363,22 @@ class EmailNotAllowed(ValueError):
     pass
 
 
-def team_recipients(addresses=None):
-    """Destinatários do e-mail: só endereços do domínio da equipe (ADR-005, ADR-037)."""
-    addresses = list(addresses if addresses is not None else settings.DIGEST_EMAIL_TO)
-    domain = "@" + settings.DIGEST_EMAIL_DOMAIN
-    bad = [a for a in addresses if not a.lower().endswith(domain)]
-    if bad or not addresses:
-        raise EmailNotAllowed(
-            f"O digest só pode ser enviado a endereços {domain} (configure DIGEST_EMAIL_TO)."
-        )
+def team_recipients():
+    """Destinatários: só os da lista `DIGEST_EMAIL_TO` do `.env` (a equipe), nunca de argumento.
+
+    A equipe ainda não tem domínio próprio (usa Gmail), então a trava é a lista explícita (ADR-037).
+    """
+    addresses = [a.strip() for a in settings.DIGEST_EMAIL_TO if a.strip()]
+    if not addresses:
+        raise EmailNotAllowed("Defina DIGEST_EMAIL_TO no .env com os e-mails da equipe.")
     return addresses
 
 
-def send_email(digest, recipients=None):
-    to = team_recipients(recipients)
-    sender = settings.DIGEST_EMAIL_FROM
-    if not sender.lower().endswith("@" + settings.DIGEST_EMAIL_DOMAIN):
-        raise EmailNotAllowed("DIGEST_EMAIL_FROM precisa ser um endereço da equipe.")
+def send_email(digest):
+    to = team_recipients()
+    sender = settings.DIGEST_EMAIL_FROM or settings.EMAIL_HOST_USER
+    if not sender:
+        raise EmailNotAllowed("Defina DIGEST_EMAIL_FROM (ou SMTP_USER) no .env.")
     msg = EmailMultiAlternatives(
         f"Radar Scorpion Bits — digest {digest.week}", render_markdown(digest), sender, to
     )

@@ -19,8 +19,10 @@ mensagens a terceiros é vetado (ADR-005).
    `company_requirement`; as barradas por prazo ou território ficam fora. Top e prazos excluem rótulo «ignorar» e oportunidades encerradas.
 4. **«Desde o último digest»** vem de `data/digests/.state.json` (sem migration); sem o arquivo, 7 dias; `--since AAAA-MM-DD` força.
    No GitHub Actions (E16) o estado local não persiste: lá se usará `--since`/janela fixa.
-5. **E-mail opcional (`--email`)**: remetente e destinatários precisam ser do domínio `DIGEST_EMAIL_DOMAIN` (padrão `scorpionbits.com`);
-   caso contrário o comando falha **antes** de gerar. Credenciais SMTP só no `.env`. Não há envio para terceiros (ADR-005).
+5. **E-mail opcional (`--email`)**: destinatários só da lista `DIGEST_EMAIL_TO` do `.env` (nunca de argumento de linha de comando ou banco);
+   sem a lista o comando falha **antes** de gerar. A equipe ainda não tem domínio próprio (usa o Gmail da empresa e e-mails pessoais
+   dos membros), então a trava é a lista explícita, não o domínio. Remetente: `DIGEST_EMAIL_FROM` ou `SMTP_USER`; credenciais SMTP
+   só no `.env`. Sem envio para terceiros (ADR-005). **Atenção:** o e-mail leva resumos de interações; só liste quem pode ver isso.
 6. **Seções de leads** ficam para quando a E21 existir; o digest avisa isso no rodapé.
 
 ## Consequências

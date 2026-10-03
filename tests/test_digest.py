@@ -196,28 +196,36 @@ class TestOutput:
 
 
 class TestEmail:
-    def test_rejects_outside_domain(self, settings):
-        settings.DIGEST_EMAIL_TO = ["alguem@example.org"]
+    def test_requires_recipient_list(self, settings):
+        settings.DIGEST_EMAIL_TO = []
         with pytest.raises(digest.EmailNotAllowed):
             digest.team_recipients()
 
     def test_command_refuses_before_generating(self, settings, tmp_path):
         settings.DIGEST_EMAIL_TO = []
-        with pytest.raises(CommandError, match="scorpionbits.com"):
+        with pytest.raises(CommandError, match="DIGEST_EMAIL_TO"):
             call_command("digest", out=str(tmp_path), email=True)
         assert list(tmp_path.iterdir()) == []
 
-    def test_sends_to_team(self, settings, tmp_path):
-        settings.DIGEST_EMAIL_TO = ["contato@scorpionbits.com"]
-        settings.DIGEST_EMAIL_FROM = "radar@scorpionbits.com"
+    def test_sends_to_configured_list(self, settings, tmp_path):
+        settings.DIGEST_EMAIL_TO = ["equipe@example.org", "membro@example.net"]
+        settings.DIGEST_EMAIL_FROM = "radar@example.org"
         opp("A")
         call_command("digest", out=str(tmp_path), email=True)
         assert len(mail.outbox) == 1
-        assert mail.outbox[0].to == ["contato@scorpionbits.com"]
+        assert mail.outbox[0].to == ["equipe@example.org", "membro@example.net"]
         assert mail.outbox[0].alternatives
 
-    def test_sender_must_be_team(self, settings):
-        settings.DIGEST_EMAIL_TO = ["contato@scorpionbits.com"]
-        settings.DIGEST_EMAIL_FROM = "radar@outro.com"
+    def test_sender_falls_back_to_smtp_user(self, settings):
+        settings.DIGEST_EMAIL_TO = ["equipe@example.org"]
+        settings.DIGEST_EMAIL_FROM = ""
+        settings.EMAIL_HOST_USER = "conta@example.org"
+        digest.send_email(digest.build())
+        assert mail.outbox[0].from_email == "conta@example.org"
+
+    def test_requires_sender(self, settings):
+        settings.DIGEST_EMAIL_TO = ["equipe@example.org"]
+        settings.DIGEST_EMAIL_FROM = ""
+        settings.EMAIL_HOST_USER = ""
         with pytest.raises(digest.EmailNotAllowed):
             digest.send_email(digest.build())

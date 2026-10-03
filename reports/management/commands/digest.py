@@ -18,7 +18,7 @@ class Command(BaseCommand):
             "--since", help="Novidades desde AAAA-MM-DD (padrão: último digest ou 7 dias)."
         )
         parser.add_argument(
-            "--email", action="store_true", help="Envia para DIGEST_EMAIL_TO (domínio da equipe)."
+            "--email", action="store_true", help="Envia para a lista DIGEST_EMAIL_TO do .env."
         )
         parser.add_argument(
             "--dry-run", action="store_true", help="Imprime o Markdown; não grava nem envia."
