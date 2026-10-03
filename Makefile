@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites contacts match rescore metrics extract superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts match rescore metrics digest extract superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -42,6 +42,9 @@ rescore:  ## Pontua as oportunidades (E13); DRY=1 simula
 
 metrics:  ## Mostra as métricas M1–M9 (E14)
 	$(UV) run python manage.py metrics
+
+digest:  ## Gera o digest semanal em data/digests (E15); MAIL=1 envia só à equipe
+	$(UV) run python manage.py digest $(if $(MAIL),--email) $(if $(DRY),--dry-run)
 
 extract:  ## Extrai campos das oportunidades candidatas (E11); N=20 itens, DRY=1 simula
 	$(UV) run python manage.py extract_opportunities --limit $(or $(N),20) $(if $(DRY),--dry-run)

@@ -91,8 +91,8 @@ semana" (top-10 com contato sugerido, razão e portfólio a citar) e "Em andamen
 **Riscos:** digest longo demais → limite rígido de itens; e-mail cair no spam → é só para a equipe; alternativa: abrir o HTML.
 **Testes:** geração com dados de teste; itens gated/descartados não aparecem; seção de prazos correta.
 **Critério de conclusão:**
-- [ ] Digest legível em < 5 min; links funcionam.
-- [ ] Nada descartado/gated aparece.
+- [ ] Digest legível em < 5 min com dados reais (P25); links do admin dependem de `DIGEST_BASE_URL`.
+- [x] Nada descartado/gated aparece nas listas de ação (testado). ADR-037; seções de leads aguardam a E21.
 
 ---
 
