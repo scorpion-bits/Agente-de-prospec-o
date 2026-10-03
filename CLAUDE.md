@@ -73,7 +73,7 @@ docs/             memória do projeto (ver docs/README.md)
 
 ## Comandos
 
-`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make extract` (E11) · `make rescore` (score, E13) · `make metrics` (M1–M9, E14) · `make digest` (E15) · `make run` (admin) · `make test` ·
+`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make extract` (E11) · `make rescore` (score, E13) · `make metrics` (M1–M9, E14) · `make digest` (E15) · `make pipeline` (cadeia, E16) · `make backup` (E16) · `make run` (admin) · `make test` ·
 `make lint`/`make fmt` · `make check` (ruff, pytest, migrations, repo_checks: o que o CI roda).
 Testes precisam de `DATABASE_URL` (PostgreSQL, ex. `docker compose up -d`).
 
@@ -98,7 +98,7 @@ Mapa completo: `docs/README.md` · estado e próxima etapa: `docs/plan/STATUS.md
 - `docs/architecture/`: `overview` (inclui bibliotecas), `data-model`, `scoring`, `geo-relevance`, `llm-strategy`, `connectors`
 - `docs/research/`: fontes (`opportunity-sources`, `organization-sources`), `legal-and-compliance`, `hosting`, `ai-models-and-costs`
 - `docs/decisions/` (ADRs) · `docs/product/` (visão, MVP, riscos, `ui-direction`) · `docs/agents/`
-- `docs/history/` (arquivo morto) · `docs/operations/` (`claude-workflow` ciclo /clear, `supabase-setup`)
+- `docs/history/` (arquivo morto) · `docs/operations/` (`claude-workflow` ciclo /clear, `supabase-setup`, `runbook`)
 
 ## Contexto de negócio mínimo
 

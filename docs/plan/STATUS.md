@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-03** (E15)
+> Última atualização: **2026-10-03** (E16)
 
 ## Onde estamos
 
@@ -9,16 +9,14 @@
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 **E05–E09** (Devpost, itch.io, `html_watch`, Querido Diário, Mapas Culturais; ADR-028–032) são conectores de oportunidades, com
-fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)** e **E15 (digest, ADR-037)** prontas, sem migration (P24, P25).
+fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)**, **E15 (digest, ADR-037)** e **E16 (agendamento e backups, ADR-038)** prontas, sem migration (P24–P26).
 **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4 concluído). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
-➡️ **E16 — Agendamento no GitHub Actions, backups e runbook** (próxima na ordem do `PLAN.md`), em thread nova: encadeia
-`collect → extract → match → rescore → digest`. Antes, o humano roda `make digest` (P25) e confere se o digest serve.
-
-➡️ **E01 — Validação de fontes + baseline manual** continua pendente: precisa de máquina com internet normal (o ambiente do
-Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co) e confere as listas SESC/parecidas e o INEP (P11, P12).
+➡️ **E21 — Score de leads** (ficou para trás na ordem do `PLAN.md`; as seções de leads do digest dependem dela) e depois **E22 — Avaliação do MVP**, em thread nova.
+Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, teste de restauração).
+➡️ **E01 (validação de fontes)** segue pendente: precisa de internet normal (o ambiente do Claude bloqueia as fontes e o supabase.co) (P11, P12).
 
 ## Concluído
 
@@ -40,6 +38,7 @@ Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co) e con
 | E13 | 2026-10-01 | `scoring/`: `Score` (migration `scoring.0001`), gates (prazo, território, requisito da empresa), 6 fatores, elegibilidade MEI, confiança K, perfis em dados, `make rescore`, breakdown no admin; 784 testes; ADR-035. **Pesos são hipótese; nada rodado em dados reais (P23)** | `…-10-01-E13.md` |
 | E14 | 2026-10-03 | `core/services/triage.py` + ações em massa no admin de oportunidades (interessante, em andamento, concluído, descartar com motivo, voltar), coluna e filtro «Não triadas»; `reports/metrics.py` + `make metrics` (M1–M9, «sem dados» quando vazio); sem migration; 799 testes; ADR-036. **Nada medido com dados reais (P24)** | `…-10-03-E14.md` |
 | E15 | 2026-10-03 | `reports/digest.py` + `make digest`: `data/digests/AAAA-Www.html/.md` (follow-ups, top-10 com «por quê», prazos ≤ 14 dias, novidades, bloqueadas por requisito com valor somado, fontes, custo do mês); nada gated/descartado nas listas; e-mail opcional só para a lista `DIGEST_EMAIL_TO`; sem migration; 817 testes; ADR-037. **Nada lido com dados reais (P25)** | `…-10-03-E15.md` |
+| E16 | 2026-10-03 | `manage.py run_pipeline` (`make pipeline`: collect→extract→match→rescore→digest, falha isolada por etapa, log só com contagens); `pipeline.yml` (diário + `workflow_dispatch`, migrate antes, digest só por e-mail às segundas, renova o agendamento); `backup.yml` + `scripts/backup.sh`/`restore_backup.sh` (`pg_dump` → age, artefato 30 dias); `docs/operations/runbook.md`; sem migration; ADR-038. **Restauração testada só em PostgreSQL local; Actions nunca rodou com Secrets (P26)** | `…-10-03-E16.md` |
 
 ## Pendências do humano
 
@@ -69,6 +68,7 @@ Claude bloqueia itch.io, devpost.com, queridodiario, gov.br e supabase.co) e con
 | P23 | **E13:** `git pull`, `make migrate` (cria `scoring_score`), `make rescore DRY=1` e depois `make rescore` na sua máquina (não no SQL Editor); no admin (Oportunidades, coluna «pontuação») leia o breakdown de 10: nota faz sentido? Anote os erros e ajuste pesos em `scoring/profiles.py` (suba `SCORING_VERSION`) | `docs/decisions/ADR-035-score-de-oportunidades.md` |
 | P24 | **E14:** `git pull`; `make rescore`; no admin (Oportunidades) filtre «Não triadas», cronometre a triagem de 20 itens (meta < 5 min) e rode `make metrics`; anote o tempo semanal (M6) aqui (M6 é autodeclarado) | `docs/decisions/ADR-036-triagem-e-metricas.md` |
 | P25 | **E15:** `git pull`, `make rescore` e `make digest` na sua máquina (não no SQL Editor; sem migration); abra `data/digests/AAAA-Www.html`: leu em < 5 min? links do admin abrem (ajuste `DIGEST_BASE_URL`)? algo faltando ou sobrando? E-mail só se quiser (`DIGEST_EMAIL_TO` com os e-mails da equipe, SMTP no `.env`; `make digest MAIL=1`) | `docs/decisions/ADR-037-digest-semanal.md` |
+| P26 | **E16:** seguir `docs/operations/runbook.md` §2: `age-keygen` (guardar a privada em 2 lugares), Secrets `DATABASE_URL`, `DJANGO_SECRET_KEY`, `BACKUP_AGE_PUBLIC_KEY` (+ chaves de IA/busca/SMTP que quiser); *Run workflow* `Pipeline` com `dry_run`, depois sem; *Run workflow* `Backup`, baixar o artefato e **restaurar no radar-dev** (`scripts/restore_backup.sh`) | `docs/decisions/ADR-038-agendamento-e-backups.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -93,7 +93,8 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 034 extração: citação obrigatória, conferência por regras, campo crítico só se verificado ·
 035 score de oportunidades: gates, fatores, confiança, pesos como dado versionado ·
 036 triagem em massa no admin e métricas M1–M9 calculadas do banco ·
-**037 digest semanal: arquivo local, listas com limite, e-mail só para a equipe**.
+037 digest semanal: arquivo local, listas com limite, e-mail só para a equipe ·
+**038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público**.
 
 ## Problemas abertos
 
