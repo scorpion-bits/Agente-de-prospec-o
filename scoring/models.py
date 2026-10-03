@@ -23,11 +23,13 @@ class Score(models.Model):
         LOW = "low", "Baixa"
         IGNORE = "ignore", "Ignorar"
         GATED = "gated", "Bloqueada"
+        ONGOING = "ongoing", "Em andamento"
 
     class GateKind(models.TextChoices):
         EXPIRED = "expired", "Prazo vencido ou já ocorreu"
         TERRITORY = "territory", "Território inelegível"
         COMPANY_REQUIREMENT = "company_requirement", "Requisito da empresa não atendido"
+        DO_NOT_CONTACT = "do_not_contact", "Não contatar (opt-out)"
 
     content_type = models.ForeignKey(
         ContentType,

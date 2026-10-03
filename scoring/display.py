@@ -16,6 +16,7 @@ COLORS = {
     Score.Label.LOW: "#57606a",
     Score.Label.IGNORE: "#8c959f",
     Score.Label.GATED: "#cf222e",
+    Score.Label.ONGOING: "#0969da",
 }
 
 

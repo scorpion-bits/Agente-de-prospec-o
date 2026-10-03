@@ -313,6 +313,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         "last_interaction_at",
         "next_action_at",
         "website_status",
+        "score",
     )
     list_filter = (
         "kind",
@@ -332,6 +333,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         "next_action_at",
         "created_at",
         "updated_at",
+        "score_breakdown",
     )
     inlines = (InteractionInline, ContactPointInline, EvidenceInline)
     save_on_top = True
@@ -351,11 +353,30 @@ class OrganizationAdmin(admin.ModelAdmin):
             "Relacionamento (calculado das interações)",
             {"fields": ("relationship_status", "last_interaction_at", "next_action_at")},
         ),
+        ("Pontuação como lead (E21)", {"fields": ("score_breakdown",)}),
         (
             "Controle",
             {"fields": ("first_seen_source", "created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )
+
+    def get_queryset(self, request):
+        return annotate_scores(super().get_queryset(request), Organization)
+
+    @admin.display(description="pontuação", ordering="_score_total")
+    def score(self, obj):
+        return label_badge(getattr(obj, "_score_label", None), getattr(obj, "_score_total", None))
+
+    @admin.display(description="por que essa nota")
+    def score_breakdown(self, obj):
+        score = (
+            Score.objects.filter(
+                content_type=ContentType.objects.get_for_model(Organization), object_id=obj.pk
+            ).first()
+            if obj.pk
+            else None
+        )
+        return breakdown_html(score)
 
 
 @admin.register(ContactPoint)

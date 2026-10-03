@@ -29,6 +29,15 @@ h2{border-bottom:1px solid #d0d7de;padding-bottom:.2rem;margin-top:2rem}.late{co
 <ul>{% for r in d.blocked.rows %}<li><b>{{ r.title }}</b>{% if r.amount %} (R$ {{ r.amount|floatformat:2 }}){% endif %}: {{ r.reason }} <a href="{{ r.admin_url }}">admin</a></li>
 {% empty %}<li>Nenhuma.</li>{% endfor %}</ul>
 
+<h2>Leads da semana ({{ d.leads.new_total }})</h2>
+<ol>{% for r in d.leads.new %}<li><b>{{ r.name }}</b> — {{ r.total }}/100 ({{ r.label }}).{% if r.service %} Serviço: {{ r.service }}.{% endif %}{% if r.proof %} Portfólio: {{ r.proof|join:", " }}.{% endif %}
+ Contato: {{ r.contact }}. <span class="muted">{{ r.why }}</span> <a href="{{ r.admin_url }}">admin</a></li>
+{% empty %}<li>Nenhum lead novo pontuado (rode <code>make match</code> e <code>make rescore</code>).</li>{% endfor %}</ol>
+
+<h2>Em andamento ({{ d.leads.ongoing_total }})</h2>
+<ul>{% for r in d.leads.ongoing %}<li><b>{{ r.name }}</b>: {{ r.status }} ({% if r.last %}última interação {{ r.last|date:"d/m/Y" }}{% else %}sem data confirmada{% endif %}{% if r.next %}; próxima ação {{ r.next|date:"d/m/Y" }}{% endif %}) <a href="{{ r.admin_url }}">admin</a></li>
+{% empty %}<li>Nenhum lead em andamento.</li>{% endfor %}</ul>
+
 <h2>Fontes</h2>
 <ul>{% for slug, status, when in d.sources.problems %}<li>{{ slug }}: última execução {{ status|lower }} ({{ when|date:"d/m/Y" }})</li>{% endfor %}
 {% for slug, what in d.sources.stale %}<li>{{ slug }}: {{ what }}</li>{% endfor %}
@@ -38,5 +47,4 @@ h2{border-bottom:1px solid #d0d7de;padding-bottom:.2rem;margin-top:2rem}.late{co
 <ul><li>Dinheiro novo: US$ {{ d.costs.money|floatformat:2 }} de US$ {{ d.costs.money_budget|floatformat:2 }}</li>
 <li>Créditos: US$ {{ d.costs.credits|floatformat:2 }} de US$ {{ d.costs.credits_budget|floatformat:2 }}</li>
 <li>Chamadas: {{ d.costs.calls }} (a busca web ainda não registra custo)</li></ul>
-<p class="muted">{{ d.leads_note }}</p>
 </body></html>
