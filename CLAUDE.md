@@ -67,13 +67,13 @@ collection/       fetcher educado, RawDocument, runner (`collect`), conectores e
 extraction/       texto de HTML/PDF, extração estruturada (LLM opcional)
 scoring/          geo (E12), matching (E20), `Score` e motor da E13: gates, fatores, elegibilidade, perfis
 llm/              abstração de provedores, cache, log de custo, orçamento
-reports/          digest semanal
+reports/          métricas M1–M9 (E14); digest semanal (E15)
 docs/             memória do projeto (ver docs/README.md)
 ```
 
 ## Comandos
 
-`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make extract` (E11) · `make rescore` (score, E13) · `make run` (admin) · `make test` ·
+`make setup` · `make migrate` · `make seed` (catálogo) · `make memory` (perfil, portfólio, interações) · `make collect` · `make websites` (site oficial, E18) · `make extract` (E11) · `make rescore` (score, E13) · `make metrics` (M1–M9, E14) · `make run` (admin) · `make test` ·
 `make lint`/`make fmt` · `make check` (ruff, pytest, migrations, repo_checks: o que o CI roda).
 Testes precisam de `DATABASE_URL` (PostgreSQL, ex. `docker compose up -d`).
 
