@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites contacts match rescore extract superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts match rescore metrics extract superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -39,6 +39,9 @@ contacts:  ## Extrai contatos públicos do site oficial (E19); N=20 organizaçõ
 
 rescore:  ## Pontua as oportunidades (E13); DRY=1 simula
 	$(UV) run python manage.py rescore $(if $(DRY),--dry-run)
+
+metrics:  ## Mostra as métricas M1–M9 (E14)
+	$(UV) run python manage.py metrics
 
 extract:  ## Extrai campos das oportunidades candidatas (E11); N=20 itens, DRY=1 simula
 	$(UV) run python manage.py extract_opportunities --limit $(or $(N),20) $(if $(DRY),--dry-run)

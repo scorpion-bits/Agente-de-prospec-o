@@ -4,7 +4,7 @@ Objetivo das métricas: **decidir se vale continuar investindo tempo/dinheiro no
 Por isso priorizamos poucas métricas, calculáveis a partir de dados que o sistema já
 guarda (status de triagem, logs de coleta, logs de custo LLM).
 
-## Métricas do MVP (implementadas na E14/E22)
+## Métricas do MVP (implementadas na E14: `make metrics`, ADR-036)
 
 | # | Métrica | Como medir | Por que importa | Meta MVP |
 |---|---|---|---|---|
