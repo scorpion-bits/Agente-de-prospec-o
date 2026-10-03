@@ -29,7 +29,7 @@ radar de oportunidades (análise de impacto: `docs/history/sessions/2026-09-30-E
 | 18 | E10 Camada de IA · 19. E11 Extração de oportunidades (feita, ADR-034; acurácia no P22) | **M3: radar de oportunidades** |
 | 20 | E13 Score de oportunidades · 21. E21 Score de leads | |
 | 22 | E14 Triagem e métricas · 23. E15 Digest (oportunidades, leads, follow-ups) · 24. E16 Agendamento (GitHub Actions) e backups | **M4: radar semanal automático** |
-| 25 | E22 Avaliação do MVP (go/no-go) | |
+| 25 | E22 Avaliação do MVP (go/no-go) | ferramenta pronta (ADR-040); decisão após 4 semanas de uso |
 | — | Fase 4 conforme E22 (E27 PNCP é a primeira candidata) | |
 
 Ordem alternativa aceitável: radar (E05–E11) antes dos leads, se a janela escolar não for prioridade.

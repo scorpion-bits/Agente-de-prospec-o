@@ -48,4 +48,6 @@ Regras:
 | 035 | Score de oportunidades: gates, fatores, confiança, pesos como dado versionado | aceito |
 | 036 | Triagem em massa no admin e métricas M1–M9 do banco (sem migration) | aceito |
 | 037 | Digest semanal: arquivo local, listas com limite, e-mail só para a equipe | aceito |
+| 038 | Agendamento diário no Actions e backups criptografados (age); nada de dado em artefato público | aceito |
 | 039 | Score de leads: mesmo motor, gate de opt-out, contatado = «em andamento» | aceito |
+| 040 | Avaliação do MVP: relatório do banco, sugestão por regras, decisão humana | aceito |
