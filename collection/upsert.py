@@ -31,9 +31,10 @@ ORGANIZATION_LOOKUP_FIELDS = (
 
 def _record(entity, drafts: list[EvidenceDraft], source, raw_document) -> bool:
     """Registra as evidências; devolve se alguma é nova (não só renovada)."""
-    before = Evidence.objects.filter(
-        content_type__model=entity._meta.model_name, object_id=entity.pk
-    ).count()
+    known = list(
+        Evidence.objects.filter(content_type__model=entity._meta.model_name, object_id=entity.pk)
+    )
+    pending: list[Evidence] = []
     for draft in drafts:
         record_evidence(
             entity,
@@ -45,11 +46,11 @@ def _record(entity, drafts: list[EvidenceDraft], source, raw_document) -> bool:
             source_name=draft.source_name or source.name,
             excerpt=draft.excerpt,
             raw_document=raw_document,
+            known=known,
+            pending=pending,
         )
-    after = Evidence.objects.filter(
-        content_type__model=entity._meta.model_name, object_id=entity.pk
-    ).count()
-    return after > before
+    Evidence.objects.bulk_create(pending)
+    return bool(pending)
 
 
 def _columns(organization_id):
@@ -106,7 +107,10 @@ def upsert_organization(candidate: OrganizationCandidate, *, source, raw_documen
     existing = find_existing_organization(candidate.name, **lookup)
     before = _columns(existing.pk) if existing is not None else None
     organization, created = get_or_create_organization(
-        candidate.name, defaults={**fields, "first_seen_source": source}, **lookup
+        candidate.name,
+        defaults={**fields, "first_seen_source": source},
+        existing=existing,
+        **lookup,
     )
     linked = _link_parent(organization, parent_name, source)
     tagged = _add_tags(organization, tags)

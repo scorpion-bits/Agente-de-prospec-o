@@ -129,7 +129,9 @@ class Evidence(models.Model):
             errors["method"] = "Evidência manual usa o método 'human'."
         elif self.kind in (self.Kind.OBSERVED, self.Kind.INFERRED) and self.method == "human":
             errors["method"] = "O método 'human' só vale para evidência manual."
-        if missing := missing_entity_error(self.content_type_id, self.object_id):
+        if not getattr(self, "entity_checked", False) and (
+            missing := missing_entity_error(self.content_type_id, self.object_id)
+        ):
             errors["object_id"] = missing
         if errors:
             raise ValidationError(errors)

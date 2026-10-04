@@ -267,3 +267,42 @@ def test_retrieved_at_defaults_to_now(opportunity):
     before = datetime.now(UTC) - timedelta(seconds=5)
     evidence = observed(opportunity)
     assert evidence.retrieved_at >= before
+
+
+class TestBatchRecording:
+    """`known` + `pending`: muitas afirmações da mesma entidade com poucas consultas."""
+
+    def test_new_claims_are_returned_unsaved_and_known_ones_are_renewed(
+        self, organization, django_assert_num_queries
+    ):
+        old = observed(organization, field="name", value="Escola A")
+        known = list(Evidence.objects.filter(object_id=organization.pk))
+        pending: list[Evidence] = []
+        kwargs = {"kind": "observed", "method": "connector:devpost", "source_url": URL}
+        with django_assert_num_queries(1):  # só a renovação da que já existia
+            renewed = record_evidence(
+                organization, "name", "Escola A", known=known, pending=pending, **kwargs
+            )
+        record_evidence(
+            organization, "phone", "(16) 3333-0000", known=known, pending=pending, **kwargs
+        )
+        # repetida na mesma rodada: não vira duas linhas
+        record_evidence(
+            organization, "phone", "(16) 3333-0000", known=known, pending=pending, **kwargs
+        )
+        assert renewed.pk == old.pk
+        assert [e.field for e in pending] == ["phone"]
+        Evidence.objects.bulk_create(pending)
+        assert Evidence.objects.filter(object_id=organization.pk).count() == 2
+
+    def test_rules_still_apply_in_batch_mode(self, organization):
+        with pytest.raises(EvidenceError):
+            record_evidence(
+                organization,
+                "name",
+                "x",
+                kind="observed",
+                method="connector:devpost",
+                known=[],
+                pending=[],
+            )
