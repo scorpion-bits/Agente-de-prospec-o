@@ -93,11 +93,16 @@ def is_private(value: str) -> bool:
 
 
 def is_active(value: str | None) -> bool:
-    """Sem coluna de situação não dá para saber: aceita. Com ela, só "em atividade" (ou 1)."""
+    """Sem coluna de situação não dá para saber: aceita. Com ela, só "em atividade" (ou 1).
+
+    A exportação do Catálogo traz a coluna «Restrição de Atendimento»; só «Escola em funcionamento
+    e sem restrição de atendimento» interessa (exclusivas de AEE, de atividade complementar ou de
+    alunos com deficiência ficam de fora).
+    """
     if not value:
         return True
     key = name_key(value)
-    return key == "1" or "em atividade" in key
+    return key == "1" or "em atividade" in key or "em funcionamento" in key
 
 
 def pretty_name(name: str) -> str:

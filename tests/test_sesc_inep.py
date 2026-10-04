@@ -151,6 +151,9 @@ class TestInepHelpers:
     def test_active_rules(self):
         assert inep_schools.is_active("Escola em atividade")
         assert inep_schools.is_active("1") and inep_schools.is_active(None)
+        assert inep_schools.is_active("ESCOLA EM FUNCIONAMENTO E SEM RESTRIÇÃO DE ATENDIMENTO")
+        assert not inep_schools.is_active("ESCOLA ATENDE EXCLUSIVAMENTE ALUNOS COM DEFICIÊNCIA")
+        assert not inep_schools.is_active("ESCOLA EXCLUSIVA DE ATIVIDADE COMPLEMENTAR")
         assert not inep_schools.is_active("Paralisada")
         assert not inep_schools.is_active("Extinta (ano anterior)")
 
