@@ -30,7 +30,7 @@ radar de oportunidades (análise de impacto: `docs/history/sessions/2026-09-30-E
 | 20 | E13 Score de oportunidades · 21. E21 Score de leads | |
 | 22 | E14 Triagem e métricas · 23. E15 Digest (oportunidades, leads, follow-ups) · 24. E16 Agendamento (GitHub Actions) e backups | **M4: radar semanal automático** |
 | 25 | E22 Avaliação do MVP (go/no-go) | ferramenta pronta (ADR-040); decisão após 4 semanas de uso |
-| — | Fase 4 conforme E22 (**E27 PNCP**, **E26 sinais web** e **E25 CNPJ** feitas, ADR-041/042/043; próxima candidata: E23) | |
+| — | Fase 4 conforme E22 (**E27 PNCP**, **E26 sinais web** e **E25 CNPJ** feitas, ADR-041/042/043; **E23 pipeline leve** adiantada, ADR-045: adoção depende do P28) | |
 
 Ordem alternativa aceitável: radar (E05–E11) antes dos leads, se a janela escolar não for prioridade.
 
@@ -82,7 +82,7 @@ Ordem alternativa aceitável: radar (E05–E11) antes dos leads, se a janela esc
 | ID | Etapa | Complexidade | IA em runtime |
 |---|---|---|---|
 | E27 | Conector PNCP (licitações — viável com MEI) — **1ª candidata** | Média | Reusa E11 |
-| E23 | Pipeline leve (Deal/estágios sobre as interações) | Média | Nenhuma |
+| E23 | Pipeline leve (Deal/estágios sobre as interações) — **feita**, ADR-045 | Média | Nenhuma |
 | E24 | Rascunho de abordagem assistido (com portfólio) | Média | A/B Claude Sonnet 5.5 × Gemini 3.1 Pro |
 | E25 | Empresas via dados abertos do CNPJ | Alta | Nenhuma |
 | E26 | Sinais de necessidade web | Média | Nenhuma |

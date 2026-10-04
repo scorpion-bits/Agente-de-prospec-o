@@ -226,5 +226,7 @@ Mesma query + params nunca é refeita dentro do TTL (padrão: 90 dias).
 Consultada antes de exibir qualquer contato e antes de qualquer abordagem.
 
 ### Fase 4
-`Deal` (organização + serviço + estágio + valor estimado + próxima ação), agrupando
-`Interaction`s já existentes. Detalhar na E23.
+**`Deal` (E23, feita — ADR-045):** `organization`, `service` (opcional), `opportunity` (origem, opcional), `stage`
+(`interesting`→`contacted`→`responded`→`meeting`→`proposal`→`negotiation`→`won`; `lost` com `lost_reason`),
+`peak_stage` (mais alto alcançado), `estimated_value`, `notes`, `stage_changed_at`, `closed_at`. `Interaction.deal`
+(FK opcional, mesma organização) agrupa o histórico. Ritmo: máx. 2 follow-ups, 7 dias (`core/services/pipeline.py`).

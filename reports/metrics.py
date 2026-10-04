@@ -13,7 +13,7 @@ from django.db.models import Count, Q, Sum
 from django.utils import timezone
 
 from collection.models import CollectionRun
-from core.models import Opportunity, Organization, Triage
+from core.models import Deal, Opportunity, Organization, Triage
 from core.services.triage import DECIDED
 from llm.models import LLMCall
 from scoring.models import Score
@@ -220,7 +220,26 @@ def compute(now=None):
             "M9", f"Follow-ups vencidos há > {OVERDUE_DAYS} dias", overdue, "0", "", overdue == 0
         )
     )
+
     return metrics
+
+
+def render_funnel(data, due=0):
+    """Funil do pipeline (E23): quantos negócios chegaram a cada estágio e onde estão agora.
+
+    Fica fora de `compute()` de propósito: o go/no-go (E22) julga só M1–M9 (ADR-045).
+    """
+    if not data["total"]:
+        return "Funil: sem negócios no pipeline (crie em «Negócios» no admin)."
+    labels = dict(Deal.Stage.choices)
+    lines = [f"Funil: {data['total']} negócios (valor aberto R$ {data['open_value']:,.2f})."]
+    for stage, reached in data["reached"].items():
+        lines.append(f"  {labels[stage]}: alcançaram {reached}, agora {data['current'][stage]}")
+    lines.append(f"  Perdido: {data['current']['lost']}")
+    lines.append(f"  Follow-ups devidos ou no limite: {due}")
+    if data["won_value"]:
+        lines.append(f"  Valor ganho: R$ {data['won_value']:,.2f}")
+    return "\n".join(lines)
 
 
 def triage_backlog():

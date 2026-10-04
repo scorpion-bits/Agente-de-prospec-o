@@ -70,6 +70,15 @@ class Interaction(models.Model):
         on_delete=models.SET_NULL,
         related_name="interactions",
     )
+    deal = models.ForeignKey(
+        "core.Deal",
+        verbose_name="negócio",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="interactions",
+        help_text="Pipeline (E23): agrupa as interações de um mesmo negócio.",
+    )
     contact_point = models.ForeignKey(
         ContactPoint,
         verbose_name="contato",
@@ -128,6 +137,12 @@ class Interaction(models.Model):
         if self.contact_point_id and self.organization_id:
             if self.contact_point.organization_id != self.organization_id:
                 errors["contact_point"] = "O contato pertence a outra organização."
+        if (
+            self.deal_id
+            and self.organization_id
+            and self.deal.organization_id != self.organization_id
+        ):
+            errors["deal"] = "O negócio pertence a outra organização."
         if self.next_action_at and not self.next_action:
             errors["next_action"] = "Descreva a próxima ação que tem data."
         if errors:

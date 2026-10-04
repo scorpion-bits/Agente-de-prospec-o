@@ -19,6 +19,7 @@ from django.utils.html import format_html
 from core.models import (
     CompanyProfile,
     ContactPoint,
+    Deal,
     Evidence,
     FollowUp,
     Interaction,
@@ -32,8 +33,10 @@ from core.models import (
     Suppression,
     Triage,
 )
+from core.models.deal import OPEN_STAGES
+from core.services.pipeline import advance_stage, follow_up_state
 from core.services.similarity import SIMILARITY_TAGS
-from core.services.suppression import is_suppressed
+from core.services.suppression import is_suppressed, register_opt_out
 from core.services.triage import triage_entities
 from scoring.display import annotate_scores, breakdown_html, label_badge
 from scoring.models import Score
@@ -163,6 +166,16 @@ class InteractionInline(admin.StackedInline):
     )
     autocomplete_fields = ("service",)
     ordering = Interaction._meta.ordering
+    show_change_link = True
+
+
+class DealInline(admin.TabularInline):
+    """Negócios (pipeline, E23) na própria organização."""
+
+    model = Deal
+    extra = 0
+    fields = ("service", "stage", "estimated_value", "lost_reason", "notes")
+    autocomplete_fields = ("service",)
     show_change_link = True
 
 
@@ -335,7 +348,8 @@ class OrganizationAdmin(admin.ModelAdmin):
         "updated_at",
         "score_breakdown",
     )
-    inlines = (InteractionInline, ContactPointInline, EvidenceInline)
+    inlines = (DealInline, InteractionInline, ContactPointInline, EvidenceInline)
+    actions = ("opt_out",)
     save_on_top = True
     fieldsets = (
         (
@@ -362,6 +376,12 @@ class OrganizationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return annotate_scores(super().get_queryset(request), Organization)
+
+    @admin.action(description="Registrar opt-out (nunca mais contatar; encerra os negócios)")
+    def opt_out(self, request, queryset):
+        for organization in queryset:
+            register_opt_out(organization, "registrado no admin")
+        self.message_user(request, f"{queryset.count()} organização(ões) em opt-out.")
 
     @admin.display(description="pontuação", ordering="_score_total")
     def score(self, obj):
@@ -577,7 +597,7 @@ class InteractionAdmin(admin.ModelAdmin):
         "organization__network",
     )
     search_fields = ("organization__name", "summary", "next_action")
-    autocomplete_fields = ("organization", "service")
+    autocomplete_fields = ("organization", "service", "deal")
     raw_id_fields = ("contact_point",)
     date_hierarchy = "occurred_at"
     readonly_fields = ("created_by", "created_at", "updated_at")
@@ -586,6 +606,81 @@ class InteractionAdmin(admin.ModelAdmin):
         if not change and obj.created_by_id is None:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
+class FollowUpStateFilter(admin.SimpleListFilter):
+    title = "ritmo de follow-up"
+    parameter_name = "ritmo"
+
+    def lookups(self, request, model_admin):
+        return [("attention", "Devido ou no limite"), ("open", "Abertos"), ("closed", "Encerrados")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "open":
+            return queryset.filter(stage__in=OPEN_STAGES)
+        if self.value() == "closed":
+            return queryset.exclude(stage__in=OPEN_STAGES)
+        if self.value() == "attention":
+            today = timezone.localdate()
+            ids = [
+                d.pk
+                for d in queryset.filter(stage__in=OPEN_STAGES).prefetch_related("interactions")
+                if follow_up_state(d, today).needs_attention
+            ]
+            return queryset.filter(pk__in=ids)
+        return queryset
+
+
+@admin.register(Deal)
+class DealAdmin(admin.ModelAdmin):
+    """Pipeline leve (E23): organização + serviço + estágio + valor. Mover pelo funil no admin."""
+
+    list_display = (
+        "organization",
+        "service",
+        "stage",
+        "estimated_value",
+        "follow_up",
+        "stage_changed_at",
+    )
+    list_filter = ("stage", FollowUpStateFilter, "service", "lost_reason")
+    search_fields = ("organization__name", "service__name", "notes")
+    autocomplete_fields = ("organization", "service")
+    raw_id_fields = ("opportunity",)
+    readonly_fields = ("peak_stage", "stage_changed_at", "closed_at", "created_at", "updated_at")
+    actions = ("advance", "win")
+    inlines = ()
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("organization", "service")
+            .prefetch_related("interactions")
+        )
+
+    @admin.display(description="follow-up")
+    def follow_up(self, obj):
+        return follow_up_state(obj, timezone.localdate()).message
+
+    @admin.action(description="Avançar para o próximo estágio")
+    def advance(self, request, queryset):
+        moved = 0
+        for deal in queryset:
+            if (stage := advance_stage(deal)) is not None:
+                deal.stage = stage
+                deal.save()
+                moved += 1
+        self.message_user(request, f"{moved} negócio(s) avançaram de estágio.")
+
+    @admin.action(description="Marcar como fechado (ganho)")
+    def win(self, request, queryset):
+        count = 0
+        for deal in queryset.filter(stage__in=OPEN_STAGES):
+            deal.stage = Deal.Stage.WON
+            deal.save()
+            count += 1
+        self.message_user(request, f"{count} negócio(s) fechados.")
 
 
 @admin.register(FollowUp)
