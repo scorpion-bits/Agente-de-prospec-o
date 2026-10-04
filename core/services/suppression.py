@@ -9,7 +9,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from core.services.normalize import name_key, normalize_cnpj, normalize_domain
+from core.services.normalize import (
+    name_key,
+    normalize_cnpj,
+    normalize_domain,
+    normalize_suppression_value,
+)
 
 
 @dataclass(frozen=True)
@@ -72,3 +77,25 @@ def exclude_suppressed(queryset):
     index = SuppressionIndex.load()
     blocked = [c.pk for c in queryset.select_related("organization") if index.contact_blocked(c)]
     return queryset.exclude(pk__in=blocked)
+
+
+def register_opt_out(organization, reason=""):
+    """Registra o opt-out da organização inteira (LGPD) e encerra os negócios abertos.
+
+    Cria a `Suppression` (CNPJ válido, senão nome), marca `do_not_contact` (decisão humana que as
+    interações não sobrescrevem) e perde os `Deal`s abertos com motivo `opt_out`. Idempotente.
+    """
+    from core.models import Deal, Organization, Suppression
+    from core.models.deal import OPEN_STAGES
+
+    value = normalize_suppression_value("organization", organization.cnpj or organization.name)
+    Suppression.objects.get_or_create(
+        kind=Suppression.Kind.ORGANIZATION, value=value, defaults={"reason": reason[:255]}
+    )
+    Organization.objects.filter(pk=organization.pk).update(
+        relationship_status=Organization.RelationshipStatus.DO_NOT_CONTACT
+    )
+    for deal in Deal.objects.filter(organization=organization, stage__in=OPEN_STAGES):
+        deal.stage = Deal.Stage.LOST
+        deal.lost_reason = Deal.LostReason.OPT_OUT
+        deal.save()

@@ -4,7 +4,7 @@
 > Nível de detalhe menor de propósito: refinar cada etapa (mesmo template) antes de executá-la.
 > Ordem sugerida: **E27 (PNCP, viável com MEI)** → E23 → E24 → E29 → demais conforme a E22.
 
-## E23 — Pipeline leve
+## E23 — Pipeline leve (feita em 2026-10-04, ADR-045; adoção depende do go/no-go)
 **Objetivo:** acompanhar contatos até o fechamento sem planilha paralela.
 **Resultado esperado:** `Deal` (organização + serviço + estágio: Interessante → Contato →
 Respondeu → Reunião → Proposta → Negociação → Fechado/Perdido, valor estimado) agrupando as

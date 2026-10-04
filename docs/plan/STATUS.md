@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-04** (E30)
+> Última atualização: **2026-10-04** (E23)
 
 ## Onde estamos
 
@@ -10,12 +10,12 @@ Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 com fontes desabilitadas até conferir termos. Prontas também: **E10** (IA `llm/`, ADR-033), **E11** (extração, P22), **E13** (score, P23),
 **E14** (triagem/métricas), **E15** (digest), **E16** (agendamento/backups), **E21** (score de leads; migrations `scoring.0001/0002`) (P24–P27),
 **E22** (ferramenta de go/no-go, ADR-040; a decisão espera uso real, P28), **E27** (PNCP, ADR-041, P29) **E26** (sinais de necessidade web,
-ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) e a **ferramenta da E30** (calibração de pesos, ADR-044, P32; sem migration). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **Repositório público** → ADR-014.
+ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) a **ferramenta da E30** (calibração de pesos, ADR-044, P32) e a **E23** (pipeline leve com `Deal`, ADR-045, P33; migration `core.0006`). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **Repositório público** → ADR-014.
 
 ## Próxima etapa
 
 ➡️ **Uso real, depois a decisão E22** (e `make calibrate` com ≥ 50 triagens, P32) (`make evaluate`, ≥ 4 semanas com triagem semanal). Antes, o humano faz P26, P27 e P28. Depois, o resto da Fase 4
-(E23, E24…) só se a avaliação for «continuar». **E01 (validação de fontes)** segue pendente: precisa de internet normal (P11, P12).
+(E24…) só se a avaliação for «continuar». **E23 foi adiantada** (sem IA, custo zero): adotar o pipeline só depende do P28. **E01 (validação de fontes)** segue pendente: precisa de internet normal (P11, P12).
 
 ## Concluído
 
@@ -39,10 +39,9 @@ ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) e a **ferramenta d
 | E16 | 2026-10-03 | `manage.py run_pipeline` (`make pipeline`: collect→extract→match→rescore→digest, falha isolada por etapa, log só com contagens); `pipeline.yml` (diário + `workflow_dispatch`, migrate antes, digest só por e-mail às segundas, renova o agendamento); `backup.yml` + `scripts/backup.sh`/`restore_backup.sh` (`pg_dump` → age, artefato 30 dias); `docs/operations/runbook.md`; sem migration; ADR-038. **Restauração testada só em PostgreSQL local; Actions nunca rodou com Secrets (P26)** | `…-10-03-E16.md` |
 | E21 | 2026-10-03 | `scoring/leads.py` + `factors/lead.py`: `lead.sesc` (SESC e parecidas) e `lead.school_course`; V (ticket do catálogo), F (match + prova), C (rede com case, relacionamento, resposta, MEI), T (sazonalidade escolar, follow-up), A (geo × contato); gate de opt-out; contatados saem como «em andamento», nunca como novos; `make rescore` cobre leads; admin de organizações com nota e breakdown; digest com «Leads da semana» e «Em andamento»; migration `scoring.0002`; 837 testes; ADR-039. **Pesos e faixas são hipótese (P27)** | `…-10-03-E21.md` |
 | E22 | 2026-10-03 | `reports/evaluation.py` + `make evaluate`: prontidão (≥ 28 dias e ≥ 20 triagens), M1–M9, custos e **sugestão** continuar/ajustar/parar/estender por regras; modelo `docs/history/mvp-evaluation.md`; sem migration; ADR-040. **Decisão em aberto: sem uso real (P28)** | `…-10-03-E22.md` |
-| E27 | 2026-10-04 | `collection/connectors/pncp.py`: propostas abertas do PNCP (SP × 4 modalidades), `Opportunity(procurement)`, valor/datas/cota ME-EPP só se informados; fonte desabilitada; ADR-041. **Formato e códigos não conferidos (P29)** | `…-10-04-E27.md` |
-| E26 | 2026-10-04 | `extraction/web_signals.py` + `make signals`: sinais da página inicial (sem site, sem HTTPS, sem viewport, © antigo, tecnologia obsoleta) como `Evidence` `web.signal.*`; frescor 30 dias; ADR-042. **Não entram no score; sites reais não testados (P30)** | `…-10-04-E26.md` |
-| E25 | 2026-10-04 | `collection/connectors/cnpj_estabelecimentos.py`: empresas ativas da região por CNAE (`data/seeds/cnae_services.csv`) dos arquivos da Receita (locais, streaming); só nome fantasia, **sem e-mail/telefone/endereço/sócios** (LGPD); fonte desabilitada; ADR-043. **Layout, Tom e CNAEs não conferidos (P31)** | `…-10-04-E25.md` |
+| E27/E26/E25 | 2026-10-04 | **E27** `pncp`: propostas abertas do PNCP (SP × 4 modalidades) como `Opportunity(procurement)`, valor/datas/cota ME-EPP só se informados; fonte desabilitada (ADR-041, P29). **E26** `extraction/web_signals.py` + `make signals`: sinais da página inicial como `Evidence` `web.signal.*` (frescor 30 dias; fora do score; ADR-042, P30). **E25** `cnpj_estabelecimentos`: empresas ativas da região por CNAE dos arquivos locais da Receita, só nome fantasia, **sem e-mail/telefone/endereço/sócios** (LGPD); fonte desabilitada (ADR-043, P31) | `…-10-04-E27.md`, `…-E26.md`, `…-E25.md` |
 | E30 (ferramenta) | 2026-10-04 | `reports/calibration.py` + `make calibrate`: fatores × triagem (média e AUC por perfil), proposta de pesos (±25%/rodada) e simulação retroativa (precisão do topo e AUC); só proposta, amostra mínima 50; sem migration; ADR-044. **Sem triagens reais: nada calibrado (P32)** | `…-10-04-E30.md` |
+| E23 | 2026-10-04 | `core/models/deal.py` (`Deal`: organização + serviço + estágio + valor; `Interaction.deal`; migration `core.0006`), `core/services/pipeline.py` (máx. 2 follow-ups, 7 dias, funil «alcançaram»), admin de negócios + opt-out em massa, funil no `make metrics` (fora de M1–M9); sem IA; ADR-045. **Nunca usado com dados reais (P33)** | `…-10-04-E23.md` |
 
 ## Pendências do humano
 
@@ -79,6 +78,7 @@ ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) e a **ferramenta d
 | P30 | **E26:** `git pull` (sem migration); depois do P13, `make signals DRY=1 N=20` e `make signals` na sua máquina (não no SQL Editor); conferir à mão 10 sites com sinal (meta: nenhum falso positivo grave; `no_viewport` é inferido) e decidir se os sinais entram como fator de Fit | `docs/decisions/ADR-042-sinais-de-necessidade-web.md` |
 | P31 | **E25:** baixar `Estabelecimentos0..9.zip` e `Municipios.zip` em dadosabertos.rfb.gov.br/CNPJ para `data/cnpj/` (descompacte só `Municipios`); `make seed`, habilitar `cnpj-estabelecimentos` no admin; `make collect` (mede o tempo; meta < 30 min); conferir 20 empresas no site da Receita/Cartão CNPJ e a coluna de município; se o layout mudou, o erro/zero resultados aponta `COL`/`Municipios` | `docs/decisions/ADR-043-empresas-do-cnpj-aberto.md` |
 | P32 | **E30:** depois de ≥ 50 triagens com `make rescore` feito, `make calibrate DRY=1` (sem migration; não no SQL Editor); leia a proposta; se a simulação melhora, edite `scoring/profiles.py`, suba `SCORING_VERSION`, `make rescore` e registre em ADR. Rode de novo a cada ~50 triagens | `docs/decisions/ADR-044-calibracao-de-pesos.md` |
+| P33 | **E23:** `git pull`, `make migrate` (`core.0006`); no admin (Negócios) criar 1 negócio por proposta SESC já enviada (P2), ligar as interações (campo «negócio») e mover pelo funil; conferir o ritmo («follow-up devido»/«limite») e `make metrics` (funil). Testar «Registrar opt-out» em organização de teste. Ajustar 2 follow-ups/7 dias em `core/services/pipeline.py` se não servir | `docs/decisions/ADR-045-pipeline-leve.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -99,7 +99,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público ·
 039 score de leads: mesmo motor, gate de opt-out, contatado = «em andamento» ·
 040 avaliação do MVP: relatório do banco, sugestão por regras, decisão humana ·
-041 PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados · 042 sinais de necessidade web: só a página inicial, ausência é inferida · 043 empresas do CNPJ aberto: arquivo local, por CNAE, sem dado pessoal · **044 calibração de pesos: só proposta, amostra mínima, mudança humana**.
+041 PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados · 042 sinais de necessidade web: só a página inicial, ausência é inferida · 043 empresas do CNPJ aberto: arquivo local, por CNAE, sem dado pessoal · 044 calibração de pesos: só proposta, amostra mínima, mudança humana · **045 pipeline leve: `Deal` com estágio humano, alerta de follow-up, funil fora do go/no-go**.
 
 ## Problemas abertos
 

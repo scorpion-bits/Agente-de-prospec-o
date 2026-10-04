@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from core.models import (
     ContactPoint,
+    Deal,
     FollowUp,
     Interaction,
     Municipality,
@@ -340,6 +341,7 @@ class TestOrganizationAdmin:
         evidence_prefix = inline_prefix(page, type(evidence))
         contact_prefix = inline_prefix(page, ContactPoint)
         interaction_prefix = inline_prefix(page, Interaction)
+        deal_prefix = inline_prefix(page, Deal)
         data = {
             "name": organization.name,
             "kind": "school",
@@ -347,6 +349,10 @@ class TestOrganizationAdmin:
             "website_status": "unknown",
             "municipality_name": "Araraquara",
             "uf": "SP",
+            f"{deal_prefix}-TOTAL_FORMS": "0",
+            f"{deal_prefix}-INITIAL_FORMS": "0",
+            f"{deal_prefix}-MIN_NUM_FORMS": "0",
+            f"{deal_prefix}-MAX_NUM_FORMS": "1000",
             f"{interaction_prefix}-TOTAL_FORMS": "0",
             f"{interaction_prefix}-INITIAL_FORMS": "0",
             f"{interaction_prefix}-MIN_NUM_FORMS": "0",
