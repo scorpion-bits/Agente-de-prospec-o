@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites contacts match rescore metrics evaluate digest pipeline backup extract superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts signals match rescore metrics evaluate digest pipeline backup extract superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -30,6 +30,9 @@ collect:  ## Roda os conectores das fontes habilitadas (collect --all); DRY=1 si
 
 websites:  ## Acha o site oficial de escolas sem site (E18); N=20 organizações, DRY=1 simula
 	$(UV) run python manage.py find_websites --kind school --limit $(or $(N),20) $(if $(DRY),--dry-run)
+
+signals:  ## Sinais de necessidade web no site das organizações (E26); N=20, DRY=1 simula
+	$(UV) run python manage.py web_signals --limit $(or $(N),20) $(if $(DRY),--dry-run)
 
 match:  ## Gera hipóteses serviço × organização × portfólio (E20); DRY=1 simula
 	$(UV) run python manage.py match_services $(if $(DRY),--dry-run)

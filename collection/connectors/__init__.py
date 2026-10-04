@@ -1,6 +1,7 @@
 """Conectores de fontes. Importar o módulo registra a classe em `collection.registry`."""
 
 from collection.connectors import (  # noqa: F401
+    cnpj_estabelecimentos,
     devpost,
     html_watch,
     inep_schools,

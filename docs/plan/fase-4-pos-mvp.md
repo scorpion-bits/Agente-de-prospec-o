@@ -31,6 +31,8 @@ do AI Pro); empate → Gemini (ADR-011). Dados `internal` → só provedores pag
 **Critério:** 10 rascunhos avaliados pelo humano; ≥ 7 usáveis com edição leve; toda afirmação sobre o destinatário tem evidência.
 
 ## E25 — Empresas via dados abertos do CNPJ
+> **Feita em 2026-10-04 (ADR-043)** com fixture sintética (conector de arquivo local, sem dado pessoal); layout e tempo reais no P31.
+
 **Objetivo:** base de empresas ativas da região por CNAEs mapeados a serviços
 (agências de marketing/publicidade → jogos para campanhas/parceria; escolas de idiomas,
 cursos livres → cursos/gamificação; editoras/educação → jogos educativos; comércio/serviços
@@ -45,6 +47,8 @@ como contatos de baixa confiança.
 **Critério:** empresas da região por CNAE carregadas em < 30 min; amostra de 20 conferida.
 
 ## E26 — Sinais de necessidade web
+> **Feita em 2026-10-04 (ADR-042)**, antes do go/no-go por não depender de dados reais; só página inicial, ainda fora do score e do pipeline (P30).
+
 **Objetivo:** identificar empresas/instituições que provavelmente precisam de site/sistema.
 **Sinais determinísticos:** sem site; site fora do ar; sem HTTPS; não responsivo (meta viewport ausente);
 copyright antigo (ex. © 2015); só página de rede social; tecnologia obsoleta (Flash, jQuery muito antigo).

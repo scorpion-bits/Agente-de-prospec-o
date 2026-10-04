@@ -1,0 +1,21 @@
+cnae,group,segment,services
+7311400,marketing,Agência de publicidade,jogos_publicitarios|gamificacao
+7312200,marketing,Agenciamento de espaços para publicidade,jogos_publicitarios
+7319002,marketing,Promoção de vendas,gamificacao|jogos_publicitarios
+7319099,marketing,Outras atividades de publicidade,jogos_publicitarios
+7319003,marketing,Marketing direto,gamificacao
+8599603,courses,Treinamento em informática,cursos|parceria
+8599604,courses,Treinamento em desenvolvimento profissional,cursos|gamificacao
+8593700,courses,Ensino de idiomas,cursos|gamificacao
+8599699,courses,Outras atividades de ensino,cursos|oficinas
+8599605,courses,Cursos preparatórios para concursos,cursos|gamificacao
+8592999,courses,Ensino de arte e cultura,oficinas
+8591100,courses,Ensino de esportes,oficinas
+5811500,publishing,Edição de livros,jogos_educativos
+5822100,publishing,Edição integrada à impressão de livros,jogos_educativos
+5819100,publishing,Edição de cadastros e outros produtos gráficos,jogos_educativos
+8230001,events,Organização de feiras e congressos,jogos_institucionais|oficinas
+8230002,events,Casas de festas e eventos,oficinas
+9329899,events,Outras atividades de recreação e lazer,oficinas|jogos_institucionais
+4751201,web,Comércio varejista de informática,sites
+7490104,web,Intermediação e agenciamento de serviços,sites
