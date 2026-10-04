@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-04** (E25)
+> Última atualização: **2026-10-04** (E30)
 
 ## Onde estamos
 
@@ -10,11 +10,11 @@ Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 com fontes desabilitadas até conferir termos. Prontas também: **E10** (IA `llm/`, ADR-033), **E11** (extração, P22), **E13** (score, P23),
 **E14** (triagem/métricas), **E15** (digest), **E16** (agendamento/backups), **E21** (score de leads; migrations `scoring.0001/0002`) (P24–P27),
 **E22** (ferramenta de go/no-go, ADR-040; a decisão espera uso real, P28), **E27** (PNCP, ADR-041, P29) **E26** (sinais de necessidade web,
-ADR-042, P30) e **E25** (empresas do CNPJ aberto, ADR-043, P31; sem migration). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **Repositório público** → ADR-014.
+ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) e a **ferramenta da E30** (calibração de pesos, ADR-044, P32; sem migration). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **Repositório público** → ADR-014.
 
 ## Próxima etapa
 
-➡️ **Uso real, depois a decisão E22** (`make evaluate`, ≥ 4 semanas com triagem semanal). Antes, o humano faz P26, P27 e P28. Depois, o resto da Fase 4
+➡️ **Uso real, depois a decisão E22** (e `make calibrate` com ≥ 50 triagens, P32) (`make evaluate`, ≥ 4 semanas com triagem semanal). Antes, o humano faz P26, P27 e P28. Depois, o resto da Fase 4
 (E23, E24…) só se a avaliação for «continuar». **E01 (validação de fontes)** segue pendente: precisa de internet normal (P11, P12).
 
 ## Concluído
@@ -39,9 +39,10 @@ ADR-042, P30) e **E25** (empresas do CNPJ aberto, ADR-043, P31; sem migration). 
 | E16 | 2026-10-03 | `manage.py run_pipeline` (`make pipeline`: collect→extract→match→rescore→digest, falha isolada por etapa, log só com contagens); `pipeline.yml` (diário + `workflow_dispatch`, migrate antes, digest só por e-mail às segundas, renova o agendamento); `backup.yml` + `scripts/backup.sh`/`restore_backup.sh` (`pg_dump` → age, artefato 30 dias); `docs/operations/runbook.md`; sem migration; ADR-038. **Restauração testada só em PostgreSQL local; Actions nunca rodou com Secrets (P26)** | `…-10-03-E16.md` |
 | E21 | 2026-10-03 | `scoring/leads.py` + `factors/lead.py`: `lead.sesc` (SESC e parecidas) e `lead.school_course`; V (ticket do catálogo), F (match + prova), C (rede com case, relacionamento, resposta, MEI), T (sazonalidade escolar, follow-up), A (geo × contato); gate de opt-out; contatados saem como «em andamento», nunca como novos; `make rescore` cobre leads; admin de organizações com nota e breakdown; digest com «Leads da semana» e «Em andamento»; migration `scoring.0002`; 837 testes; ADR-039. **Pesos e faixas são hipótese (P27)** | `…-10-03-E21.md` |
 | E22 | 2026-10-03 | `reports/evaluation.py` + `make evaluate`: prontidão (≥ 28 dias e ≥ 20 triagens), M1–M9, custos e **sugestão** continuar/ajustar/parar/estender por regras; modelo `docs/history/mvp-evaluation.md`; sem migration; ADR-040. **Decisão em aberto: sem uso real (P28)** | `…-10-03-E22.md` |
-| E27 | 2026-10-04 | `collection/connectors/pncp.py`: propostas abertas do PNCP (SP × 4 modalidades), `Opportunity(procurement)` com link do edital, valor e datas só se informados, cota ME/EPP só se o texto diz; fonte desabilitada; fixture sintética; 894 testes; ADR-041. **Formato e códigos não conferidos (P29)** | `…-10-04-E27.md` |
-| E26 | 2026-10-04 | `extraction/web_signals.py` + `make signals`: sem site, só rede social, site fora do ar, sem HTTPS, sem viewport, © antigo, Flash/jQuery 1–2/frameset, só da página inicial, como `Evidence` `web.signal.*` (observado com trecho; ausência = inferido); frescor 30 dias sem migration; opt-out respeitado; 914 testes; ADR-042. **Sinais ainda não entram no score; sites reais não testados (P30)** | `…-10-04-E26.md` |
-| E25 | 2026-10-04 | `collection/connectors/cnpj_estabelecimentos.py`: empresas ativas da região por CNAE (`data/seeds/cnae_services.csv`, 4 grupos; `web` desligado) dos arquivos `Estabelecimentos` da Receita (`.zip`/`.csv` locais, streaming, 30 colunas sem cabeçalho, município Tom→nome); só com nome fantasia; **sem e-mail, telefone, endereço ou sócios** (LGPD); evidência observada + `service_hint` inferida; fonte desabilitada; sem migration; ADR-043. **Layout, Tom e CNAEs não conferidos com arquivo real (P31)** | `…-10-04-E25.md` |
+| E27 | 2026-10-04 | `collection/connectors/pncp.py`: propostas abertas do PNCP (SP × 4 modalidades), `Opportunity(procurement)`, valor/datas/cota ME-EPP só se informados; fonte desabilitada; ADR-041. **Formato e códigos não conferidos (P29)** | `…-10-04-E27.md` |
+| E26 | 2026-10-04 | `extraction/web_signals.py` + `make signals`: sinais da página inicial (sem site, sem HTTPS, sem viewport, © antigo, tecnologia obsoleta) como `Evidence` `web.signal.*`; frescor 30 dias; ADR-042. **Não entram no score; sites reais não testados (P30)** | `…-10-04-E26.md` |
+| E25 | 2026-10-04 | `collection/connectors/cnpj_estabelecimentos.py`: empresas ativas da região por CNAE (`data/seeds/cnae_services.csv`) dos arquivos da Receita (locais, streaming); só nome fantasia, **sem e-mail/telefone/endereço/sócios** (LGPD); fonte desabilitada; ADR-043. **Layout, Tom e CNAEs não conferidos (P31)** | `…-10-04-E25.md` |
+| E30 (ferramenta) | 2026-10-04 | `reports/calibration.py` + `make calibrate`: fatores × triagem (média e AUC por perfil), proposta de pesos (±25%/rodada) e simulação retroativa (precisão do topo e AUC); só proposta, amostra mínima 50; sem migration; ADR-044. **Sem triagens reais: nada calibrado (P32)** | `…-10-04-E30.md` |
 
 ## Pendências do humano
 
@@ -77,6 +78,7 @@ ADR-042, P30) e **E25** (empresas do CNPJ aberto, ADR-043, P31; sem migration). 
 | P29 | **E27:** `git pull`, `make seed`; conferir termos/robots do PNCP e os parâmetros no Swagger (`/contratacoes/proposta`, códigos de modalidade), marcar «coleta permitida» e habilitar `pncp` no admin; `make collect DRY=1` e `make collect` (não no SQL Editor); revisar 10 contratações, ajustar `keywords`/`exclude_patterns` e salvar uma resposta real como fixture | `docs/decisions/ADR-041-conector-pncp.md` |
 | P30 | **E26:** `git pull` (sem migration); depois do P13, `make signals DRY=1 N=20` e `make signals` na sua máquina (não no SQL Editor); conferir à mão 10 sites com sinal (meta: nenhum falso positivo grave; `no_viewport` é inferido) e decidir se os sinais entram como fator de Fit | `docs/decisions/ADR-042-sinais-de-necessidade-web.md` |
 | P31 | **E25:** baixar `Estabelecimentos0..9.zip` e `Municipios.zip` em dadosabertos.rfb.gov.br/CNPJ para `data/cnpj/` (descompacte só `Municipios`); `make seed`, habilitar `cnpj-estabelecimentos` no admin; `make collect` (mede o tempo; meta < 30 min); conferir 20 empresas no site da Receita/Cartão CNPJ e a coluna de município; se o layout mudou, o erro/zero resultados aponta `COL`/`Municipios` | `docs/decisions/ADR-043-empresas-do-cnpj-aberto.md` |
+| P32 | **E30:** depois de ≥ 50 triagens com `make rescore` feito, `make calibrate DRY=1` (sem migration; não no SQL Editor); leia a proposta; se a simulação melhora, edite `scoring/profiles.py`, suba `SCORING_VERSION`, `make rescore` e registre em ADR. Rode de novo a cada ~50 triagens | `docs/decisions/ADR-044-calibracao-de-pesos.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -97,7 +99,7 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público ·
 039 score de leads: mesmo motor, gate de opt-out, contatado = «em andamento» ·
 040 avaliação do MVP: relatório do banco, sugestão por regras, decisão humana ·
-041 PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados · 042 sinais de necessidade web: só a página inicial, ausência é inferida · **043 empresas do CNPJ aberto: arquivo local, por CNAE, sem dado pessoal**.
+041 PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados · 042 sinais de necessidade web: só a página inicial, ausência é inferida · 043 empresas do CNPJ aberto: arquivo local, por CNAE, sem dado pessoal · **044 calibração de pesos: só proposta, amostra mínima, mudança humana**.
 
 ## Problemas abertos
 
@@ -107,11 +109,9 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 - Endpoints das fontes **não testados** (E01): Querido Diário, Mapas Culturais, itch.io, páginas do `html_watch` e PNCP (E27) só de documentação/memória (ADR-029–032, 041; P17–P20, P29). Devpost conferido pelo uso real, mas lento (2–3 min/página, P16, ADR-029).
 - E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). Pesos, faixas e valores dos fatores (E13, E21) são hipótese (P23, P27).
 - Supabase (projeto **Prospection**): migrations aplicadas pelo titular até a E03b. **Não conferido por nós:** a Data API sem as tabelas expostas; migrations seguintes só no PostgreSQL local, então `make migrate` após cada merge (P21 para `llm`).
-- Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
-  CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
+- Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs) são **hipóteses** editáveis no admin; CNAEs a confirmar com o contador (P7). Preços ficam no banco.
 - Dedupe de organização por nome varre a tabela em Python (ADR-020): indexar quando a base crescer (E25 pode trazer milhares). `COMPANY_CNPJ` e `CONTACT_EMAIL` só no `.env` (sem eles `make memory` deixa o perfil em branco).
-- CI usa `checkout@v4`/`setup-uv@v5` (Node 20); aviso do Django 6 sobre `URLField`. Limites de free tier (Supabase, Gemini, Serper/Brave) e créditos do AI Pro: confirmar ao criar as contas.
-- `schedule` do GitHub Actions desliga após 60 dias sem commits (repositório público) — mitigação em ADR-014.
+- CI usa `checkout@v4`/`setup-uv@v5` (Node 20); aviso do Django 6 sobre `URLField`. Limites de free tier e créditos do AI Pro: confirmar ao criar as contas. `schedule` do Actions desliga após 60 dias sem commits (ADR-014).
 
 ## Riscos de negócio a acompanhar
 

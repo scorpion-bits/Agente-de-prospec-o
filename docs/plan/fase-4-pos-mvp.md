@@ -92,6 +92,8 @@ UI além do admin; ~US$ 20/membro); VPS (US$ 5–10). Vercel Hobby **não** (uso
 **Riscos:** exposição do admin → camada extra de acesso; cold start → aceitável para uso interno.
 
 ## E30 — Calibração de pesos
+> **Ferramenta feita em 2026-10-04 (ADR-044, `make calibrate`)**; a calibração em si espera ≥ 50 triagens reais (P32).
+
 **Objetivo:** ajustar pesos do score com base na triagem real (≥ 50 itens triados).
 **Resultado esperado:** relatório comparando fatores entre interessantes e descartados;
 proposta de novos pesos; nova `scoring_version`; ADR.
