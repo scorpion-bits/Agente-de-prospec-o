@@ -56,3 +56,4 @@ Regras:
 | 043 | Empresas do CNPJ aberto: arquivo local por CNAE, sem dado pessoal, fonte desabilitada | aceito |
 | 044 | Calibração de pesos: só proposta, amostra mínima, simulação retroativa, mudança humana | aceito |
 | 045 | Pipeline leve: `Deal` com estágio humano, alerta de follow-up (2 × 7 dias), funil fora do go/no-go, opt-out em massa | aceito |
+| 046 | Rascunho de abordagem: fatos com origem, validador, A/B Gemini × Claude, `rules` como piso, nada enviado | aceito |

@@ -226,6 +226,9 @@ Mesma query + params nunca é refeita dentro do TTL (padrão: 90 dias).
 Consultada antes de exibir qualquer contato e antes de qualquer abordagem.
 
 ### Fase 4
+**`OutreachDraft` (E24, feita — ADR-046):** `organization`, `service`, `channel` (`email`/`whatsapp`), `mode` (`first_contact`/`follow_up`),
+`subject`, `body`, `claims` (`{text, about, facts[]}`), `facts` (lista enviada ao modelo), `status` (`valid`/`rejected`), `validation_issues`,
+`attempts`, `strategy`, `prompt_version`, `cost_usd`, `rating` (`usable`/`rewrite`/`unusable`) e `rating_note` (humano), `created_by`.
 **`Deal` (E23, feita — ADR-045):** `organization`, `service` (opcional), `opportunity` (origem, opcional), `stage`
 (`interesting`→`contacted`→`responded`→`meeting`→`proposal`→`negotiation`→`won`; `lost` com `lost_reason`),
 `peak_stage` (mais alto alcançado), `estimated_value`, `notes`, `stage_changed_at`, `closed_at`. `Interaction.deal`
