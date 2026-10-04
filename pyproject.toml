@@ -10,6 +10,8 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "httpx>=0.27",
     "pydantic>=2.8",
+    "gunicorn>=26.2.0",
+    "whitenoise>=6.7",
 ]
 
 [dependency-groups]
@@ -30,6 +32,8 @@ testpaths = ["tests"]
 filterwarnings = [
     # Django 5.2 avisa que URLField passará a assumir https (6.0). Só afeta quem digita URL sem
     # esquema; a setting de transição já é depreciada. Remover ao migrar para o Django 6.
+    # WhiteNoise avisa quando `collectstatic` ainda não rodou (testes e dev não precisam).
+    "ignore:No directory at:UserWarning",
     "ignore:The default scheme will be changed:django.utils.deprecation.RemovedInDjango60Warning",
 ]
 

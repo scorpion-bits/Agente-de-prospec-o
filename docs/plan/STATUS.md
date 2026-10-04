@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-04** (E24)
+> Última atualização: **2026-10-04** (E24 + E29)
 
 ## Onde estamos
 
@@ -10,12 +10,12 @@ Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 com fontes desabilitadas até conferir termos. Prontas também: **E10** (IA `llm/`, ADR-033), **E11** (extração, P22), **E13** (score, P23),
 **E14** (triagem/métricas), **E15** (digest), **E16** (agendamento/backups), **E21** (score de leads; migrations `scoring.0001/0002`) (P24–P27),
 **E22** (ferramenta de go/no-go, ADR-040; a decisão espera uso real, P28), **E27** (PNCP, ADR-041, P29) **E26** (sinais de necessidade web,
-ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) a **ferramenta da E30** (calibração de pesos, ADR-044, P32) e a **E23** (pipeline leve com `Deal`, ADR-045, P33; migration `core.0006`) e a **E24** (rascunho de abordagem, ADR-046, P34; migration `core.0007`). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **Repositório público** → ADR-014.
+ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) a **ferramenta da E30** (calibração de pesos, ADR-044, P32) e a **E23** (pipeline leve com `Deal`, ADR-045, P33; migration `core.0006`) e a **E24** (rascunho de abordagem, ADR-046, P34; migration `core.0007`). **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4). **E29 adiantada** (admin no Cloud Run, ADR-047, P35; sem migration). **Repositório público** → ADR-014.
 
 ## Próxima etapa
 
 ➡️ **Uso real, depois a decisão E22** (e `make calibrate` com ≥ 50 triagens, P32) (`make evaluate`, ≥ 4 semanas com triagem semanal). Antes, o humano faz P26, P27 e P28. Depois, o resto da Fase 4
-(E28, E29…) só se a avaliação for «continuar». **E23 e E24 foram adiantadas** (E23 sem IA; E24 só gasta com chave paga, ~US$ 0,01/rascunho): adotá-las só depende do P28. Restam E28 (agente de pesquisa, condicional) e E29 (UI online). **E01 (validação de fontes)** segue pendente: precisa de internet normal (P11, P12).
+(E28, UI nova…) só se a avaliação for «continuar». **E23 e E24 foram adiantadas** (E23 sem IA; E24 só gasta com chave paga, ~US$ 0,01/rascunho): adotá-las só depende do P28. A E29 (admin no ar) também foi adiantada (P35). Resta a E28 (agente de pesquisa, condicional). **E01 (validação de fontes)** segue pendente: precisa de internet normal (P11, P12).
 
 ## Concluído
 
@@ -53,7 +53,7 @@ ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) a **ferramenta da 
 | P7 | Falar com o **contador** sobre CNAEs de software/web/jogos e migração para ME; ajustar `mei_coverage` no admin | ADR-015 |
 | P8 | Decidir: manter repositório público (recomendado agora, com ADR-014) ou privado | ADR-014 |
 | P9 | **Vercel** está conectado a este repositório (ADR-010: sem Vercel no MVP): tenta um deploy a cada push, sem ter o que construir, e, se receber `DATABASE_URL`, exporia o admin com contatos (LGPD). Desconectar ou usar *Ignored Build Step* até existir o front | painel do Vercel |
-| P10 | **UI nova** decidida: web + API do Django, visual do site (ADR-019). Falta replanejar a E29 (front + API) e escolher tecnologia/hospedagem, **depois** de E03b/E04 | `docs/product/ui-direction.md` |
+| P10 | **UI nova** decidida: web + API do Django, visual do site (ADR-019). A hospedagem do **admin** já está pronta (E29, P35); a UI web nova (front + API) fica para depois | `docs/product/ui-direction.md` |
 | P11 | **E17:** (a) conferir `data/seeds/sesc_sp.csv` contra sescsp.org.br (unidades faltando/sobrando) e preencher `website`/`source_url`; (b) baixar o Catálogo de Escolas do INEP para `data/inep/catalogo_escolas.csv`, rodar `make seed`, habilitar a fonte `inep-escolas` no admin, `make collect`, e `uv run python manage.py count_organizations school`; conferir 5 escolas à mão; se o CSV tiver outros nomes de coluna, o erro aponta qual | `docs/decisions/ADR-023-sesc-sp-e-escolas-inep.md` |
 | P12 | **E17b:** conferir `data/seeds/similar_orgs.csv` (unidades faltando/sobrando, URLs oficiais) e rodar `make seed` seguido de `make collect` no terminal da sua máquina (não no SQL Editor); sem migration nova | `docs/decisions/ADR-024-organizacoes-parecidas-com-o-sesc.md` |
 | P13 | **E18:** criar a chave Serper (ou Brave) em `.env` (`SEARCH_PROVIDER`, `SERPER_API_KEY`); rodar `make migrate` e `make websites DRY=1 N=20` na sua máquina (não no SQL Editor); conferir à mão os `found` (meta ≥ 85%) e anotar erros; depois `make websites` | `docs/decisions/ADR-025-descoberta-de-site-oficial.md` |
@@ -78,6 +78,7 @@ ADR-042, P30) **E25** (empresas do CNPJ aberto, ADR-043, P31) a **ferramenta da 
 | P32 | **E30:** depois de ≥ 50 triagens com `make rescore` feito, `make calibrate DRY=1` (sem migration; não no SQL Editor); leia a proposta; se a simulação melhora, edite `scoring/profiles.py`, suba `SCORING_VERSION`, `make rescore` e registre em ADR. Rode de novo a cada ~50 triagens | `docs/decisions/ADR-044-calibracao-de-pesos.md` |
 | P33 | **E23:** `git pull`, `make migrate` (`core.0006`); no admin (Negócios) criar 1 negócio por proposta SESC já enviada (P2), ligar as interações (campo «negócio») e mover pelo funil; conferir o ritmo («follow-up devido»/«limite») e `make metrics` (funil). Testar «Registrar opt-out» em organização de teste. Ajustar 2 follow-ups/7 dias em `core/services/pipeline.py` se não servir | `docs/decisions/ADR-045-pipeline-leve.md` |
 | P34 | **E24:** `git pull`, `make migrate` (`core.0007`); chaves paga no `.env` (`GEMINI_API_KEY_PAID` e/ou `ANTHROPIC_API_KEY`; nunca no chat; confira preços em `llm/pricing.py`); `make draft ORG="id1 id2…" CMP=1` em 10 organizações com match (não no SQL Editor); avalie cada rascunho no admin (Rascunhos de abordagem: ≥ 7 usáveis e toda afirmação com fato); `make draft REPORT=1`; empate → Gemini. Ajuste `core/prompts/draft_outreach_v1.txt` (suba `PROMPT_VERSION`) | `docs/decisions/ADR-046-rascunho-de-abordagem.md` |
+| P35 | **E29:** pôr o admin no ar (Google Cloud: projeto + faturamento, Secret Manager, login do GitHub, 5 variáveis, *Run workflow*), depois `make superuser` com senha forte. Passo a passo em `docs/operations/hosting.md` | `docs/decisions/ADR-047-hospedagem-do-admin-cloud-run.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -115,5 +116,4 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 ## Riscos de negócio a acompanhar
 
 - **Janela escolar 2027 (out–dez/2026)**: manter prospecção manual de escolas e follow-up das propostas SESC.
-- **MEI**: CNAEs cobrem ensino e treinamento em informática, mas não software/web/jogos sob
-  encomenda (ADR-015). Editais com exigência de 2 anos de CNPJ: elegível só a partir de **10/04/2027**. Limite de faturamento do MEI: R$ 81 mil/ano.
+- **MEI**: CNAEs cobrem ensino e treinamento em informática, mas não software/web/jogos sob encomenda (ADR-015). Editais com exigência de 2 anos de CNPJ: elegível só a partir de **10/04/2027**. Limite de faturamento do MEI: R$ 81 mil/ano.
