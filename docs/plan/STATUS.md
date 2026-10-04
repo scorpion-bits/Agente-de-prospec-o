@@ -1,7 +1,7 @@
 # STATUS — Radar Scorpion Bits
 
 > Estado vivo do projeto. Atualizar ao fim de **toda** etapa. Limite: 120 linhas.
-> Última atualização: **2026-10-03** (E22)
+> Última atualização: **2026-10-04** (E27)
 
 ## Onde estamos
 
@@ -9,13 +9,13 @@
 E19 (contatos públicos, migration `core.0005`) e E20 (matching por regras, sem migration); detalhes na tabela abaixo.
 Marco **M1** (memória comercial) funcional. Comandos do dia a dia: `make help`.
 **E05–E09** (Devpost, itch.io, `html_watch`, Querido Diário, Mapas Culturais; ADR-028–032) são conectores de oportunidades, com
-fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)**, **E15 (digest, ADR-037)**, **E16 (agendamento e backups, ADR-038)** e **E21 (score de leads, ADR-039; migration `scoring.0002`)** prontas (P24–P27). **E22 (ferramenta de go/no-go, ADR-040)** pronta; a decisão espera uso real (P28).
+fontes desabilitadas até conferir termos. **E10 (camada de IA `llm/`, ADR-033)** pronta (fumaça Gemini OK); **E11 (extração, ADR-034)** pronta, acurácia a medir (P22). **E13 (score, ADR-035)** pronta (migration `scoring.0001`, P23); **E14 (triagem e métricas, ADR-036)**, **E15 (digest, ADR-037)**, **E16 (agendamento e backups, ADR-038)** e **E21 (score de leads, ADR-039; migration `scoring.0002`)** prontas (P24–P27). **E22 (ferramenta de go/no-go, ADR-040)** pronta; a decisão espera uso real (P28). **E27 (conector PNCP, ADR-041)** pronta (fonte desabilitada, P29).
 **E01b parcial**; migrations aplicadas no Supabase pelo titular (P4 concluído). **Repositório público** → regras de dados em ADR-014.
 
 ## Próxima etapa
 
 ➡️ **Uso real, depois a decisão E22.** A ferramenta (`make evaluate`) está pronta; a **decisão go/no-go** exige ≥ 4 semanas de uso com triagem semanal.
-Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, restauração), o P27 e o P28. Depois, a Fase 4 (E27 PNCP primeiro) só se a avaliação for «continuar».
+Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, restauração), o P27 e o P28. Depois, o resto da Fase 4 (E23, E24…) só se a avaliação for «continuar».
 ➡️ **E01 (validação de fontes)** segue pendente: precisa de internet normal (o ambiente do Claude bloqueia as fontes e o supabase.co) (P11, P12).
 
 ## Concluído
@@ -41,6 +41,7 @@ Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, restauração), 
 | E16 | 2026-10-03 | `manage.py run_pipeline` (`make pipeline`: collect→extract→match→rescore→digest, falha isolada por etapa, log só com contagens); `pipeline.yml` (diário + `workflow_dispatch`, migrate antes, digest só por e-mail às segundas, renova o agendamento); `backup.yml` + `scripts/backup.sh`/`restore_backup.sh` (`pg_dump` → age, artefato 30 dias); `docs/operations/runbook.md`; sem migration; ADR-038. **Restauração testada só em PostgreSQL local; Actions nunca rodou com Secrets (P26)** | `…-10-03-E16.md` |
 | E21 | 2026-10-03 | `scoring/leads.py` + `factors/lead.py`: `lead.sesc` (SESC e parecidas) e `lead.school_course`; V (ticket do catálogo), F (match + prova), C (rede com case, relacionamento, resposta, MEI), T (sazonalidade escolar, follow-up), A (geo × contato); gate de opt-out; contatados saem como «em andamento», nunca como novos; `make rescore` cobre leads; admin de organizações com nota e breakdown; digest com «Leads da semana» e «Em andamento»; migration `scoring.0002`; 837 testes; ADR-039. **Pesos e faixas são hipótese (P27)** | `…-10-03-E21.md` |
 | E22 | 2026-10-03 | `reports/evaluation.py` + `make evaluate`: prontidão (≥ 28 dias e ≥ 20 triagens), M1–M9, custos e **sugestão** continuar/ajustar/parar/estender por regras; modelo `docs/history/mvp-evaluation.md`; sem migration; ADR-040. **Decisão em aberto: sem uso real (P28)** | `…-10-03-E22.md` |
+| E27 | 2026-10-04 | `collection/connectors/pncp.py`: propostas abertas do PNCP (SP × 4 modalidades), `Opportunity(procurement)` com link do edital, valor e datas só se informados, cota ME/EPP só se o texto diz; fonte desabilitada; fixture sintética; 894 testes; ADR-041. **Formato e códigos não conferidos (P29)** | `…-10-04-E27.md` |
 
 ## Pendências do humano
 
@@ -73,6 +74,7 @@ Antes, o humano faz o P26 (Secrets, 1ª execução do pipeline, restauração), 
 | P26 | **E16:** seguir `docs/operations/runbook.md` §2: `age-keygen` (guardar a privada em 2 lugares), Secrets `DATABASE_URL`, `DJANGO_SECRET_KEY`, `BACKUP_AGE_PUBLIC_KEY` (+ chaves de IA/busca/SMTP que quiser); *Run workflow* `Pipeline` com `dry_run`, depois sem; *Run workflow* `Backup`, baixar o artefato e **restaurar no radar-dev** (`scripts/restore_backup.sh`) | `docs/decisions/ADR-038-agendamento-e-backups.md` |
 | P27 | **E21:** `git pull`, `make migrate` (`scoring.0002`), `make match` e `make rescore` na sua máquina (não no SQL Editor); no admin (Organizações, coluna «pontuação») leia o breakdown de 5 leads; confira que SESC Bauru, Ribeirão Preto e São Carlos aparecem «Em andamento» (registre as propostas: P2) e que o digest traz «Leads da semana». Ajuste pesos/sazonalidade em `scoring/profiles.py` | `docs/decisions/ADR-039-score-de-leads.md` |
 | P28 | **E22:** usar o radar ≥ 4 semanas (pipeline diário, triagem semanal); anotar o tempo de triagem (M6) e fazer o baseline manual da E01 (`docs/research/baseline-manual.md`, ≥ 10 itens); então `make evaluate M3=<n> M6=<min>` e preencher `docs/history/mvp-evaluation.md` com a decisão (ADR) | `docs/decisions/ADR-040-avaliacao-do-mvp.md` |
+| P29 | **E27:** `git pull`, `make seed`; conferir termos/robots do PNCP e os parâmetros no Swagger (`/contratacoes/proposta`, códigos de modalidade), marcar «coleta permitida» e habilitar `pncp` no admin; `make collect DRY=1` e `make collect` (não no SQL Editor); revisar 10 contratações, ajustar `keywords`/`exclude_patterns` e salvar uma resposta real como fixture | `docs/decisions/ADR-041-conector-pncp.md` |
 
 ## Decisões vigentes (ver `docs/decisions/README.md`)
 
@@ -92,15 +94,16 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 037 digest semanal: arquivo local, listas com limite, e-mail só para a equipe ·
 038 agendamento diário no Actions, backup age semanal, nada de dado em artefato público ·
 039 score de leads: mesmo motor, gate de opt-out, contatado = «em andamento» ·
-**040 avaliação do MVP: relatório do banco, sugestão por regras, decisão humana**.
+040 avaliação do MVP: relatório do banco, sugestão por regras, decisão humana ·
+**041 PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados**.
 
 ## Problemas abertos
 
 - Coordenadas dos municípios vêm de conjunto derivado do IBGE (sedes), não do IBGE direto (rede bloqueada): conferir quando possível (ADR-022).
 - Lista SESC-SP, layout do INEP, organizações parecidas e URLs oficiais são de memória, nada conferido na fonte (P11, P12, ADR-023/024); chamamentos do SESC-SP ficam fora do `html_watch` até haver URL (ADR-030).
 - E18: Serper/Brave só da documentação, sites só em JS caem em ambíguo (ADR-025). E19: nenhum site real testado; e-mail ofuscado/JS não é lido (ADR-026). E20: regras e forças não calibradas (ADR-027).
-- Endpoints das fontes **não testados** (E01); E08: formato da API do Querido Diário só da documentação (ADR-031); E09: instâncias e JSON do Mapas Culturais só de memória (ADR-032); E06: HTML do itch.io só de memória (ADR-029); E07: URLs das páginas monitoradas também (P18, ADR-030). Devpost conferido pelo uso real.
-- Devpost lento (2–3 min/página, P16, ADR-029). E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). E13: pesos, faixas e valores dos fatores são hipótese (P23, ADR-035); pesos de leads (E21) também são hipótese (P27).
+- Endpoints das fontes **não testados** (E01): Querido Diário, Mapas Culturais, itch.io, páginas do `html_watch` e PNCP (E27) só de documentação/memória (ADR-029–032, 041; P17–P20, P29). Devpost conferido pelo uso real, mas lento (2–3 min/página, P16, ADR-029).
+- E10: preços do Gemini pago a conferir (P21). E11: PDF não é lido, prompt só testado com texto sintético (P22). Pesos, faixas e valores dos fatores (E13, E21) são hipótese (P23, P27).
 - Supabase (projeto **Prospection**): migrations aplicadas pelo titular até a E03b. **Não conferido por nós:** a Data API sem as tabelas expostas; migrations seguintes só no PostgreSQL local, então `make migrate` após cada merge (P21 para `llm`).
 - Valores iniciais do catálogo (palavras-chave, tipos-alvo, CNAEs exigidos) são **hipóteses** editáveis no admin;
   CNAEs a confirmar com o contador (P7). Preços não estão no repositório (ficam no banco).
@@ -111,8 +114,6 @@ ADR-001 Django/admin · 003 IA último recurso · 004 evidência · 005 humano n
 
 ## Riscos de negócio a acompanhar
 
-- **Janela escolar 2027 (out–dez/2026)**: manter prospecção manual de escolas e follow-up das
-  propostas SESC em paralelo ao desenvolvimento.
+- **Janela escolar 2027 (out–dez/2026)**: manter prospecção manual de escolas e follow-up das propostas SESC.
 - **MEI**: CNAEs cobrem ensino e treinamento em informática, mas não software/web/jogos sob
-  encomenda (ADR-015). Editais com exigência de 2 anos de CNPJ: elegível só a partir de **10/04/2027**.
-- Limite de faturamento do MEI: R$ 81 mil/ano.
+  encomenda (ADR-015). Editais com exigência de 2 anos de CNPJ: elegível só a partir de **10/04/2027**. Limite de faturamento do MEI: R$ 81 mil/ano.

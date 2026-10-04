@@ -26,7 +26,7 @@ Confiabilidade: 5 = oficial/estruturado · 3 = agregador confiável · 1 = não 
 
 | Fonte | Tipo | Método | Custo | Confiab. | Observação |
 |---|---|---|---|---|---|
-| **PNCP** (`pncp.gov.br/api/consulta`) | Contratações públicas (cursos, software, jogos educativos) | API REST pública (Swagger); `/contratacoes/proposta` (propostas abertas), `/contratacoes/publicacao` | Grátis | 5 | **Viável com o MEI** (ADR-013); cotas exclusivas ME/EPP/MEI até R$ 80 mil; 1ª candidata da Fase 4 |
+| **PNCP** (`pncp.gov.br/api/consulta`) | Contratações públicas (cursos, software, jogos educativos) | API REST pública (Swagger); `/contratacoes/proposta` (propostas abertas), `/contratacoes/publicacao` | Grátis | 5 | **Viável com o MEI** (ADR-013); cotas exclusivas ME/EPP/MEI até R$ 80 mil; conector pronto (E27, ADR-041), fonte desabilitada até conferir parâmetros e termos (P29) |
 | Finep (chamadas públicas) | Inovação | `html_watch` | Grátis | 5 | Geralmente exige empresa estruturada |
 | MCTI / CNPq chamadas | Pesquisa/inovação | `html_watch` | Grátis | 5 | Baixo encaixe no curto prazo |
 | Portal de Dados Abertos da Cultura (dados.cultura.gov.br) | Datasets do Mapa da Cultura | Dataset | Grátis | 5 | Complementa Mapas Culturais |
