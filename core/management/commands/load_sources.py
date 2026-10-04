@@ -8,7 +8,8 @@ habilitadas. `inep-escolas` nasce
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
 `itch-jams` (listagem pública de game jams, E06), `querido-diario` (API de diários oficiais, E08,
 ADR-031), `mapas-culturais` (editais culturais, E09, ADR-032) e `pncp` (contratações, E27,
-ADR-041) seguem a mesma regra. As páginas monitoradas pelo `html_watch` genérico (E07, ADR-030)
+ADR-041) e `cnpj-estabelecimentos` (empresas por CNAE, E25, ADR-043)
+seguem a mesma regra. As páginas monitoradas pelo `html_watch` genérico (E07, ADR-030)
 também nascem **desabilitadas**, e as URLs são de memória/da pesquisa: confirme cada uma (e o
 `selector`, se a listagem tiver área própria) antes de habilitar.
 """
@@ -105,6 +106,20 @@ INITIAL_SOURCES = [
         "reliability": 5,
         "enabled": False,  # habilite só depois de conferir parâmetros, termos e robots.txt (P29)
         "config": {"ufs": ["SP"], "max_pages_per_query": 4, "min_interval_seconds": 3},
+    },
+    {
+        "slug": "cnpj-estabelecimentos",
+        "name": "Receita Federal — empresas ativas da região por CNAE",
+        "kind": Source.Kind.DATASET,
+        "base_url": "https://dadosabertos.rfb.gov.br/CNPJ/",
+        "license": "Dados abertos (Receita Federal)",
+        "reliability": 4,
+        "enabled": False,  # baixe os .zip à mão em data/cnpj e habilite (P31)
+        "config": {
+            "path": "data/cnpj",
+            "groups": ["marketing", "courses", "publishing", "events"],
+            "max_km": 150,
+        },
     },
 ]
 

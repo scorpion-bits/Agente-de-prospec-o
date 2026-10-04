@@ -53,3 +53,4 @@ Regras:
 | 040 | Avaliação do MVP: relatório do banco, sugestão por regras, decisão humana | aceito |
 | 041 | Conector PNCP: propostas abertas, filtro por objeto, valor e cota ME/EPP só se informados | aceito |
 | 042 | Sinais de necessidade web: só a página inicial, ausência é inferida, frescor sem migration | aceito |
+| 043 | Empresas do CNPJ aberto: arquivo local por CNAE, sem dado pessoal, fonte desabilitada | aceito |

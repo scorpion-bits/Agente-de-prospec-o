@@ -31,6 +31,8 @@ do AI Pro); empate → Gemini (ADR-011). Dados `internal` → só provedores pag
 **Critério:** 10 rascunhos avaliados pelo humano; ≥ 7 usáveis com edição leve; toda afirmação sobre o destinatário tem evidência.
 
 ## E25 — Empresas via dados abertos do CNPJ
+> **Feita em 2026-10-04 (ADR-043)** com fixture sintética (conector de arquivo local, sem dado pessoal); layout e tempo reais no P31.
+
 **Objetivo:** base de empresas ativas da região por CNAEs mapeados a serviços
 (agências de marketing/publicidade → jogos para campanhas/parceria; escolas de idiomas,
 cursos livres → cursos/gamificação; editoras/educação → jogos educativos; comércio/serviços
