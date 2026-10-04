@@ -7,10 +7,10 @@ habilitadas. `inep-escolas` nasce
 `devpost` (API pública, E05) também nasce **desabilitada** e sem `robots_ok`: confira os termos
 e o robots.txt, marque «coleta permitida» e habilite no admin (opportunity-sources.md).
 `itch-jams` (listagem pública de game jams, E06), `querido-diario` (API de diários oficiais, E08,
-ADR-031) e `mapas-culturais` (editais culturais, E09, ADR-032) seguem a mesma regra. As páginas
-monitoradas pelo `html_watch` genérico (E07, ADR-030) também nascem **desabilitadas**, e as URLs são
-de memória/da pesquisa: confirme cada uma (e o `selector`, se a listagem tiver área própria) antes
-de habilitar.
+ADR-031), `mapas-culturais` (editais culturais, E09, ADR-032) e `pncp` (contratações, E27,
+ADR-041) seguem a mesma regra. As páginas monitoradas pelo `html_watch` genérico (E07, ADR-030)
+também nascem **desabilitadas**, e as URLs são de memória/da pesquisa: confirme cada uma (e o
+`selector`, se a listagem tiver área própria) antes de habilitar.
 """
 
 from django.core.management.base import BaseCommand
@@ -94,6 +94,17 @@ INITIAL_SOURCES = [
         "reliability": 4,
         "enabled": False,  # habilite só depois de conferir instâncias, termos e robots.txt (P20)
         "config": {"max_pages_per_instance": 4, "min_interval_seconds": 3},
+    },
+    {
+        "slug": "pncp",
+        "name": "PNCP — contratações com propostas abertas (SP)",
+        "kind": Source.Kind.API,
+        "base_url": "https://pncp.gov.br/",
+        "terms_url": "https://www.gov.br/pncp/pt-br/acesso-a-informacao/manuais",
+        "license": "Dados abertos (Lei 14.133); termos da API não conferidos",
+        "reliability": 5,
+        "enabled": False,  # habilite só depois de conferir parâmetros, termos e robots.txt (P29)
+        "config": {"ufs": ["SP"], "max_pages_per_query": 4, "min_interval_seconds": 3},
     },
 ]
 

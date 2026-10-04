@@ -53,6 +53,8 @@ copyright antigo (ex. © 2015); só página de rede social; tecnologia obsoleta 
 **Critério:** sinais como `Evidence(observed)` com URL; amostra conferida.
 
 ## E27 — Conector PNCP (contratações públicas)
+> **Feita em 2026-10-04 (ADR-041)**, antes do go/no-go por não depender de dados reais; fonte desabilitada até o P29.
+
 **Objetivo:** detectar contratações públicas abertas relacionadas a cursos, oficinas,
 desenvolvimento de software/jogos educativos, sites.
 **Resultado esperado:** `/contratacoes/proposta` filtrado por palavras-chave/modalidade/UF →
