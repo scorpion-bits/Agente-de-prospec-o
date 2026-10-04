@@ -23,7 +23,7 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
-# --- Hospedagem (E29, ADR-046) ---------------------------------------------------------
+# --- Hospedagem (E29, ADR-047) ---------------------------------------------------------
 # Em produção (Cloud Run) o HTTPS termina no proxy do Google: DJANGO_HTTPS=true liga redirect,
 # cookies seguros e HSTS. Em dev/CI fica desligado (padrão). Origens do CSRF = URLs https do site.
 HTTPS = env.bool("DJANGO_HTTPS", default=False)
@@ -37,7 +37,7 @@ if HTTPS:
     SECURE_HSTS_SECONDS = env.int("DJANGO_HSTS_SECONDS", default=31536000)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = False  # só depois de estável: pré-carregar é difícil de desfazer
-    SILENCED_SYSTEM_CHECKS = ["security.W021"]  # o aviso do preload é intencional (ADR-046)
+    SILENCED_SYSTEM_CHECKS = ["security.W021"]  # o aviso do preload é intencional (ADR-047)
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_REFERRER_POLICY = "same-origin"
     X_FRAME_OPTIONS = "DENY"

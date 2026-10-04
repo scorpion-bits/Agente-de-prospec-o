@@ -1,4 +1,4 @@
-"""Hospedagem (E29, ADR-046): health check, estáticos e configuração de produção."""
+"""Hospedagem (E29, ADR-047): health check, estáticos e configuração de produção."""
 
 import os
 import subprocess

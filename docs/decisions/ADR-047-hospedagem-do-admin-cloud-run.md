@@ -1,4 +1,4 @@
-# ADR-046 — Hospedagem do admin: Cloud Run, banco no Supabase, deploy manual
+# ADR-047 — Hospedagem do admin: Cloud Run, banco no Supabase, deploy manual
 
 - **Status:** aceito
 - **Data:** 2026-10-04
@@ -32,6 +32,6 @@ estar online. A E29 do plano previa Django no Cloud Run; ela estava parada esper
 + Admin acessível de qualquer computador, mesmo banco que o terminal e o GitHub Actions usam.
 + Custo ≈ US$ 0 em uso interno; sem servidor para manter.
 − Cold start de alguns segundos após período parado (aceitável).
-− O admin fica exposto na internet com autenticação só por senha: depende de senhas fortes (P34).
-− Conta Google Cloud com faturamento é pré-requisito (ação do titular, P34). Imagem não foi construída no ambiente do Claude (sem Docker);
+− O admin fica exposto na internet com autenticação só por senha: depende de senhas fortes (P35).
+− Conta Google Cloud com faturamento é pré-requisito (ação do titular, P35). Imagem não foi construída no ambiente do Claude (sem Docker);
   o primeiro deploy valida o `Dockerfile`.

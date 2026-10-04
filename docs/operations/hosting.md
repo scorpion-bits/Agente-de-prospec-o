@@ -1,4 +1,4 @@
-# Admin online no Cloud Run (E29, ADR-046) — passo a passo para o titular
+# Admin online no Cloud Run (E29, ADR-047) — passo a passo para o titular
 
 > Faça tudo isto **uma vez**, no fim, junto com os demais itens P. Nunca cole senha, `DATABASE_URL` ou chaves no chat ou no git.
 > Pode usar o **Cloud Shell** do console do Google (terminal no navegador, já com `gcloud`): não precisa instalar nada.
