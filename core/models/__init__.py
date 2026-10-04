@@ -9,6 +9,7 @@ Decisões herdadas da E03:
 - Município: `municipality_name` + `uf` guardam o texto como veio da fonte; `municipality` (FK, E12)
   é a versão resolvida pela tabela do IBGE, preenchida ao salvar quando o nome e a UF casam.
 - `Interaction`, `PortfolioItem` e `CompanyProfile` (E03b): memória comercial, portfólio e perfil.
+- `OutreachDraft` (E24) guarda rascunhos de abordagem com afirmações ligadas a fatos (ADR-046).
 - `Deal` (E23, pipeline leve) agrupa interações por organização + serviço (ADR-045).
 - `Evidence.raw_document` entra na E04, junto com `RawDocument`.
 - Identificadores externos únicos e opcionais ficam NULL (nunca "") quando ausentes.
@@ -34,6 +35,7 @@ from core.models.interaction import FollowUp, Interaction
 from core.models.municipality import UF_BY_IBGE_CODE, Municipality
 from core.models.opportunity import Opportunity
 from core.models.organization import Organization
+from core.models.outreach import OutreachDraft
 from core.models.portfolio import PortfolioItem
 from core.models.source import Source
 
@@ -57,6 +59,7 @@ __all__ = [
     "Municipality",
     "Opportunity",
     "Organization",
+    "OutreachDraft",
     "PortfolioItem",
     "ServiceOffering",
     "Source",

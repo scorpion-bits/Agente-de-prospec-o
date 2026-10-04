@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 UV ?= uv
 
-.PHONY: help setup run migrate seed memory collect websites contacts signals match rescore metrics evaluate calibrate digest pipeline backup extract superuser test lint fmt docs-check check
+.PHONY: help setup run migrate seed memory collect websites contacts signals match rescore draft metrics evaluate calibrate digest pipeline backup extract superuser test lint fmt docs-check check
 
 help:  ## Lista os comandos
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -39,6 +39,9 @@ match:  ## Gera hipóteses serviço × organização × portfólio (E20); DRY=1 
 
 contacts:  ## Extrai contatos públicos do site oficial (E19); N=20 organizações, DRY=1 simula
 	$(UV) run python manage.py extract_contacts --limit $(or $(N),20) $(if $(DRY),--dry-run)
+
+draft:  ## Rascunho de abordagem (E24): ORG="1 2" gera, CMP=1 compara estratégias (A/B), REPORT=1 resume
+	$(UV) run python manage.py draft_outreach $(if $(ORG),--org $(ORG)) $(if $(CMP),--compare) $(if $(REPORT),--report)
 
 rescore:  ## Pontua as oportunidades (E13); DRY=1 simula
 	$(UV) run python manage.py rescore $(if $(DRY),--dry-run)

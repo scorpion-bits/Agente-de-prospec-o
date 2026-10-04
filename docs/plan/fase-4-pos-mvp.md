@@ -2,7 +2,7 @@
 
 > Estas etapas só começam se a E22 recomendar. A E22 pode reordená-las ou cortá-las.
 > Nível de detalhe menor de propósito: refinar cada etapa (mesmo template) antes de executá-la.
-> Ordem sugerida: **E27 (PNCP, viável com MEI)** → E23 → E24 → E29 → demais conforme a E22.
+> Ordem sugerida: **E27 (PNCP, viável com MEI)** → E23 → E24 (feitas) → E29 → demais conforme a E22.
 
 ## E23 — Pipeline leve (feita em 2026-10-04, ADR-045; adoção depende do go/no-go)
 **Objetivo:** acompanhar contatos até o fechamento sem planilha paralela.
@@ -16,6 +16,8 @@ admin; limite de follow-ups (2) e intervalo (7 dias) com alerta.
 **Testes/Critério:** mover um lead por todo o funil no admin; métricas de funil no `metrics`.
 
 ## E24 — Rascunho de abordagem assistido
+> **Feita em 2026-10-04 (ADR-046)** com `FakeProvider`; o A/B com modelos reais e a avaliação dos 10 rascunhos estão no P34.
+
 **Objetivo:** reduzir o tempo de escrever a primeira mensagem, sem inventar nada.
 **Resultado esperado:** ação "Gerar rascunho" num lead → texto curto (e-mail ou
 WhatsApp) + lista de afirmações com evidência; humano edita e copia. Entrada: evidências da

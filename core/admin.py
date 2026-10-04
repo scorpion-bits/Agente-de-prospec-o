@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 
 from core.models import (
     CompanyProfile,
@@ -27,6 +27,7 @@ from core.models import (
     Municipality,
     Opportunity,
     Organization,
+    OutreachDraft,
     PortfolioItem,
     ServiceOffering,
     Source,
@@ -34,6 +35,7 @@ from core.models import (
     Triage,
 )
 from core.models.deal import OPEN_STAGES
+from core.services.outreach import OutreachBlocked, OutreachError, generate_draft
 from core.services.pipeline import advance_stage, follow_up_state
 from core.services.similarity import SIMILARITY_TAGS
 from core.services.suppression import is_suppressed, register_opt_out
@@ -349,7 +351,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         "score_breakdown",
     )
     inlines = (DealInline, InteractionInline, ContactPointInline, EvidenceInline)
-    actions = ("opt_out",)
+    actions = ("draft_outreach", "opt_out")
     save_on_top = True
     fieldsets = (
         (
@@ -376,6 +378,22 @@ class OrganizationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return annotate_scores(super().get_queryset(request), Organization)
+
+    @admin.action(description="Gerar rascunho de abordagem (E-mail, serviço do melhor match)")
+    def draft_outreach(self, request, queryset):
+        """E24: um rascunho por organização (até 5). Nada é enviado: o humano edita e envia."""
+        made = []
+        for organization in queryset[:5]:
+            try:
+                made.append(generate_draft(organization, user=request.user))
+            except (OutreachBlocked, OutreachError) as exc:
+                self.message_user(request, f"{organization}: {exc}", level="warning")
+        if len(made) == 1:
+            return HttpResponseRedirect(
+                reverse("admin:core_outreachdraft_change", args=[made[0].pk])
+            )
+        if made:
+            self.message_user(request, f"{len(made)} rascunho(s) em «Rascunhos de abordagem».")
 
     @admin.action(description="Registrar opt-out (nunca mais contatar; encerra os negócios)")
     def opt_out(self, request, queryset):
@@ -779,6 +797,70 @@ class MatchAdmin(admin.ModelAdmin):
     search_fields = ("organization__name", "service__name")
     autocomplete_fields = ("organization", "service")
     filter_horizontal = ("portfolio_refs",)
+
+
+@admin.register(OutreachDraft)
+class OutreachDraftAdmin(admin.ModelAdmin):
+    """Rascunhos (E24): o humano edita o texto, avalia e envia por conta própria (ADR-005)."""
+
+    list_display = ("organization", "channel", "mode", "status", "strategy", "rating", "created_at")
+    list_filter = ("status", "channel", "mode", "rating", "strategy")
+    search_fields = ("organization__name", "body")
+    autocomplete_fields = ("organization",)
+    readonly_fields = (
+        "organization",
+        "service",
+        "channel",
+        "mode",
+        "status",
+        "claims_view",
+        "validation_issues",
+        "attempts",
+        "facts",
+        "strategy",
+        "prompt_version",
+        "cost_usd",
+        "created_by",
+        "created_at",
+    )
+    exclude = ("claims",)
+    save_on_top = True
+    fieldsets = (
+        ("Texto (edite à vontade; nada é enviado pelo sistema)", {"fields": ("subject", "body")}),
+        ("Sua avaliação", {"fields": ("rating", "rating_note")}),
+        ("Afirmações e seus fatos", {"fields": ("claims_view", "validation_issues")}),
+        (
+            "Origem",
+            {
+                "fields": (
+                    ("organization", "service"),
+                    ("channel", "mode", "status"),
+                    ("strategy", "prompt_version", "cost_usd"),
+                    "attempts",
+                    "facts",
+                    ("created_by", "created_at"),
+                ),
+                "classes": ("collapse",),
+            },
+        ),
+    )
+
+    def has_add_permission(self, request):
+        return False  # nasce pela ação da organização ou por `make draft`
+
+    @admin.display(description="afirmações")
+    def claims_view(self, obj):
+        by_id = {f["id"]: f for f in obj.facts}
+        rows = [
+            format_html(
+                "<li><b>{}</b>: {} <i>({})</i></li>",
+                c.get("about", ""),
+                c.get("text", ""),
+                "; ".join(by_id.get(i, {}).get("text", f"?{i}")[:80] for i in c.get("facts", [])),
+            )
+            for c in obj.claims
+        ]
+        return format_html("<ul>{}</ul>", format_html_join("", "{}", ((r,) for r in rows)))
 
 
 @admin.register(Triage)
