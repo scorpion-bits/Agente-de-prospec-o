@@ -38,6 +38,7 @@ Guarde `~/radar-backup.key` em **dois** lugares seguros fora do repositório (ge
 
 ## 4. Problemas comuns
 
+- **Pipeline/Backup "pulado" com aviso amarelo:** no agendamento, sem os Secrets (`DATABASE_URL`, `DJANGO_SECRET_KEY`; no backup também `BACKUP_AGE_PUBLIC_KEY`) os workflows saem verdes com um aviso, sem rodar. Configure os Secrets (seção 2) e eles passam a rodar. Disparo manual sem Secrets falha de propósito.
 - **Agendamento parou** (`schedule` desliga após 60 dias sem atividade): Actions → `Pipeline` → *Enable workflow*. O próprio pipeline tenta renová-lo a cada execução agendada.
   Fallback: cron externo chamando `workflow_dispatch` (API do GitHub com token) ou `make pipeline` num cron local.
 - **Supabase pausado** (Free pausa por inatividade): painel do Supabase → projeto → *Restore project*; depois rode o `Pipeline` à mão. O pipeline diário evita a pausa.
