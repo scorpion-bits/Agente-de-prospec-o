@@ -98,7 +98,7 @@ Mapa completo: `docs/README.md` · estado e próxima etapa: `docs/plan/STATUS.md
 - `docs/architecture/`: `overview` (inclui bibliotecas), `data-model`, `scoring`, `geo-relevance`, `llm-strategy`, `connectors`
 - `docs/research/`: fontes (`opportunity-sources`, `organization-sources`), `legal-and-compliance`, `hosting`, `ai-models-and-costs`
 - `docs/decisions/` (ADRs) · `docs/product/` (visão, MVP, riscos, `ui-direction`) · `docs/agents/`
-- `docs/history/` (arquivo morto) · `docs/operations/` (`claude-workflow` ciclo /clear, `supabase-setup`, `runbook`)
+- `docs/history/` (arquivo morto) · `docs/operations/` (`claude-workflow` ciclo /clear, `supabase-setup`, `hosting` admin no Cloud Run, `runbook`)
 
 ## Contexto de negócio mínimo
 

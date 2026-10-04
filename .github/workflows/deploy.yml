@@ -1,0 +1,51 @@
+name: Deploy admin (Cloud Run)
+
+# E29, ADR-046. Só manual e só da main: nada de deploy a cada push. Sem chave JSON: login por
+# Workload Identity Federation. Os valores abaixo ficam em Settings > Variables (não são segredos);
+# os segredos de verdade ficam no Secret Manager do Google. Passo a passo: docs/operations/hosting.md
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-admin
+  cancel-in-progress: false
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT }}
+  REGION: ${{ vars.GCP_REGION }}
+  SERVICE: radar-admin
+  REPO: radar
+  HOSTS: ${{ vars.APP_HOSTS }} # separados por vírgula, sem https://; ex.: app.scorpionbits.com
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' && vars.GCP_PROJECT != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Build e enviar a imagem
+        run: |
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}/${SERVICE}:${GITHUB_SHA}"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+      - name: Publicar no Cloud Run
+        run: |
+          ORIGINS=$(echo "$HOSTS" | tr ',' '\n' | sed 's|^|https://|' | paste -sd, -)
+          gcloud run deploy "$SERVICE" \
+            --project "$PROJECT" --region "$REGION" --image "$IMAGE" \
+            --allow-unauthenticated \
+            --min-instances 0 --max-instances 2 --cpu 1 --memory 512Mi --concurrency 20 \
+            --set-env-vars "^|^DJANGO_DEBUG=false|DJANGO_HTTPS=true|DJANGO_ALLOWED_HOSTS=${HOSTS}|DJANGO_CSRF_TRUSTED_ORIGINS=${ORIGINS}" \
+            --set-secrets "DJANGO_SECRET_KEY=radar-secret-key:latest,DATABASE_URL=radar-database-url:latest"

@@ -80,6 +80,7 @@ conferir termos de armazenamento) × Claude Sonnet 5.5 + API de busca; teto ~US$
 **Critério:** 5 execuções avaliadas: evidências novas úteis em ≥ 3; custo dentro do teto.
 
 ## E29 — UI online em `app.scorpionbits.com`
+> **Parte feita (2026-10-04, ADR-046):** o **admin** já tem Dockerfile, settings de produção e deploy manual no Cloud Run (`docs/operations/hosting.md`, P34). Resta a UI web nova (front + API, ADR-019) e, se preciso, camada extra de acesso.
 **Objetivo:** acesso de 2–3 pessoas de qualquer lugar (inclusive não desenvolvedores) com segurança.
 **Resultado esperado:** Django em container no **Google Cloud Run** (escala a zero; free tier +
 créditos do AI Pro), domínio `app.scorpionbits.com` ou `prospeccao.scorpionbits.com` (DNS do
