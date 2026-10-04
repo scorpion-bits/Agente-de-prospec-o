@@ -75,15 +75,20 @@ def find_existing_organization(
     return None
 
 
+_LOOKUP = object()
+
+
 @transaction.atomic
-def get_or_create_organization(name, *, defaults=None, **lookup):
+def get_or_create_organization(name, *, defaults=None, existing=_LOOKUP, **lookup):
     """`(organização, criada)`. `lookup` são os critérios de `find_existing_organization`.
 
     `defaults` (outros campos do modelo) só são usados na criação; numa existente apenas
-    preenchem campos em branco de `FILLABLE_FIELDS`.
+    preenchem campos em branco de `FILLABLE_FIELDS`. `existing` evita repetir a busca quando quem
+    chama já a fez (`find_existing_organization`, inclusive com resultado `None`).
     """
     defaults = dict(defaults or {})
-    existing = find_existing_organization(name, **lookup)
+    if existing is _LOOKUP:
+        existing = find_existing_organization(name, **lookup)
     if existing is not None:
         changed = []
         values = {**{k: v for k, v in lookup.items() if k in FILLABLE_FIELDS}, **defaults}

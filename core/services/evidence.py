@@ -8,12 +8,14 @@ Valor diferente na mesma fonte gera uma nova linha: o histórico de mudanças é
 
 from __future__ import annotations
 
+import json
 import unicodedata
 from datetime import datetime
 from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Model
 from django.utils import timezone
 
@@ -68,6 +70,8 @@ def record_evidence(
     verified: bool = False,
     source_text: str | None = None,
     raw_document=None,
+    known: list[Evidence] | None = None,
+    pending: list[Evidence] | None = None,
 ) -> Evidence:
     """Registra (ou renova) a afirmação "`entity.field` vale `value`" com sua origem.
 
@@ -82,6 +86,10 @@ def record_evidence(
     - `raw_document`: `collection.RawDocument` de onde o dado veio (opcional).
     - Saída de LLM (`llm:`) só vale como `observed` se a citação for encontrada em
       `source_text`; caso contrário é registrada como `inferred` (ADR-004), sem perder o dado.
+
+    - `known` e `pending` (opcionais, para gravar muitas evidências da mesma entidade de uma vez):
+      `known` são as evidências que ela já tem (evita uma consulta por afirmação); com `pending`,
+      as novas não são salvas, só acrescentadas à lista para o chamador gravar com `bulk_create`.
 
     Levanta `EvidenceError` se o pedido violar uma regra; nunca grava dado inválido.
     """
@@ -112,23 +120,46 @@ def record_evidence(
         raw_document=raw_document,
     )
     try:
-        candidate.full_clean()
+        # `content_type` acabou de vir do ORM e as restrições do banco repetem `clean()` e os
+        # validadores do campo: pular essas duas consultas por evidência acelera coletas grandes.
+        candidate.entity_checked = known is not None  # o chamador acabou de ler a entidade
+        candidate.full_clean(exclude=["content_type"], validate_constraints=False)
     except ValidationError as exc:
         details = "; ".join(f"{name}: {' '.join(msgs)}" for name, msgs in exc.message_dict.items())
         raise EvidenceError(details) from exc
 
-    existing = Evidence.objects.filter(
-        content_type=content_type,
-        object_id=entity.pk,
-        field=field,
-        kind=candidate.kind,
-        method=method,
-        source_url=candidate.source_url,
-        value=value,
-    ).first()
+    if known is None:
+        existing = Evidence.objects.filter(
+            content_type=content_type,
+            object_id=entity.pk,
+            field=field,
+            kind=candidate.kind,
+            method=method,
+            source_url=candidate.source_url,
+            value=value,
+        ).first()
+    else:
+        stored_value = json.loads(json.dumps(value, cls=DjangoJSONEncoder))
+        existing = next(
+            (
+                row
+                for row in known
+                if (row.field, row.kind, row.method, row.source_url, row.value)
+                == (field, candidate.kind, method, candidate.source_url, stored_value)
+            ),
+            None,
+        )
     if existing is None:
-        candidate.save()
+        if pending is None:
+            candidate.save()
+        else:
+            pending.append(candidate)
+            if known is not None:
+                known.append(candidate)
         return candidate
+
+    if existing.pk is None:  # repetida na mesma rodada, ainda na fila de `pending`
+        return existing
 
     existing.retrieved_at = candidate.retrieved_at
     update_fields = ["retrieved_at"]
