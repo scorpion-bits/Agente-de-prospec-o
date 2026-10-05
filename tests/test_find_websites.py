@@ -17,6 +17,7 @@ from core.models import Evidence, Organization
 from extraction.website import (
     canonical_site_url,
     decide,
+    domain_recalls_name,
     evaluate_candidate,
     is_blocked_domain,
     name_tokens,
@@ -457,3 +458,9 @@ def test_diretorio_nao_listado_nunca_vira_found_porque_o_dominio_nao_lembra_o_no
     decision, *_ = run_find(escola, serp, {"guia-de-escolas.com.br": SITE_CERTO})
     assert decision.status == "ambiguous"
     assert "domínio não lembra o nome" in decision.candidates[0].reason
+
+
+def test_directory_matching_generic_english_word_is_not_a_match():
+    tokens = name_tokens("Maple Bear Canadian School Catanduva")
+    assert "school" not in tokens
+    assert not domain_recalls_name("https://schooladvisor.com.br/escolas/1", tokens)

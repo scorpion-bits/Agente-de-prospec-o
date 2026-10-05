@@ -36,7 +36,7 @@ BLOCKED_DOMAINS = frozenset(
         "tripadvisor.com", "foursquare.com", "cylex.com.br", "listamais.com.br",
         "cnpj.biz", "cnpja.com", "casadosdados.com.br", "econodata.com.br", "cnpj.info",
         "empresascnpj.com", "consultasocio.com", "cnpjs.rocks", "serasaexperian.com.br",
-        "teleconsulta.com.br", "monitorcnpj.com.br",
+        "teleconsulta.com.br", "monitorcnpj.com.br", "schooladvisor.com.br", "escolas.info",
         # jornais e resultados de olimpíadas que só listam o nome da escola
         "estadao.com.br", "onciencias.org",
         # reclamações, vagas e classificados
@@ -56,7 +56,8 @@ GENERIC_TOKENS = frozenset(
         "escola", "colegio", "centro", "educacional", "educacao", "instituto", "municipal",
         "estadual", "federal", "particular", "emef", "emei", "emeief", "eefm", "eef", "ceu",
         "creche", "unidade", "prof", "profa", "professor", "professora", "dr", "dra", "sao",
-        "santa", "santo", "ensino", "curso", "cursos", "faculdade", "universidade",
+        "santa", "santo", "school", "infantil", "fundamental", "ensino", "curso", "cursos",
+        "faculdade", "universidade",
     }
 )  # fmt: skip
 
