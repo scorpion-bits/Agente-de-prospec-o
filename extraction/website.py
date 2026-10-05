@@ -30,11 +30,15 @@ BLOCKED_DOMAINS = frozenset(
         # diretórios de escolas, empresas e telefones
         "escolas.com.br", "escolasbrasil.com.br", "escolas.net.br", "qedu.org.br",
         "melhoresescolas.com.br", "melhorescola.com.br", "querobolsa.com.br",
-        "educamaisbrasil.com.br", "mundoeducacao.uol.com.br", "guiamais.com.br",
+        "educamaisbrasil.com.br", "prospectei.app.br", "portalon.com.br",
+        "ondecomprarbarato.com.br", "reduz.ia.br", "mundoeducacao.uol.com.br", "guiamais.com.br",
         "telelistas.net", "apontador.com.br", "yelp.com", "tripadvisor.com.br",
         "tripadvisor.com", "foursquare.com", "cylex.com.br", "listamais.com.br",
         "cnpj.biz", "cnpja.com", "casadosdados.com.br", "econodata.com.br", "cnpj.info",
-        "empresascnpj.com", "consultasocio.com", "cnpjs.rocks",
+        "empresascnpj.com", "consultasocio.com", "cnpjs.rocks", "serasaexperian.com.br",
+        "teleconsulta.com.br", "monitorcnpj.com.br",
+        # jornais e resultados de olimpíadas que só listam o nome da escola
+        "estadao.com.br", "onciencias.org",
         # reclamações, vagas e classificados
         "reclameaqui.com.br", "glassdoor.com.br", "indeed.com", "olx.com.br",
         "mercadolivre.com.br", "infojobs.com.br", "catho.com.br",
@@ -128,6 +132,13 @@ def required_tokens(count: int) -> int:
     return count if count <= 2 else max(2, math.ceil(0.75 * count))
 
 
+def domain_recalls_name(url: str, tokens: list[str]) -> bool:
+    """O domínio contém alguma palavra distintiva do nome? Barra diretórios ainda não listados:
+    o site de `Colégio Dom Bosco` é `dombosco…`, nunca `portal-de-escolas…`."""
+    squashed = normalize_domain(url).replace("-", "").replace(".", "")
+    return any(len(token) >= 4 and token in squashed for token in tokens)
+
+
 def canonical_site_url(url: str) -> str:
     """Raiz do site quando o resultado é a página inicial; senão a URL sem query."""
     parts = urlsplit(url)
@@ -184,6 +195,10 @@ def evaluate_candidate(
     if city not in f" {name_key(full)} ":
         return CandidateVerdict(
             url, "weak", "o nome confere, mas o município não aparece na página"
+        )
+    if not domain_recalls_name(url, tokens):
+        return CandidateVerdict(
+            url, "weak", "nome e município conferem, mas o domínio não lembra o nome (diretório?)"
         )
     return CandidateVerdict(
         url, "match", "nome e município conferem na página", _excerpt(full, tokens), full
