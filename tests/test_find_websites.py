@@ -126,6 +126,8 @@ def test_dominios_bloqueados_por_sufixo():
     assert is_blocked_domain("https://www.querobolsa.com.br/escolas/aurora")
     assert is_blocked_domain("https://www.melhorescola.com.br/escola/aurora")
     assert is_blocked_domain("http://177.21.38.106/Siave/arquivo?Id=1")  # IP puro
+    for diretorio in ("prospectei.app.br", "empresas.serasaexperian.com.br", "monitorcnpj.com.br"):
+        assert is_blocked_domain(f"https://{diretorio}/escola/aurora")
 
 
 def test_site_key_agrupa_subdominios():
@@ -448,3 +450,10 @@ def test_escola_ignora_resultados_em_gov_br(escola):
     decision, _, web = run_find(escola, serp, {"auroraboreal.com.br": SITE_CERTO})
     assert decision.status == "found"
     assert not any(r.url.host.endswith(".gov.br") for r in web.requests)
+
+
+def test_diretorio_nao_listado_nunca_vira_found_porque_o_dominio_nao_lembra_o_nome(escola):
+    serp = [("Aurora", "https://guia-de-escolas.com.br/aurora-boreal", "")]
+    decision, *_ = run_find(escola, serp, {"guia-de-escolas.com.br": SITE_CERTO})
+    assert decision.status == "ambiguous"
+    assert "domínio não lembra o nome" in decision.candidates[0].reason
