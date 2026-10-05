@@ -20,6 +20,7 @@ from extraction.website import (
     evaluate_candidate,
     is_blocked_domain,
     name_tokens,
+    site_key,
 )
 
 HTML = {"content-type": "text/html; charset=utf-8"}
@@ -122,6 +123,15 @@ def test_dominios_bloqueados_por_sufixo():
     assert not is_blocked_domain("https://auroraboreal.com.br")
     assert not is_blocked_domain("https://notfacebook.com")
     assert not is_blocked_domain("https://escola.araraquara.sp.gov.br")
+    assert is_blocked_domain("https://www.querobolsa.com.br/escolas/aurora")
+    assert is_blocked_domain("https://www.melhorescola.com.br/escola/aurora")
+    assert is_blocked_domain("http://177.21.38.106/Siave/arquivo?Id=1")  # IP puro
+
+
+def test_site_key_agrupa_subdominios():
+    assert site_key("lp.escola.com.br") == site_key("escola.com.br") == "escola.com.br"
+    assert site_key("aurora.net.br") != site_key("aurora.com.br")
+    assert site_key("escola.org") == "escola.org"
 
 
 def test_tokens_ignoram_palavras_genericas():
@@ -410,3 +420,24 @@ def test_comando_respeita_limit_e_teto(db, cmd):
 
 def test_build_query(escola):
     assert build_query(escola) == QUERY
+
+
+def test_subdominios_do_mesmo_site_contam_uma_vez(escola):
+    serp = [
+        ("Aurora", "https://lp.auroraboreal.com.br/agende-uma-visita", ""),
+        ("Aurora", "https://www.auroraboreal.com.br/", ""),
+    ]
+    hosts = {"lp.auroraboreal.com.br": SITE_CERTO, "auroraboreal.com.br": SITE_CERTO}
+    decision, *_ = run_find(escola, serp, hosts)
+    assert decision.status == "found"
+    assert decision.url.startswith("https://lp.auroraboreal.com.br")  # o 1º resultado vale
+
+
+def test_escola_ignora_resultados_em_gov_br(escola):
+    serp = [
+        ("Lista de escolas", "https://educacao.araraquara.sp.gov.br/escolas", ""),
+        ("Colégio Aurora Boreal", "https://auroraboreal.com.br", ""),
+    ]
+    decision, _, web = run_find(escola, serp, {"auroraboreal.com.br": SITE_CERTO})
+    assert decision.status == "found"
+    assert not any(r.url.host.endswith(".gov.br") for r in web.requests)

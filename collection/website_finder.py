@@ -18,6 +18,7 @@ from extraction.website import (
     decide,
     evaluate_candidate,
     is_blocked_domain,
+    site_key,
 )
 
 METHOD = "rule:website_match"
@@ -57,11 +58,14 @@ def find_website(
     seen_domains: set[str] = set()
     for result in results:
         domain = normalize_domain(result.url)
-        if domain in seen_domains or is_blocked_domain(result.url):
+        key = site_key(domain)
+        if key in seen_domains or is_blocked_domain(result.url):
             continue
+        if organization.kind == Organization.Kind.SCHOOL and domain.endswith(".gov.br"):
+            continue  # escola privada não tem site em órgão público: são listas e documentos
         if len(seen_domains) >= MAX_CANDIDATES:
             break
-        seen_domains.add(domain)
+        seen_domains.add(key)
         try:
             html = fetcher.fetch(result.url).text
         except FetchError:  # robots, bloqueio, 404, binário, limite: não dá para conferir a página
