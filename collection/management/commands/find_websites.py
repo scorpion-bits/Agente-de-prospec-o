@@ -43,7 +43,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--details",
             action="store_true",
-            help="Imprime decisão e motivo de cada organização (só local: traz nomes, não no Actions).",
+            help="Mostra decisão e motivo de cada organização (só local: traz nomes).",
         )
 
     def handle(self, *args, kind, limit, retry, dry_run, provider, details=False, **options):
