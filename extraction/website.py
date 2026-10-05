@@ -37,6 +37,10 @@ BLOCKED_DOMAINS = frozenset(
         "cnpj.biz", "cnpja.com", "casadosdados.com.br", "econodata.com.br", "cnpj.info",
         "empresascnpj.com", "consultasocio.com", "cnpjs.rocks", "serasaexperian.com.br",
         "teleconsulta.com.br", "monitorcnpj.com.br", "schooladvisor.com.br", "escolas.info",
+        "escol.as", "escolasnobrasil.com", "escolasbrasil.org", "imovelguide.com.br",
+        "magicpin.com", "educacaosaocarlos.net.br", "rioclarofacil.com.br", "solutudo.com.br",
+        "temnaminhacidade.com.br", "ltlnossalista.com.br", "portal016.com", "escavador.com",
+        "portaldiadianews.com.br",
         # jornais e resultados de olimpíadas que só listam o nome da escola
         "estadao.com.br", "onciencias.org",
         # reclamações, vagas e classificados
