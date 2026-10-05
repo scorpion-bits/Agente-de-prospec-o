@@ -28,8 +28,8 @@ memory:  ## Carrega perfil da empresa, portfólio e (se existir) o histórico pr
 collect:  ## Roda os conectores das fontes habilitadas (collect --all); DRY=1 simula
 	$(UV) run python manage.py collect --all $(if $(DRY),--dry-run)
 
-websites:  ## Acha o site oficial de escolas sem site (E18); N=20 organizações, DRY=1 simula
-	$(UV) run python manage.py find_websites --kind school --limit $(or $(N),20) $(if $(DRY),--dry-run)
+websites:  ## Acha o site oficial de escolas sem site (E18); N=20 organizações, DRY=1 simula, DETAILS=1 mostra o motivo
+	$(UV) run python manage.py find_websites --kind school --limit $(or $(N),20) $(if $(DRY),--dry-run) $(if $(DETAILS),--details)
 
 signals:  ## Sinais de necessidade web no site das organizações (E26); N=20, DRY=1 simula
 	$(UV) run python manage.py web_signals --limit $(or $(N),20) $(if $(DRY),--dry-run)

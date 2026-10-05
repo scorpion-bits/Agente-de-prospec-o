@@ -389,6 +389,13 @@ def test_comando_dry_run_nao_grava(escola, cmd):
     assert out.startswith("[dry-run]") and not Evidence.objects.exists()
 
 
+def test_details_mostra_decisao_e_motivo_so_quando_pedido(escola, cmd):
+    serp = {QUERY: [("Aurora", "https://auroraboreal.com.br", "")]}
+    out, _ = cmd(serp, {"auroraboreal.com.br": SITE_CERTO}, "--dry-run", "--details")
+    assert "found | Colégio Aurora Boreal (Araraquara) | https://auroraboreal.com.br" in out
+    assert "auroraboreal.com.br [match:" in out
+
+
 def test_comando_ignora_quem_ja_tem_site_ou_foi_pesquisado(escola, cmd):
     Organization.objects.create(name="Com site", kind="school", website="https://x.com.br")
     Organization.objects.create(

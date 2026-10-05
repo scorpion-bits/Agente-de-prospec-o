@@ -17,6 +17,16 @@ from core.services.normalize import normalize_domain
 from extraction.website import MAX_CANDIDATES
 
 
+def _describe(organization, decision) -> str:
+    """Uma linha por organização: decisão, motivo e cada domínio candidato com seu veredito."""
+    candidates = "; ".join(
+        f"{c.domain} [{c.verdict}: {c.reason}]" for c in (decision.candidates or [])
+    )
+    return f"{decision.status} | {organization.name} ({organization.municipality_name}) | " + (
+        f"{decision.url or decision.reason}" + (f" | {candidates}" if candidates else "")
+    )
+
+
 class Command(BaseCommand):
     help = "Encontra e valida o site oficial de organizações sem site (busca web com cache)."
 
@@ -30,8 +40,13 @@ class Command(BaseCommand):
         )
         parser.add_argument("--dry-run", action="store_true", help="Não grava site nem evidência.")
         parser.add_argument("--provider", help="serper | brave (padrão: SEARCH_PROVIDER).")
+        parser.add_argument(
+            "--details",
+            action="store_true",
+            help="Mostra decisão e motivo de cada organização (só local: traz nomes).",
+        )
 
-    def handle(self, *args, kind, limit, retry, dry_run, provider, **options):
+    def handle(self, *args, kind, limit, retry, dry_run, provider, details=False, **options):
         if limit < 1:
             raise CommandError("--limit deve ser positivo.")
         statuses = [STATUS.UNKNOWN] + ([STATUS.NOT_FOUND, STATUS.AMBIGUOUS] if retry else [])
@@ -60,6 +75,8 @@ class Command(BaseCommand):
                     stop = f"busca falhou: {exc}"
                     break
                 counts[decision.status] += 1
+                if details:
+                    self.stdout.write(_describe(organization, decision))
                 if not dry_run:
                     apply_decision(organization, decision, provider_name=search.name)
                     if decision.url:
