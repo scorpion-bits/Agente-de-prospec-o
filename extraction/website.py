@@ -9,6 +9,7 @@ domínios ou página não verificável) ou `not_found`. **Errar para `ambiguous`
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, urlunsplit
@@ -28,7 +29,8 @@ BLOCKED_DOMAINS = frozenset(
         "wikipedia.org", "wikimedia.org", "wikidata.org",
         # diretórios de escolas, empresas e telefones
         "escolas.com.br", "escolasbrasil.com.br", "escolas.net.br", "qedu.org.br",
-        "melhoresescolas.com.br", "mundoeducacao.uol.com.br", "guiamais.com.br",
+        "melhoresescolas.com.br", "melhorescola.com.br", "querobolsa.com.br",
+        "educamaisbrasil.com.br", "mundoeducacao.uol.com.br", "guiamais.com.br",
         "telelistas.net", "apontador.com.br", "yelp.com", "tripadvisor.com.br",
         "tripadvisor.com", "foursquare.com", "cylex.com.br", "listamais.com.br",
         "cnpj.biz", "cnpja.com", "casadosdados.com.br", "econodata.com.br", "cnpj.info",
@@ -96,9 +98,23 @@ def html_text(html: str) -> tuple[str, str]:
     return " ".join(" ".join(parser.title).split()), " ".join(" ".join(parser.parts).split())
 
 
+_IPV4 = re.compile(r"^\d{1,3}(\.\d{1,3}){3}$")
+_BR_SECOND_LEVEL = frozenset({"com", "org", "net", "edu", "gov", "ind", "art", "eco", "adm"})
+
+
 def is_blocked_domain(url: str) -> bool:
     domain = normalize_domain(url)
-    return not domain or any(domain == d or domain.endswith("." + d) for d in BLOCKED_DOMAINS)
+    if not domain or _IPV4.match(domain):  # endereço IP puro nunca é o site oficial
+        return True
+    return any(domain == d or domain.endswith("." + d) for d in BLOCKED_DOMAINS)
+
+
+def site_key(domain: str) -> str:
+    """Domínio registrável (`lp.escola.com.br` → `escola.com.br`): subdomínios são o mesmo site."""
+    labels = domain.split(".")
+    if len(labels) >= 3 and labels[-1] == "br" and labels[-2] in _BR_SECOND_LEVEL:
+        return ".".join(labels[-3:])
+    return ".".join(labels[-2:])
 
 
 def name_tokens(name: str) -> list[str]:
@@ -193,8 +209,17 @@ class Decision:
 
 def decide(verdicts: list[CandidateVerdict]) -> Decision:
     """`found` só com **um** domínio em `match` e nenhum outro domínio plausível."""
-    matches = {v.domain: v for v in verdicts if v.verdict == "match"}
-    weak = [v for v in verdicts if v.verdict == "weak"]
+    matches: dict[str, CandidateVerdict] = {}
+    for v in verdicts:  # um site por domínio registrável; vale o endereço mais curto (a raiz)
+        key = site_key(v.domain)
+        if v.verdict == "match" and (key not in matches or len(v.url) < len(matches[key].url)):
+            matches[key] = v
+    weak = {}
+    for v in verdicts:
+        key = site_key(v.domain)
+        if v.verdict == "weak" and key not in matches:
+            weak.setdefault(key, v)
+    weak = list(weak.values())
     if len(matches) == 1 and not weak:
         chosen = next(iter(matches.values()))
         return Decision("found", canonical_site_url(chosen.url), chosen, verdicts, chosen.reason)
